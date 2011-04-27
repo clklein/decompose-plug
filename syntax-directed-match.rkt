@@ -149,8 +149,10 @@
   merge-bindings : b b -> b or #f
   [(merge-bindings 
     ([x_0 v_0] ... [x_i v_i] [x_i+1 v_i+1] ...)
-    ([x_0’ v_0’] ... [x_i v_i] [x_i+1’ v_i+1’] ...))
+    ([x_0’ v_0’] ... [x_i v_i’] [x_i+1’ v_i+1’] ...))
    ([x_i v_i] [x_0’’ v_0’’] ...)
+   (side-condition (equal? (term (reify v_i))
+                           (term (reify v_i’))))
    (where ([x_0’’ v_0’’] ...)
           (merge-bindings 
            ([x_0 v_0] ... [x_i+1 v_i+1] ...)
@@ -166,6 +168,20 @@
    b]
   [(merge-bindings b_0 b_1) ; else
    #f])
+
+(define-metafunction patterns
+  reify : v -> t
+  [(reify t) t]
+  [(reify C) (reify-context C)])
+
+(define-metafunction patterns
+  reify-context : C -> t
+  [(reify-context no-frame)
+   :hole]
+  [(reify-context ((left t) C))
+   (:cons (reify-context C) t)]
+  [(reify-context ((right t) C))
+   (:cons t (reify-context C))])
 
 (define-metafunction patterns
   concat : (any ...) ... -> (any ...)

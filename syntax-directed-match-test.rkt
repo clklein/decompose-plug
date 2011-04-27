@@ -141,3 +141,30 @@
                         ,(encode-term '(:hole ((λ (x) x) (λ (y) y)))))))
            `(((E (:hole :hole)) 
               (r ((λ (x) x) (λ (y) y)))))))
+
+(term-let ([L (term ([W (:hole
+                         (:in-hole (:cons (:name x (:nt W)) mt)
+                                   (:cons (:nt n) (:cons :hole mt))))]
+                     [n (1 2 3 4 5)]))])
+          (test-matches L (:nt W) :hole)
+          (test-matches L (:nt W) ,(encode-term '((1 :hole))))
+          (test-matches L (:nt W) ,(encode-term '((((1 (2 (3 :hole))))))))
+          (test-doesnt-match L (:nt W) ,(encode-term '(((1 (2 (3 :hole))))))))
+
+(term-let ([L (term ([W (:hole
+                         (:cons (:in-hole (:name x (:nt W))
+                                          (:cons (:nt n) (:cons :hole mt)))
+                                (:cons (:name x (:nt W))
+                                       mt)))]
+                     [n (1 2 3 4 5)]))])
+          (test-matches L (:nt W) ,(encode-term '((1 :hole) :hole)))
+          (test-matches L (:nt W) ,(encode-term '(((1 (2 :hole)) :hole) 
+                                                  ((1 :hole) :hole))))
+          (test-matches L (:nt W) ,(encode-term '((((1 (2 (3 :hole))) :hole) ((1 :hole) :hole))
+                                                  (((1 (2 :hole)) :hole) ((1 :hole) :hole)))))
+          (test-equal
+           (term
+            (match-top L (:in-hole (:nt W) (:name n (:nt n)))
+                       ,(encode-term '((((1 (2 (3 4))) :hole) ((1 :hole) :hole))
+                                       (((1 (2 :hole)) :hole) ((1 :hole) :hole))))))
+           '(((n 4)))))
