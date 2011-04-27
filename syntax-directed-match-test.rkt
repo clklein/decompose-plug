@@ -1,6 +1,6 @@
 #lang racket
 
-(require redex "algorithm.rkt")
+(require redex "syntax-directed-match.rkt")
 
 (define-syntaxes (test-matches test-doesnt-match)
   (let ([make-test
