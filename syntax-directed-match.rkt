@@ -9,8 +9,6 @@
      (:nt x)
      (:in-hole p p)
      (:cons p p))
-  (h p
-     #f)
   (a :hole
      variable-not-otherwise-mentioned
      number)
