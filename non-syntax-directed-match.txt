@@ -1,0 +1,78 @@
+p ::= a
+    | hole
+    | (name x p)
+    | (nt x)
+    | (in-hole p p)
+    | empty
+    | (cons p l)
+
+Additionally,
+1. non-linear variables have consistent ellipsis-depth,
+2. in (name x p), x not in var(p),
+3. in (in-hole p p'), var(p) disjoint var(p')
+
+t ::= a
+    | hole
+    | empty
+    | (cons t t)
+
+F ::= (left t)
+    | (right t)
+C ::= empty
+    | F:C
+
+b : finite maps from x to t
+L : finite maps from x to sets of patterns
+
+Decomposition: L |- t = C[t'] : p | b
+Interpretation: "In the language L, term t decomposes into context C
+and term t' by pattern p, with bindings b."
+
+-----------------------------
+L |- t = empty[t] : hole | {}
+
+L |- t = C[t'] : p | b
+------------------------------------------
+L |- t = C[t'] : (name x p) : {(x, C)} U b
+
+b_1 ~ b_2
+L |- t_1 = C[t_1'] : p_1 | b_1
+L |- t_2 : p_2 | b_2
+---------------------------------------------------------------------
+L |- (cons t_1 t_2) = (left t_2):C[t_1'] : (cons p_1 p_2) | b_1 U b_2
+
+b_1 ~ b_2
+L |- t_1 : p_1 | b_1
+L |- t_2 = C[t_2'] : p_2 | b_2
+----------------------------------------------------------------------
+L |- (cons t_1 t_2) = (right t_1):C[t_2'] : (cons p_1 p_2) | b_1 U b_2
+
+b_1 ~ b_2
+L |- t = C_1[t_1] : p_1 | b_1
+L |- t_1 = C_2[t_2] : p_2 | b_2
+C = (append C_1 C_2)
+-----------------------------------------------
+L |- t = C[t_2] : (in-hole p_1 p_2) | b_1 U b_2
+
+p in L(x)
+L |- t = C[t'] : p | b
+----------------------------
+L |- t = C[t'] : (nt x) | {}
+
+Matching: L |- t : p | b
+Interpretation: "In the language L, term t matches pattern p with
+bindings b."
+
+L |- t = C[hole] | b
+--------------------
+L |- t : p | b
+
+---------------
+L |- a : a | {}
+
+-----------------------
+L |- empty : empty | {}
+
+Binding consistency: b ~ b'
+Interpretation: "b and b' agree at all points where they're both
+defined."
