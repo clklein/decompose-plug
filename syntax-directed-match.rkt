@@ -145,41 +145,26 @@
 
 (define-metafunction patterns
   merge-bindings : b b -> b or #f
-  [(merge-bindings 
-    ([x_0 v_0] ... [x_i v_i] [x_i+1 v_i+1] ...)
-    ([x_0’ v_0’] ... [x_i v_i’] [x_i+1’ v_i+1’] ...))
-   ([x_i v_i] [x_0’’ v_0’’] ...)
-   (side-condition (equal? (term (reify v_i))
-                           (term (reify v_i’))))
-   (where ([x_0’’ v_0’’] ...)
-          (merge-bindings 
-           ([x_0 v_0] ... [x_i+1 v_i+1] ...)
-           ([x_0’ v_0’] ... [x_i+1’ v_i+1’] ...)))]
-  [(merge-bindings 
-    ([x_0 v_0] [x_1 v_1] ...)
-    ([x_0’ v_0’] ...))
-   ([x_0 v_0] [x_0’’ v_0’’] ...)
-   (where ([x_0’’ v_0’’] ...)
-          (merge-bindings ([x_1 v_1] ...) ([x_0’ v_0’] ...)))
-   (side-condition (not (memq (term x_0) (term (x_0’ ...)))))]
   [(merge-bindings () b)
    b]
-  [(merge-bindings b_0 b_1) ; else
+  [(merge-bindings ([x_0 v_0] [x_1 v_1] ...) b)
+   (merge-bindings ([x_1 v_1] ...) b_1)
+   (where b_1 (merge-binding x_0 v_0 b))]
+  [(merge-bindings b_1 b_2) ; else
    #f])
 
 (define-metafunction patterns
-  reify : v -> t
-  [(reify t) t]
-  [(reify C) (reify-context C)])
-
-(define-metafunction patterns
-  reify-context : C -> t
-  [(reify-context no-frame)
-   :hole]
-  [(reify-context ((left t) C))
-   (:cons (reify-context C) t)]
-  [(reify-context ((right t) C))
-   (:cons t (reify-context C))])
+  merge-binding : x v b -> b or #f
+  [(merge-binding x v ())
+   ([x v])]
+  [(merge-binding x v ([x v] [x_1 v_1] ...))
+   ([x v] [x_1 v_1] ...)]
+  [(merge-binding x v ([x_0 v_0] [x_1 v_1] ...))
+   ([x_0 v_0] [x_1’ v_1’] ...)
+   (side-condition (not (equal? (term x) (term x_0))))
+   (where ([x_1’ v_1’] ...) (merge-binding x v ([x_1 v_1] ...)))]
+  [(merge-binding x v b) ; else
+   #f])
 
 (define-metafunction patterns
   concat : (any ...) ... -> (any ...)

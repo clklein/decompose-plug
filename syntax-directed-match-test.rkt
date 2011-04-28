@@ -25,7 +25,7 @@
 (test-equal (term (match-top () (:cons (:name x a) (:name x a)) (:cons a a)))
             '(((x a))))
 (test-equal (term (match-top () (:cons (:name x a) (:name y b)) (:cons a b)))
-            '(((x a) (y b))))
+            '(((y b) (x a))))
 
 (term-let ([ones-lang (term ([ones (mt (:cons 1 (:nt ones)))]))])
           (test-matches ones-lang (:nt ones) mt)
@@ -65,6 +65,23 @@
              (:in-hole (:name x (:cons a (:cons :hole c))) b) 
              (:cons a (:cons b c))))
  '(((x ((right a) ((left c) no-frame))))))
+
+(test-matches 
+ ()
+ (:in-hole
+  (:cons (:name C (:cons :hole b))
+         (:name C (:cons :hole b)))
+  a)
+ (:cons (:cons :hole b)
+        (:cons a b)))
+(test-equal
+ (term
+  (match-top ()
+             (:cons (:name C (:cons :hole b))
+                    (:name C (:cons :hole b)))
+             (:cons (:cons :hole b)
+                    (:cons :hole b))))
+ '(((C ((left b) no-frame)))))
 
 (define vars-a-to-z
   (build-list 
@@ -125,9 +142,9 @@
              (match-top λv 
                         (:in-hole (:name E (:nt E)) (:name e (:nt e)))
                         ,(encode-term '((λ (x) x) (λ (y) y))))))
-           `(((E :hole) (e ((λ (x) x) (λ (y) y))))
-             ((E (:hole (λ (y) y))) (e (λ (x) x)))
-             ((E ((λ (x) x) :hole)) (e (λ (y) y)))))
+           `(((e ((λ (x) x) (λ (y) y))) (E :hole))
+             ((e (λ (x) x)) (E (:hole (λ (y) y))))
+             ((e (λ (y) y)) (E ((λ (x) x) :hole)))))
           
           (test-equal
            (decode-bindings
@@ -139,8 +156,8 @@
                                 (:cons (:cons λ (:cons (:cons x mt) (:cons (:nt e) mt)))
                                        (:cons (:nt v) mt))))
                         ,(encode-term '(:hole ((λ (x) x) (λ (y) y)))))))
-           `(((E (:hole :hole)) 
-              (r ((λ (x) x) (λ (y) y)))))))
+           `(((r ((λ (x) x) (λ (y) y)))
+              (E (:hole :hole))))))
 
 (term-let ([L (term ([W (:hole
                          (:in-hole (:cons (:name x (:nt W)) mt)
