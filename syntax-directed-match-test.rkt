@@ -101,7 +101,7 @@
 
 (define decode-term
   (term-match/single
-   patterns
+   directed-matching
    [no-frame (term :hole)]
    [((left t) C)
     (cons (decode-term (term C))

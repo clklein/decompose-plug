@@ -1,44 +1,22 @@
 #lang racket
 
-(require redex)
-(provide match-top patterns)
+(require redex
+         "patterns.rkt")
+(provide match-top
+         directed-matching)
 
-(define-language patterns
-  (p a
-     (:name x p)
-     (:nt x)
-     (:in-hole p p)
-     (:cons p p))
-  (a :hole
-     variable-not-otherwise-mentioned
-     number)
-  (x variable-not-otherwise-mentioned)
-  
-  ((t u) a
-         (:cons t t))
-  
-  (b ([x v] ...))
-  (v t C)
-  
-  (L (n ...))
-  (n [x (p ...)])
-  
-  (F (left t)
-     (right t))
-  (C no-frame
-     (F C))
-  
+(define-extended-language directed-matching patterns
   (d (C t)
      no-decomp)
   (m (d b)))
 
-(define-metafunction patterns
+(define-metafunction directed-matching
   match-top : L p t -> (b ...)
   [(match-top L p t)
    (b_0 ...)
    (where ((no-decomp b_0) ...) (non-decompositions (match L p t)))])
 
-(define-metafunction patterns
+(define-metafunction directed-matching
   non-decompositions : (m ...) -> (m ...)
   [(non-decompositions ())
    ()]
@@ -51,7 +29,7 @@
   [(non-decompositions (((C_0 t_0) b_0) m_1 ...)) ; t_0 ≠ :hole
    (non-decompositions (m_1 ...))])
 
-(define-metafunction patterns
+(define-metafunction directed-matching
   match : L p t -> (m ...)
   [(match L :hole t)
    (((no-frame t) ()))]
@@ -72,12 +50,12 @@
   [(match L p t) ; else 
    ()])
 
-(define-metafunction patterns
+(define-metafunction directed-matching
   named : d t -> v
   [(named no-decomp t) t]
   [(named (C t) u) C])
 
-(define-metafunction patterns
+(define-metafunction directed-matching
   decompositions : (m ...) -> (m ...)
   [(decompositions ())
    ()]
@@ -87,7 +65,7 @@
   [(decompositions ((no-decomp b_0) m_1 ...))
    (decompositions (m_1 ...))])
 
-(define-metafunction patterns
+(define-metafunction directed-matching
   decomp-merge : m (m ...) -> (m ...)
   [(decomp-merge m ())
    ()]
@@ -99,7 +77,7 @@
    (decomp-merge (d_0 b_0) (m_2 ...))
    (where #f (merge-bindings b_0 b_1))])
 
-(define-metafunction patterns
+(define-metafunction directed-matching
   cons-merge/many-many : t (m ...) t (m ...) -> (m ...)
   [(cons-merge/many-many t_1 () t_2 (m ...))
    ()]
@@ -107,7 +85,7 @@
    (concat (cons-merge/one-many t_1 m_0 t_2 (m_i ...))
            (cons-merge/many-many t_1 (m_1 ...) t_2 (m_i ...)))])
 
-(define-metafunction patterns
+(define-metafunction directed-matching
   cons-merge/one-many : t m t (m ...) -> (m ...)
   [(cons-merge/one-many t m u ())
    ()]
@@ -115,7 +93,7 @@
    (concat (cons-merge/one-one t m_0 u m_1)
            (cons-merge/one-many t m_0 u (m_2 ...)))])
 
-(define-metafunction patterns
+(define-metafunction directed-matching
   cons-merge/one-one : t m t m -> (m ...)
   [(cons-merge/one-one t_1 (d_1 b_1) t_2 (d_2 b_2))
    ()
@@ -125,7 +103,7 @@
    (where b (merge-bindings b_1 b_2))
    (where (d ...) (select-decomp t_1 d_1 t_2 d_2))])
 
-(define-metafunction patterns
+(define-metafunction directed-matching
   select-decomp : t d t d -> (d ...)
   [(select-decomp t no-decomp u no-decomp)
    (no-decomp)]
@@ -143,7 +121,7 @@
   [(select-decomp t (C_t t_0) u (C_u u_0)) ; t_0 ≠ :hole ∧ u_0 ≠ :hole
    ()])
 
-(define-metafunction patterns
+(define-metafunction directed-matching
   merge-bindings : b b -> b or #f
   [(merge-bindings () b)
    b]
@@ -153,7 +131,7 @@
   [(merge-bindings b_1 b_2) ; else
    #f])
 
-(define-metafunction patterns
+(define-metafunction directed-matching
   merge-binding : x v b -> b or #f
   [(merge-binding x v ())
    ([x v])]
@@ -166,7 +144,7 @@
   [(merge-binding x v b) ; else
    #f])
 
-(define-metafunction patterns
+(define-metafunction directed-matching
   concat : (any ...) ... -> (any ...)
   [(concat)
    ()]
@@ -174,7 +152,7 @@
    (any_0 ... any_i ...)
    (where (any_i ...) (concat any ...))])
 
-(define-metafunction patterns
+(define-metafunction directed-matching
   no-dups : (any ...) -> (any ...)
   [(no-dups ()) ()]
   [(no-dups (any_0 any_1 ... any_0 any_i ...))
