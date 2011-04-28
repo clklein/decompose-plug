@@ -83,6 +83,14 @@
                     (:cons :hole b))))
  '(((C ((left b) no-frame)))))
 
+(test-equal
+ (term (match-top ()
+                  (:in-hole (:name x (:in-hole (:cons a :hole)
+                                               (:cons :hole c)))
+                            b)
+                  (:cons a (:cons b c))))
+ '(((x ((right a) ((left c) no-frame))))))
+
 (define vars-a-to-z
   (build-list 
    26

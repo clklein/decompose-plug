@@ -42,7 +42,7 @@
    (no-dups (concat ((d_0 ()) ...) ...))
    (where (((d_0 b_0) ...) ...) ((match L p_0 t) ...))]
   [(match L (:in-hole p_c p_h) t)
-   (concat (decomp-merge m_0 (match L p_h t_0)) ...)
+   (concat (in-hole-merge m_0 (match L p_h t_0)) ...)
    (where ((name m_0 ((C_0 t_0) b_0)) ...) (decompositions (match L p_c t)))]
   [(match L (:cons p_1 p_2) (:cons t_1 t_2))
    (cons-merge/many-many t_1 (match L p_1 t_1)
@@ -66,16 +66,30 @@
    (decompositions (m_1 ...))])
 
 (define-metafunction directed-matching
-  decomp-merge : m (m ...) -> (m ...)
-  [(decomp-merge m ())
+  in-hole-merge : ((C t) b) (m ...) -> (m ...)
+  [(in-hole-merge ((C t) b) ())
    ()]
-  [(decomp-merge (d_0 b_0) ((d_1 b_1) m_2 ...))
-   ((d_1 b) m ...)
+  [(in-hole-merge ((C_0 t_0) b_0) ((d_1 b_1) m_2 ...))
+   (((merge-decomps C_0 t_0 d_1) b) m ...)
    (where b (merge-bindings b_0 b_1))
-   (where (m ...) (decomp-merge (d_0 b_0) (m_2 ...)))]
-  [(decomp-merge (d_0 b_0) ((d_1 b_1) m_2 ...))
-   (decomp-merge (d_0 b_0) (m_2 ...))
+   (where (m ...) (in-hole-merge ((C_0 t_0) b_0) (m_2 ...)))]
+  [(in-hole-merge ((C_0 t_0) b_0) ((d_1 b_1) m_2 ...))
+   (in-hole-merge ((C_0 t_0) b_0) (m_2 ...))
    (where #f (merge-bindings b_0 b_1))])
+
+(define-metafunction directed-matching
+  merge-decomps : C t d -> d
+  [(merge-decomps C t no-decomp)
+   no-decomp]
+  [(merge-decomps C_1 t_1 (C_2 t_2))
+   ((append-contexts C_1 C_2) t_2)])
+
+(define-metafunction directed-matching
+  append-contexts : C C -> C
+  [(append-contexts no-frame C) 
+   C]
+  [(append-contexts (F C_1) C_2)
+   (F (append-contexts C_1 C_2))])
 
 (define-metafunction directed-matching
   cons-merge/many-many : t (m ...) t (m ...) -> (m ...)
