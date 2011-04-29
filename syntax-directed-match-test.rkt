@@ -66,6 +66,17 @@
              (:cons a (:cons b c))))
  '(((x ((right a) ((left c) no-frame))))))
 
+(test-equal
+ (term
+  (match-top ()
+             (:name C
+                    (:cons (:name D (:cons :hole b))
+                           mt))
+             (:cons (:cons :hole b)
+                    mt)))
+ '(((C ((left mt) ((left b) no-frame)))
+    (D ((left b) no-frame)))))
+
 (test-matches 
  ()
  (:in-hole

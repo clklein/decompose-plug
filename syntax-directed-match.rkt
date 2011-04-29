@@ -36,8 +36,8 @@
   [(match L a a) ; a ≠ :hole
    ((no-decomp ()))]
   [(match L (:name x p) t)
-   ((d ([x (named d t)] [x_0 u_0] ...)) ...)
-   (where ((d ([x_0 u_0] ...)) ...) (match L p t))]
+   ((d ([x (named d t)] [x_0 v_0] ...)) ...)
+   (where ((d ([x_0 v_0] ...)) ...) (match L p t))]
   [(match (name L (n_0 ... [x_i (p_0 ...)] n_i+1 ...)) (:nt x_i) t)
    (no-dups (concat ((d_0 ()) ...) ...))
    (where (((d_0 b_0) ...) ...) ((match L p_0 t) ...))]
