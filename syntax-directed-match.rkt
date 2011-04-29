@@ -21,8 +21,8 @@
   [(non-decompositions ())
    ()]
   [(non-decompositions (((C_0 :hole) b_0) m_1 ...))
-   ((no-decomp b_0) m_1 ...)
-   (where (m_1 ...) (non-decompositions (m_1 ...)))]
+   ((no-decomp b_0) m_1’ ...)
+   (where (m_1’ ...) (non-decompositions (m_1 ...)))]
   [(non-decompositions ((no-decomp b_0) m_1 ...))
    ((no-decomp b_0) m_1’ ...)
    (where (m_1’ ...) (non-decompositions (m_1 ...)))]

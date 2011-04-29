@@ -165,7 +165,15 @@
                                        (:cons (:nt v) mt))))
                         ,(encode-term '(:hole ((λ (x) x) (λ (y) y)))))))
            `(((r ((λ (x) x) (λ (y) y)))
-              (E (:hole :hole))))))
+              (E (:hole :hole)))))
+          
+          (test-equal
+           (term
+            (match-top λv
+                       (:name v_1 (:nt v))
+                       ,(encode-term '(:hole :hole))))
+           '(((v_1 ((left (:cons :hole mt)) no-frame)))
+             ((v_1 ((right :hole) ((left mt) no-frame)))))))
 
 (term-let ([L (term ([W (:hole
                          (:in-hole (:cons (:name x (:nt W)) mt)
