@@ -85,6 +85,7 @@
   a)
  (:cons (:cons :hole b)
         (:cons a b)))
+
 (test-equal
  (term
   (match-top ()
@@ -92,6 +93,11 @@
                     (:name C (:cons :hole b)))
              (:cons (:cons :hole b)
                     (:cons :hole b))))
+ ; match-top reports two identical bindings because
+ ; there are two ways to choose the "real" hole. The
+ ; difference would be significant if the hole pattern
+ ; were wrapped in a :name ... but it's not, so maybe
+ ; the test is right.
  '(((C ((left b) no-frame)))))
 
 (test-equal
