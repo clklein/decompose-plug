@@ -190,7 +190,21 @@
                        (:name v_1 (:nt v))
                        ,(encode-term '(:hole :hole))))
            '(((v_1 ((left (:cons :hole mt)) no-frame)))
-             ((v_1 ((right :hole) ((left mt) no-frame)))))))
+             ((v_1 ((right :hole) ((left mt) no-frame))))))
+          
+          (test-equal
+           (term
+            (match-top λv
+                       (:cons (:cons λ (:cons (:cons (:name x (:nt x)) mt) (:cons (:name e (:nt e)) mt)))
+                              (:cons (:name v (:nt v))
+                                     mt))
+                       ,(encode-term '((λ (y) y) (:hole :hole)))))
+           '(((v ((left (:cons :hole mt)) no-frame))
+              (e y)
+              (x y))
+             ((v ((right :hole) ((left mt) no-frame)))
+              (e y)
+              (x y)))))
 
 (term-let ([L (term ([W (:hole
                          (:in-hole (:cons (:name x (:nt W)) mt)
