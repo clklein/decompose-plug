@@ -74,8 +74,8 @@
                            mt))
              (:cons (:cons :hole b)
                     mt)))
- '(((C ((left mt) ((left b) no-frame)))
-    (D ((left b) no-frame)))))
+ '(((C (:cons (:cons :hole b) mt))
+    (D (:cons :hole b)))))
 
 (test-matches 
  ()
@@ -93,12 +93,42 @@
                     (:name C (:cons :hole b)))
              (:cons (:cons :hole b)
                     (:cons :hole b))))
- ; match-top reports two identical bindings because
- ; there are two ways to choose the "real" hole. The
- ; difference would be significant if the hole pattern
- ; were wrapped in a :name ... but it's not, so maybe
- ; the test is right.
- '(((C ((left b) no-frame)))))
+ '(((C (:cons :hole b)))))
+
+(test-equal
+ (term
+  (match-top ()
+             (:in-hole
+              (:cons (:cons :hole b)
+                     (:cons :hole b))
+              :hole)
+             (:cons (:cons :hole b)
+                    (:cons :hole b))))
+ ; would be '(() ()) without no-dups in match-top
+ '(()))
+
+(test-equal
+ (term
+  (match-top ()
+             (:in-hole
+              (:name C
+                     (:cons (:cons :hole b)
+                            (:cons :hole b)))
+              :hole)
+             (:cons (:cons :hole b)
+                    (:cons :hole b))))
+ '(((C ((left (:cons :hole b)) ((left b) no-frame))))
+   ((C ((right (:cons :hole b)) ((left b) no-frame))))))
+
+(test-equal
+ (term
+  (match-top ()
+             (:cons (:in-hole (:name x (:cons :hole a))
+                              :hole)
+                    (:name x (:cons :hole a)))
+             (:cons (:cons :hole a)
+                    (:cons :hole a))))
+ '(((x ((left a) no-frame)))))
 
 (test-equal
  (term (match-top ()
@@ -184,13 +214,19 @@
            `(((r ((λ (x) x) (λ (y) y)))
               (E (:hole :hole)))))
           
+          (test-matches λv (:nt v) ,(encode-term '(:hole :hole)))
+          
           (test-equal
            (term
             (match-top λv
-                       (:name v_1 (:nt v))
+                       (:in-hole (:name E (:nt E)) (:name e (:nt e)))
                        ,(encode-term '(:hole :hole))))
-           '(((v_1 ((left (:cons :hole mt)) no-frame)))
-             ((v_1 ((right :hole) ((left mt) no-frame))))))
+           '(((e (:cons :hole (:cons :hole mt)))
+              (E no-frame))
+             ((e :hole)
+              (E ((left (:cons :hole mt)) no-frame)))
+             ((e :hole)
+              (E ((right :hole) ((left mt) no-frame))))))
           
           (test-equal
            (term
@@ -199,10 +235,7 @@
                               (:cons (:name v (:nt v))
                                      mt))
                        ,(encode-term '((λ (y) y) (:hole :hole)))))
-           '(((v ((left (:cons :hole mt)) no-frame))
-              (e y)
-              (x y))
-             ((v ((right :hole) ((left mt) no-frame)))
+           '(((v (:cons :hole (:cons :hole mt)))
               (e y)
               (x y)))))
 

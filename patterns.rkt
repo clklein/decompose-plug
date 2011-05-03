@@ -27,3 +27,12 @@
      (right t))
   (C no-frame
      (F C)))
+
+(define-metafunction patterns
+  uncontext : C -> t
+  [(uncontext no-frame)
+   :hole]
+  [(uncontext ((left t) C))
+   (:cons (uncontext C) t)]
+  [(uncontext ((right t) C))
+   (:cons t (uncontext C))])

@@ -65,7 +65,7 @@
   consistent ⊆ x × v × b
   [(consistent x v {})]
   [(consistent x v_1 {[x v_2]})
-   ,(equal? (term (reify v_1)) (term (reify v_2)))]
+   ,(equal? (term (uncontext v_1)) (term (uncontext v_2)))]
   [(consistent x_1 v_1 {[x_2 v_2]})
    ,(not (equal? (term x_1) (term x_2)))]
   [(consistent x v (∪ b_1 b_2))

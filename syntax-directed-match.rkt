@@ -13,25 +13,26 @@
 (define-metafunction directed-matching
   match-top : L p t -> (b ...)
   [(match-top L p t)
-   (b_0 ...)
+   ; the no-dups could probably go in the :in-hole case
+   (no-dups (b_0 ...))
    (where ((no-decomp b_0) ...) (non-decompositions (match L p t)))])
 
 (define-metafunction directed-matching
   non-decompositions : (m ...) -> (m ...)
   [(non-decompositions ())
    ()]
-  [(non-decompositions (((C_0 :hole) b_0) m_1 ...))
-   ((no-decomp b_0) m_1’ ...)
+  [(non-decompositions ((name d_0 (no-decomp b_0)) m_1 ...))
+   (d_0 m_1’ ...)
    (where (m_1’ ...) (non-decompositions (m_1 ...)))]
-  [(non-decompositions ((no-decomp b_0) m_1 ...))
-   ((no-decomp b_0) m_1’ ...)
-   (where (m_1’ ...) (non-decompositions (m_1 ...)))]
-  [(non-decompositions (((C_0 t_0) b_0) m_1 ...)) ; t_0 ≠ :hole
+  [(non-decompositions (((C_0 t_0) b_0) m_1 ...))
    (non-decompositions (m_1 ...))])
 
 (define-metafunction directed-matching
   match : L p t -> (m ...)
-  [(match L :hole t)
+  [(match L :hole :hole)
+   (((no-frame :hole) ())
+    (no-decomp ()))]
+  [(match L :hole t) ; t ≠ :hole
    (((no-frame t) ()))]
   [(match L a a) ; a ≠ :hole
    ((no-decomp ()))]
@@ -60,8 +61,8 @@
   [(decompositions ())
    ()]
   [(decompositions (((C_0 t_0) b_0) m_1 ...))
-   (((C_0 t_0) b_0) m_1 ...)
-   (where (m_1 ...) (decompositions (m_1 ...)))]
+   (((C_0 t_0) b_0) m_1’ ...)
+   (where (m_1’ ...) (decompositions (m_1 ...)))]
   [(decompositions ((no-decomp b_0) m_1 ...))
    (decompositions (m_1 ...))])
 
@@ -125,14 +126,7 @@
    ((((left u) C) t_0))]
   [(select-decomp t no-decomp u (C u_0))
    ((((right t) C) u_0))]
-  [(select-decomp t (C_t :hole) u (C_u :hole))
-   ((((left u) C_t) :hole)
-    (((right t) C_u) :hole))]
-  [(select-decomp t (C_t t_0) u (C_u :hole)) ; t_0 ≠ :hole
-   ((((left u) C_t) t_0))]
-  [(select-decomp t (C_t :hole) u (C_u u_0)) ; t_0 ≠ :hole
-   ((((right t) C_u) u_0))]
-  [(select-decomp t (C_t t_0) u (C_u u_0)) ; t_0 ≠ :hole ∧ u_0 ≠ :hole
+  [(select-decomp t (C_t t_0) u (C_u u_0))
    ()])
 
 (define-metafunction directed-matching
@@ -149,13 +143,26 @@
   merge-binding : x v b -> b or #f
   [(merge-binding x v ())
    ([x v])]
-  [(merge-binding x v ([x v] [x_1 v_1] ...))
-   ([x v] [x_1 v_1] ...)]
+  [(merge-binding x v ([x v_0] [x_1 v_1] ...))
+   ([x v_m] [x_1 v_1] ...)
+   (where v_m (merge-value v v_0))]
   [(merge-binding x v ([x_0 v_0] [x_1 v_1] ...))
    ([x_0 v_0] [x_1’ v_1’] ...)
    (side-condition (not (equal? (term x) (term x_0))))
    (where ([x_1’ v_1’] ...) (merge-binding x v ([x_1 v_1] ...)))]
   [(merge-binding x v b) ; else
+   #f])
+
+(define-metafunction directed-matching
+  merge-value : v v -> v or #f
+  [(merge-value v v) v]
+  [(merge-value C t)
+   C
+   (where t (uncontext C))]
+  [(merge-value t C)
+   C
+   (where t (uncontext C))]
+  [(merge-value v_1 v_2) ; else
    #f])
 
 (define-metafunction directed-matching
