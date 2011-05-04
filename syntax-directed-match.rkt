@@ -86,13 +86,6 @@
    ((append-contexts C_1 C_2) t_2)])
 
 (define-metafunction directed-matching
-  append-contexts : C C -> C
-  [(append-contexts no-frame C) 
-   C]
-  [(append-contexts (F C_1) C_2)
-   (F (append-contexts C_1 C_2))])
-
-(define-metafunction directed-matching
   cons-merge/many-many : t (m ...) t (m ...) -> (m ...)
   [(cons-merge/many-many t_1 () t_2 (m ...))
    ()]

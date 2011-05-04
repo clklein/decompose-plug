@@ -36,3 +36,34 @@
    (:cons (uncontext C) t)]
   [(uncontext ((right t) C))
    (:cons t (uncontext C))])
+
+(define-metafunction patterns
+  append-contexts : C C -> C
+  [(append-contexts no-frame C)
+   C]
+  [(append-contexts (F C_1) C_2)
+   (F (append-contexts C_1 C_2))])
+
+(define encode-term
+  (match-lambda
+    ['() 'mt]
+    [(cons t u)
+     `(:cons ,(encode-term t)
+             ,(encode-term u))]
+    [t t]))
+
+(define decode-term
+  (term-match/single
+   patterns
+   [no-frame (term :hole)]
+   [((left t) C)
+    (cons (decode-term (term C))
+          (decode-term (term t)))]
+   [((right t) C)
+    (cons (decode-term (term t))
+          (decode-term (term C)))]
+   [mt '()]
+   [(:cons t_1 t_2)
+    (cons (decode-term (term t_1))
+          (decode-term (term t_2)))]
+   [a (term a)]))

@@ -1,73 +1,110 @@
 #lang racket
 
-(require redex
+(require racklog
+         redex
+         unstable/dict
+         unstable/debug
          "patterns.rkt")
-(provide matches decomposes)
 
-(define-extended-language non-directed-matching patterns
-  (b {}
-     {[x v]}
-     (∪ b b)))
+(provide (all-defined-out))
 
-(define-relation non-directed-matching
-  matches ⊆ L × t × p × b
-  [(matches L a a {})]
-  [(matches L t (:name x p) (∪ {[x t]} b))
-   (matches L t p b)]
-  [(matches (name L (n_0 ... [x_i (p_0 ... p_i p_i+1 ...)] n_i+1 ...)) t (:nt x_i) {})
-   (matches L t p_i b)]
-  [(matches L (:cons t_1 t_2) (:cons p_1 p_2) (∪ b_1 b_2))
-   (matches L t_1 p_1 b_1)
-   (matches L t_2 p_2 b_2)
-   (~ b_1 b_2)]
-  [(matches L t_1 (:in-hole p_1 p_2) (∪ b_1 b_2))
-   (decomposes L t_1 C t_2 p_1 b_1)
-   (matches L t_2 p_2 b_2)
-   (~ b_1 b_2)])
+(define-syntax-rule (relation [vars conc prem ...] ...)
+  (let ([r %empty-rel])
+    (%assert! r vars [conc prem ...]) ...
+    r))
 
-(define-relation non-directed-matching
-  decomposes ⊆ L × t × C × t × p × b
-  [(decomposes L t no-frame t :hole {})]
-  [(decomposes L t_1 C t_2 (:name x p) (∪ {[x C]} b))
-   (decomposes L t_1 C t_2 p b)]
-  [(decomposes L (:cons t_1 t_2) ((left t_2) C) t_1’ (:cons p_1 p_2) (∪ b_1 b_2))
-   (decomposes L t_1 C t_1’ p_1 b_1)
-   (matches L t_2 p_2 b_2)
-   (~ b_1 b_2)]
-  [(decomposes L (:cons t_1 t_2) ((right t_1) C) t_1’ (:cons p_1 p_2) (∪ b_1 b_2))
-   (matches L t_1 p_1 b_1)
-   (decomposes L t_2 C t_2’ p_2 b_2)
-   (~ b_1 b_2)]
-  [(decomposes L t C t_2 (:in-hole p_1 p_2) (∪ b_1 b_2))
-   (decomposes L t C_1 t_1 p_1 b_1)
-   (decomposes L t_1 C_2 t_2 p_2 b_2)
-   (append-contexts C_1 C_2 C)
-   (~ b_1 b_2)]
-  [(decomposes (name L (n_0 ... [x_i (p_0 ... p_i p_i+1 ...)] n_i+1 ...)) t_1 C t_2 (:nt x_i) {})
-   (decomposes L t_1 C t_2 p_i b)])
+(define matches ; (L t p b)
+  (relation
+   [(L a) ; atom
+    (L a a empty)
+    (is-atom a)]
+   [(L t x p b) ; name
+    (L t `(:name ,x ,p) (cons (list x t) b))
+    (matches L t p b)]
+   [(L t x p ps b) ; non-terminal
+    (L t `(:nt ,x) empty)
+    (productions L x ps)
+    (%member p ps)
+    (matches L t p b)]
+   [(L t1 t2 p1 p2 b1 b2 b) ; cons
+    (L `(:cons ,t1 ,t2) `(:cons ,p1 ,p2) b)
+    (matches L t1 p1 b1)
+    (matches L t2 p2 b2)
+    (merges b1 b2 b)]
+   [(L t1 C t2 p1 p2 b1 b2 b) ; in-hole
+    (L t1 `(:in-hole ,p1 ,p2) b)
+    (decomposes L t1 C t2 p1 b1)
+    (matches L t2 p2 b2)
+    (merges b1 b2 b)]))
 
-(define-relation non-directed-matching
-  append-contexts ⊆ C × C × C
-  [(append-contexts no-frame C C)]
-  [(append-contexts (F C_1) C_2 (F C_3))
-   (append-contexts C_1 C_2 C_3)])
+(define decomposes ; (L t C t p b)
+  (relation
+   [(L t) ; hole
+    (L t 'no-frame t ':hole empty)]
+   [(L t1 C t2 x p t b) ; name
+    (L t1 C t2 `(:name ,x ,p) (cons (list x t) b))
+    (decomposes L t1 C t2 p b)
+    (%is/nonvar (C) t (uncontext/proc C))]
+   [(L t1 t2 C t p1 p2 b1 b2 b) ; cons-left
+    (L `(:cons ,t1 ,t2) `((left ,t2) ,C) t `(:cons ,p1 ,p2) b)
+    (decomposes L t1 C t p1 b1)
+    (matches L t2 p2 b2)
+    (merges b1 b2 b)]
+   [(L t1 t2 C t p1 p2 b1 b2 b) ; cons-right
+    (L `(:cons ,t1 ,t2) `((right ,t1) ,C) t `(:cons ,p1 ,p2) b)
+    (matches L t1 p1 b1)
+    (decomposes L t2 C t p2 b2)
+    (merges b1 b2 b)]
+   [(L t t1 t2 C C1 C2 p1 p2 b1 b2 b) ; in-hole
+    (L t C t2 `(:in-hole ,p1 ,p2) b)
+    (decomposes L t C1 t1 p1 b1)
+    (decomposes L t1 C2 t2 p2 b2)
+    (%is/nonvar (C1 C2) C (append-contexts/proc C1 C2))
+    (merges b1 b2 b)]
+   [(L t C u x b p ps) ; non-terminal
+    (L t C u `(:nt ,x) empty)
+    (productions L x ps)
+    (%member p ps)
+    (decomposes L t C u p b)]))
 
-(define-relation non-directed-matching
-  ~ ⊆ b × b
-  [(~ {} b)]
-  [(~ {[x v]} b)
-   (consistent x v b)]
-  [(~ (∪ b_1 b_2) b)
-   (~ b_1 b)
-   (~ b_2 b)])
+(define productions
+  (relation
+   [(x L ps)
+    (L x ps)
+    (%is/nonvar (x L) ps (car (dict-ref L x)))]))
 
-(define-relation non-directed-matching
-  consistent ⊆ x × v × b
-  [(consistent x v {})]
-  [(consistent x v_1 {[x v_2]})
-   ,(equal? (term (uncontext v_1)) (term (uncontext v_2)))]
-  [(consistent x_1 v_1 {[x_2 v_2]})
-   ,(not (equal? (term x_1) (term x_2)))]
-  [(consistent x v (∪ b_1 b_2))
-   (consistent x v b_1)
-   (consistent x v b_2)])
+(define merges
+  (let ([union
+         (λ (b1 b2 k)
+           (dict-union
+            b1 b2
+            #:combine (λ (t u)
+                        (if (equal? t u)
+                            t
+                            (k false)))))])
+    (relation
+     [(b1 b2 b)
+      (b1 b2 b)
+      (%is/nonvar (b1 b2) b (let/ec return (union b1 b2 return)))
+      (%/= b false)])))
+
+(define (uncontext/proc C)
+  (term (uncontext ,C)))
+(define (append-contexts/proc C D)
+  (term (append-contexts ,C ,D)))
+
+(define is-atom
+  (let ([a? (redex-match patterns a)])
+    (λ (x)
+      (%is/nonvar (x) true (and (a? x) true)))))
+
+(define-syntax (%is/nonvar stx)
+  (syntax-case stx ()
+    [(_ () E1 E2)
+     #'(%is E1 E2)]
+    [(form-name (X0 X1 ...) E1 E2)
+     (identifier? #'X0)
+     #'(%if-then-else
+        (%nonvar X0)
+        (form-name (X1 ...) E1 E2)
+        (%is 'dont-care (error 'form-name "~s uninstantiated" 'X0)))]))

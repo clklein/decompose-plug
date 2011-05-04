@@ -1,6 +1,8 @@
 #lang racket
 
-(require redex "syntax-directed-match.rkt")
+(require redex 
+         "syntax-directed-match.rkt"
+         "patterns.rkt")
 
 (define-syntaxes (test-matches test-doesnt-match)
   (let ([make-test
@@ -145,30 +147,6 @@
      (string->symbol
       (list->string
        (list (integer->char (+ i (char->integer #\a)))))))))
-
-(define encode-term
-  (match-lambda
-    ['() 'mt]
-    [(cons t u)
-     `(:cons ,(encode-term t)
-             ,(encode-term u))]
-    [t t]))
-
-(define decode-term
-  (term-match/single
-   directed-matching
-   [no-frame (term :hole)]
-   [((left t) C)
-    (cons (decode-term (term C))
-          (decode-term (term t)))]
-   [((right t) C)
-    (cons (decode-term (term t))
-          (decode-term (term C)))]
-   [mt '()]
-   [(:cons t_1 t_2)
-    (cons (decode-term (term t_1))
-          (decode-term (term t_2)))]
-   [a (term a)]))
 
 (define decode-bindings
   (match-lambda
