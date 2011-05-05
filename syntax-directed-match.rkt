@@ -2,8 +2,7 @@
 
 (require redex
          "patterns.rkt")
-(provide match-top
-         directed-matching)
+(provide match-top)
 
 (define-extended-language directed-matching patterns
   (d (C t)
