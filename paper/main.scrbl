@@ -8,5 +8,5 @@
 @include-section["1-intro.scrbl"]
 @include-section["2-redex.scrbl"]
 @include-section["3-semantics.scrbl"]
-@include-section["4-implementation.scrbl"]
+@include-section["4-algorithm.scrbl"]
 @section{How Redex Should Change}
