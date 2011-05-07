@@ -2,7 +2,8 @@
 
 (require redex
          "patterns.rkt")
-(provide match-top)
+(provide match-top
+         unmatch)
 
 (define-extended-language directed-matching patterns
   (d (C t)
@@ -25,6 +26,70 @@
    (where (m_1’ ...) (non-decompositions (m_1 ...)))]
   [(non-decompositions (((C_0 t_0) b_0) m_1 ...))
    (non-decompositions (m_1 ...))])
+
+(define-metafunction directed-matching
+  extract-binding : x b -> v
+  [(extract-binding x ((x_1 v_1) ... (x v) (x_2 v_2) ...))
+   v]
+  [(extract-binding x ((x_1 v_1) ...)) ; binding not found
+   x])
+
+(define-metafunction directed-matching
+  cross-prod : (t ...) (t ...) -> (t ...)
+  [(cross-prod () (t ...))
+   ()]
+  [(cross-prod (t ...) ())
+   ()]
+  [(cross-prod (t_1) (t_2 t_3 ...))
+   ((:cons t_1 t_2) t_* ...)
+   (where (t_* ...) (cross-prod (t_1) (t_3 ...)))]
+  [(cross-prod (t_1 t_2 ...) (t ...)) ; recursive call
+   (t_* ... t_** ...)
+   (where (t_* ...) (cross-prod (t_1) (t ...)))
+   (where (t_** ...) (cross-prod (t_2 ...) (t ...)))])
+
+(define-metafunction directed-matching
+  plug-terms : (t ...) (t ...) -> (t ...)
+  [(plug-terms () (t ...))
+   ()]
+  [(plug-terms (t ...) ())
+   ()]
+  [(plug-terms (t_1) (t_2 t_3 ...))
+   (t_* ... t_** ...)
+   (where (t_* ...) (plug-single-term t_1 t_2))
+   (where (t_** ...) (plug-terms (t_1) (t_3 ...)))]
+  [(plug-terms (t_1 t_2 ...) (t ...))
+   (t_* ... t_** ...)
+   (where (t_* ...) (plug-terms (t_1) (t ...)))
+   (where (t_** ...) (plug-terms (t_2 ...) (t ...)))])
+
+(define-metafunction directed-matching
+  plug-single-term : t t -> (t ...)
+  [(plug-single-term :hole t)
+   (t)]
+  [(plug-single-term a t)
+   ()]
+  [(plug-single-term (:cons t_1 t_2) t)
+   (t_* ... t_** ...)
+   (where (t_* ...) (cross-prod (plug-single-term t_1 t)(t_2)))
+   (where (t_** ...) (cross-prod (t_1) (plug-single-term t_2 t)))])
+
+
+(define-metafunction directed-matching
+  unmatch : L p b -> (t ...)
+  [(unmatch L a b)
+   (a)]
+  [(unmatch L (:nt x) b) ; shouldn't happen
+   (x)]
+  [(unmatch L (:name x p) b)
+   ((extract-binding x b))]
+  [(unmatch L (:cons p_1 p_2) b)
+   (cross-prod (unmatch L p_1 b)
+               (unmatch L p_2 b))]
+  [(unmatch L (:in-hole p_1 p_2) b)
+   (plug-terms (unmatch L p_1 b) (unmatch L p_2 b))]
+  [(unmatch L p b) ; else
+   ()])
 
 (define-metafunction directed-matching
   match : L p t -> (m ...)
