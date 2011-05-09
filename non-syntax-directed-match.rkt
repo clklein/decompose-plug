@@ -74,19 +74,11 @@
     (%is/nonvar (x L) ps (car (dict-ref L x)))]))
 
 (define merges
-  (let ([union
-         (λ (b1 b2 k)
-           (dict-union
-            b1 b2
-            #:combine (λ (t u)
-                        (if (equal? t u)
-                            t
-                            (k false)))))])
-    (relation
-     [(b1 b2 b)
-      (b1 b2 b)
-      (%is/nonvar (b1 b2) b (let/ec return (union b1 b2 return)))
-      (%/= b false)])))
+  (relation
+   [(b1 b2 b)
+    (b1 b2 b)
+    (%is/nonvar (b1 b2) b (merge-bindings b1 b2))
+    (%/= b false)]))
 
 (define (uncontext/proc C)
   (term (uncontext ,C)))

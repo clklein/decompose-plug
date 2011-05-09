@@ -136,11 +136,11 @@
    ()]
   [(in-hole-merge ((C_0 t_0) b_0) ((d_1 b_1) m_2 ...))
    (((merge-decomps C_0 t_0 d_1) b) m ...)
-   (where b (merge-bindings b_0 b_1))
+   (where b (merge-binds b_0 b_1))
    (where (m ...) (in-hole-merge ((C_0 t_0) b_0) (m_2 ...)))]
   [(in-hole-merge ((C_0 t_0) b_0) ((d_1 b_1) m_2 ...))
    (in-hole-merge ((C_0 t_0) b_0) (m_2 ...))
-   (where #f (merge-bindings b_0 b_1))])
+   (where #f (merge-binds b_0 b_1))])
 
 (define-metafunction directed-matching
   merge-decomps : C t d -> d
@@ -169,10 +169,10 @@
   cons-merge/one-one : t m t m -> (m ...)
   [(cons-merge/one-one t_1 (d_1 b_1) t_2 (d_2 b_2))
    ()
-   (where #f (merge-bindings b_1 b_2))]
+   (where #f (merge-binds b_1 b_2))]
   [(cons-merge/one-one t_1 (d_1 b_1) t_2 (d_2 b_2))
    ((d b) ...)
-   (where b (merge-bindings b_1 b_2))
+   (where b (merge-binds b_1 b_2))
    (where (d ...) (select-decomp t_1 d_1 t_2 d_2))])
 
 (define-metafunction directed-matching
@@ -187,13 +187,13 @@
    ()])
 
 (define-metafunction directed-matching
-  merge-bindings : b b -> b or #f
-  [(merge-bindings () b)
+  merge-binds : b b -> b or #f
+  [(merge-binds () b)
    b]
-  [(merge-bindings ([x_0 v_0] [x_1 v_1] ...) b)
-   (merge-bindings ([x_1 v_1] ...) b_1)
+  [(merge-binds ([x_0 v_0] [x_1 v_1] ...) b)
+   (merge-binds ([x_1 v_1] ...) b_1)
    (where b_1 (merge-binding x_0 v_0 b))]
-  [(merge-bindings b_1 b_2) ; else
+  [(merge-binds b_1 b_2) ; else
    #f])
 
 (define-metafunction directed-matching

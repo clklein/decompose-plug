@@ -1,6 +1,6 @@
 #lang racket
 
-(require redex/reduction-semantics)
+(require redex/reduction-semantics unstable/dict)
 (provide (all-defined-out))
 
 (define-language patterns
@@ -67,3 +67,23 @@
     (cons (decode-term (term t_1))
           (decode-term (term t_2)))]
    [a (term a)]))
+
+(define no-contexts-bindings
+  (let ([context? (redex-match patterns C)])
+    (λ (bs)
+      (for/list ([b bs])
+        (for/list ([m b])
+          (match m
+            [(list x v)
+             (list x
+                   (if (context? v)
+                       (term (uncontext ,v))
+                       v))]))))))
+
+(define (merge-bindings b1 b2)
+  (let/ec return
+    (define (c t u)
+      (if (equal? t u)
+          t
+          (return false)))
+    (dict-union b1 b2 #:combine c)))

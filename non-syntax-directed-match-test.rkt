@@ -13,33 +13,16 @@
     [`(((b . ,bindings)) ...)
      (remove-duplicates bindings)]))
 
-(define-metafunction patterns
-  no-distinguished-hole : C -> t
-  [(no-distinguished-hole no-frame)
-   :hole]
-  [(no-distinguished-hole ((left t) C))
-   (:cons (no-distinguished-hole C) t)]
-  [(no-distinguished-hole ((right t) C))
-   (:cons t (no-distinguished-hole C))])
-
 (define test-non-syntax-directed
-  (let ([context? (redex-match patterns C)])
-    (match-lambda
-      [(test:match _ L p t)
-       (not (empty? (all-matches L p t)))]
-      [(test:no-match _ L p t)
-       (empty? (all-matches L p t))]
-      [(test:bind _ L p t bs)
-       (equal-bindings?
-        (all-matches L p t) 
-        (for/list ([b bs])
-          (for/list ([m b])
-            (match m
-              [(list x v)
-               (list x
-                     (if (context? v)
-                         (term (no-distinguished-hole ,v))
-                         v))]))))])))
+  (match-lambda
+    [(test:match _ L p t)
+     (not (empty? (all-matches L p t)))]
+    [(test:no-match _ L p t)
+     (empty? (all-matches L p t))]
+    [(test:bind _ L p t bs)
+     (equal-bindings?
+      (all-matches L p t) 
+      (no-contexts-bindings bs))]))
 
 (run-tests test-non-syntax-directed)
 

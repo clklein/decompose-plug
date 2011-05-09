@@ -327,22 +327,20 @@
   (define (fail)
     (set! num-failures (+ 1 num-failures)))
   
-  (define (handle-exn exn)
-    (fail)
-    (displayln "Execution of the test:")
-    (pretty-print test)
-    (displayln "raises an exception:")
-    (pretty-print exn))
-  
   (for ([test flattened-tests])
-    (with-handlers ([exn:fail? handle-exn])
-      (if (run-one test)
-          (when show-passes?
-            (printf "Pass: ~a\n" (test-src-loc test)))
-          (begin
-            (fail)
-            (displayln "Failure:")
-            (pretty-print test)))))
+       (with-handlers ([exn:fail? (λ (exn)
+                                    (fail)
+                                    (displayln "Execution of the test:")
+                                    (pretty-print test)
+                                    (displayln "raises an exception:")
+                                    (pretty-print exn))])
+         (if (run-one test)
+             (when show-passes?
+               (printf "Pass: ~a\n" (test-src-loc test)))
+             (begin
+               (fail)
+               (displayln "Failure:")
+               (pretty-print test)))))
   (if (zero? num-failures)
       (printf "Passed all ~a tests.\n" (length flattened-tests))
       (printf "Failed ~a of ~a tests.\n" num-failures (length flattened-tests))))
