@@ -43,3 +43,34 @@
   (check-true (A? '(:cons (:cons λ (:cons (:cons (:cons λ (:cons λ :hole)) e) e)) e)))
   (check-false (A? '(:cons (:cons λ (:cons (:cons λ (:cons λ :hole)) e)) e)))
   (check-false (A? '(:cons (:cons (:cons λ (:cons (:cons λ (:cons λ :hole)) e)) e) e))))
+
+(let ([shift-reset ; http://arxiv.org/pdf/cs/0508048v4 (Section 4.4)
+       `([t ((:nt v) 
+             (:nt x)
+             (:cons (:nt t) (:cons (:nt t) mt)) ; app
+             (:cons succ (:cons (:nt t) mt))
+             (:cons reset (:cons (:nt t) mt))
+             (:cons shift (:cons (:nt x) (:cons (:nt t) mt))))]
+         [v ((:nt m)
+             (:cons λ (:cons (:nt x) (:cons (:nt t) mt)))
+             (:nt C))]
+         [C (:hole
+             (:cons (:nt C) (:cons (:nt t) mt))
+             (:cons (:nt v) (:cons (:nt C) mt))
+             (:cons succ (:cons (:nt C) mt)))]
+         [M (:hole
+             (:in-hole (:nt C) (:cons reset (:cons (:nt M) mt))))]
+         [x ,(build-list 
+              26
+              (λ (i) 
+                (string->symbol
+                 (list->string
+                  (list (integer->char (+ i (char->integer #\a))))))))]
+         [m ,(build-list 10 values)])])
+  (check-equal?
+   (matches 
+    shift-reset
+    '(:in-hole (:in-hole (:name M (:nt M)) (:name C (:nt C))) r)
+    (encode-term '((λ x x) (reset (succ (reset ((λ x x) (r 2))))))))
+   `(((C ,(encode-term '((λ x x) (:hole 2))))
+      (M ,(encode-term '((λ x x) (reset (succ (reset :hole))))))))))
