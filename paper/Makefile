@@ -1,4 +1,5 @@
 main.pdf: DOES_NOT_EXIST 
-	scribble --pdf ++extra eptcs.cls --prefix eptcs-prefix.tex ++style style.tex main.scrbl
+	raco make main.scrbl
+	scribble --pdf main.scrbl
 
 DOES_NOT_EXIST:
