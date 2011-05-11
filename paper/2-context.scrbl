@@ -6,6 +6,12 @@
           "kont-model/model.rkt"
           "kont-model/util.rkt")
 
+@(define-language unfortunate-loop
+   (L hole
+      (in-hole (L e) (λ x hole)))
+   (A hole
+      (in-hole L A)))
+
 @title{Matching and Contexts}
 
 @figure["fig:cont" "Continuation Language"]{
@@ -21,3 +27,6 @@ and numbers.
   @(render-language Λk/red)
   @(render-reduction-relation red)
 }
+
+@(render-language unfortunate-loop)
+

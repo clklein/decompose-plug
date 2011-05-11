@@ -1,29 +1,32 @@
 #lang racket
 (require redex/reduction-semantics)
 
-(provide Λk Λk/red red subst subst-1 Σ
-         any-which-way-Λk
-         any-which-way-red)
+(provide Λ Λ/red Λk/red red subst subst-1 Σ
+         arith arith-red)
 
-;; TAG: cont
-(define-language Λk
+(define-language arith
+  (e (+ e ...) number)
+  (C (+ e ... C e ...) hole))
+
+(define arith-red
+  (reduction-relation
+   arith
+   (--> (in-hole C (+ number ...))
+        (in-hole C (Σ number ...)))))
+ 
+(define-language Λ
   (e (e e ...)
      x
      (λ (x ...) e)
-     call/cc
      +
      number)
   (x variable-not-otherwise-mentioned))
 
-;; TAG: cont/red
-(define-extended-language
-  Λk/red Λk
-  (e .... (cont (hide-hole E)))
+(define-extended-language Λ/red Λ
   (v (λ (x ...) e)
      call/cc
      +
-     number
-     (cont (hide-hole E)))
+     number)
   (E (v ... E e ...)
      hole))
 
@@ -31,12 +34,6 @@
 (define red
   (reduction-relation 
    Λk/red
-   (--> (in-hole E (call/cc v))
-        (in-hole E (v (cont E)))
-        "call/cc")
-   (--> (in-hole E_1 ((cont E_2) v))
-        (in-hole E_2 v)
-        "cont")
    (--> (in-hole E ((λ (x ..._1) e) v ..._1))
         (in-hole E (subst e (x v) ...))
         "βv")
@@ -44,22 +41,40 @@
         (in-hole E (Σ number ...))
         "+")))
 
+(define-extended-language Λk/red Λ/red
+  (e .... call/cc (cont (hide-hole E)))
+  (v .... call/cc (cont (hide-hole E))))
+
+
+(define cont-partial-red
+  (reduction-relation 
+   Λk/red
+   (--> (in-hole E (call/cc v))
+        (in-hole E (v (cont E)))
+        "call/cc")
+   (--> (in-hole E_1 ((cont E_2) v))
+        (in-hole E_2 v)
+        "cont")))
+
+(define cont-red
+  (union-reduction-relations cont-partial-red red))
+
+(define-extended-language Λneed/red Λ/red
+  (E hole 
+     (E e)
+     (λ (x_1 ... x x_2 ...) (in-hole E x))
+     ((λ (x ...) E) e))
+  (A v ((λ (x ...) A) e)))
+
+(define need-red
+  (--> (in-hole E (+ number ...))
+       (in-hole E (Σ number ...))
+       "+")
+
 ;; TAG: Σ
 (define-metafunction Λk/red
   [(Σ number ...)
    ,(foldr + 0 (term (number ...)))])
-
-
-;; TAG: any-which-way-lang
-(define-extended-language
-  any-which-way-Λk Λk/red
-  (E (e ... E e ...)
-     hole))
-
-;; TAG: any-which-way-red
-(define any-which-way-red
-  (extend-reduction-relation 
-   red any-which-way-Λk))
 
 ;; substitution function is like to the one here
 ;;    http://redex.racket-lang.org/lam-v.html

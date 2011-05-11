@@ -60,9 +60,9 @@
          (term 3))
 
 (test--> red
-         (term (+ 1 (A (+ 2 3))))
-         (term (+ 2 3)))
-         
+         (term (+ 1 ((cont hole) 2)))
+         (term 2))
+
 (test-->> red
           (term (+ (call/cc (λ (k) (k 1))) 2))
           (term 3))
@@ -79,6 +79,15 @@
 (test-->> red
           #:cycles-ok
           (term ((λ (x) (x x)) (λ (y) (y y)))))
+
+;; arith tests
+(test--> arith-red
+         (term (+ (+ 1 2) (+ 3 4)))
+         (term (+ 3 (+ 3 4)))
+         (term (+ (+ 1 2) 7)))
+(test-->> arith-red
+          (term (+ (+ 1 2) (+ 3 4)))
+          (term 10))
 
 (test-results)
 
