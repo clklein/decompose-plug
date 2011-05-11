@@ -20,7 +20,7 @@
      (λ (x ...) e)
      +
      number)
-  (x variable-not-otherwise-mentioned))
+  ((x y) variable-not-otherwise-mentioned))
 
 (define-extended-language Λ/red Λ
   (v (λ (x ...) e)
@@ -70,6 +70,15 @@
   (--> (in-hole E (+ number ...))
        (in-hole E (Σ number ...))
        "+")
+  (--> (in-hole E_1 ((λ (x) (in-hole E_2 x)) V))
+       (in-hole E_1 ((λ (x) (in-hole E_2 V)) V))
+       "deref")
+  (--> (in-hole E (((λ (x) A) e_1) e_2))
+       (in-hole E ((λ (x) (A e_1)) e_2))
+       "lift")
+  (--> (in-hole E_1 ((λ (x) (in-hole E_2 x)) ((λ (y) A) e)))
+       (in-hole E_1 ((λ (y) ((λ (x) (in-hole E_2 x)) A)) e))
+       "assoc"))
 
 ;; TAG: Σ
 (define-metafunction Λk/red
