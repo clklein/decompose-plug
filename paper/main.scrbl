@@ -11,7 +11,7 @@
 @title{A Semantics for Context-Sensitive Reduction Semantics}
 
 @include-section["1-intro.scrbl"]
-@include-section["2-redex.scrbl"]
+@include-section["2-context.scrbl"]
 @include-section["3-semantics.scrbl"]
 @include-section["4-algorithm.scrbl"]
 @section{How Redex Should Change}

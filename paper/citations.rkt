@@ -489,3 +489,14 @@
    #:title "Fundamentals of Context-sensitive rewriting"
    #:location (proceedings-location sofsem)
    #:date "1995"))
+
+(define cbn-calculus
+  (make-bib
+   #:author (authors "Zena M. Ariola" "Matthias Felleisen")
+   #:title "The Call-by-Need Lambda-Calculus"
+   #:location (journal-location jfp
+                                #:volume 7
+                                #:number 3
+                                #:pages '(265 301))
+   #:date "1997"))
+  

@@ -1,6 +1,5 @@
 #lang racket
-(require redex/pict
-         redex/reduction-semantics)
+(require redex/reduction-semantics)
 
 (provide Λk Λk/red red subst subst-1 Σ
          any-which-way-Λk
