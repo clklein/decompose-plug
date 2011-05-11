@@ -21,8 +21,8 @@ of a reduction semantics to factor the definition of
 a calculus into one part that specifies that atomic steps
 of computation and a second part that controls where these
 steps may occur. This factoring enables concise specification that, e.g, 
-a language is call-by-value (or call-by-name or call-by-need@~cite[cbn-calculus]), 
-that @racket[if] expressions must evaluate 
+a language is call-by-value (or call-by-name or call-by-need@~cite[cbn-calculus]),
+@racket[if] expressions must evaluate 
 the test position before the branches, and even the behavior of 
 exceptions, continuations, and state@~cite[felleisen-hieb],
 all without cluttering the rules that describe the atomic steps
@@ -38,7 +38,8 @@ or this bizarre, small one?
 @centered{@(render-language ex2)}
 To remedy this lack, we have developed
 a semantics for matching that supports contexts in their full glory
-that is able to explain both of these examples.
+that is able to explain both of these examples, as well as match the
+intuitive meaning and countless existing research papers.
 
 Our motivation for studying context matching is the domain-specific
 programming language Redex@~cite[rta2004-mfff redex]. Redex is designed to support
@@ -49,7 +50,8 @@ prototyping of context-sensitive operational semantics,
 random testing, automatic typesetting, and, via its embedding
 in Racket, access to a large palette of standard programming
 tools. Redex is widely used, having supported several dozen research papers
-as well as the latest Scheme standard@~cite[R6RS].
+as well as the latest Scheme standard@~cite[R6RS] and a number of larger
+models, including a model of the Racket virtual machine.
 
 The remainder of this paper builds up an intuitive understanding of 
 what contexts are and how they are used via a series of examples, gives a semantics
