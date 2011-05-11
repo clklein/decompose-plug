@@ -41,7 +41,8 @@ a semantics for matching that supports contexts in their full glory
 that is able to explain both of these examples, as well as match the
 intuitive meaning and countless existing research papers.
 
-Our motivation for studying context matching is the domain-specific
+Our motivation for studying context matching is its implementation
+in the domain-specific
 programming language Redex@~cite[rta2004-mfff redex]. Redex is designed to support
 the semantics engineer with a lightweight toolset for
 operational semantics and related formalisms. 
