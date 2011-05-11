@@ -44,7 +44,7 @@
   (check-false (A? '(:cons (:cons λ (:cons (:cons λ (:cons λ :hole)) e)) e)))
   (check-false (A? '(:cons (:cons (:cons λ (:cons (:cons λ (:cons λ :hole)) e)) e) e))))
 
-(let ([shift-reset ; http://arxiv.org/pdf/cs/0508048v4 (Section 4.4)
+(let ([shift-reset ; like http://arxiv.org/pdf/cs/0508048v4 (Section 4.4)
        `([t ((:nt v) 
              (:nt x)
              (:cons (:nt t) (:cons (:nt t) mt)) ; app
@@ -53,7 +53,7 @@
              (:cons shift (:cons (:nt x) (:cons (:nt t) mt))))]
          [v ((:nt m)
              (:cons λ (:cons (:nt x) (:cons (:nt t) mt)))
-             (:nt C))]
+             (:cons cont (:cons (:nt C) mt)))]
          [C (:hole
              (:cons (:nt C) (:cons (:nt t) mt))
              (:cons (:nt v) (:cons (:nt C) mt))
