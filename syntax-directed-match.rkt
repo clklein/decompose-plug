@@ -1,134 +1,78 @@
 #lang racket
 
 (require redex
-         "patterns.rkt")
-(provide match-top)
+         "patterns.rkt"
+         (rename-in "set-comp.rkt" [set-comp :set-comp]))
+(provide matches)
 
 (define-extended-language directed-matching patterns
   (d (C t)
-     no-decomp)
+     •)
   (m (d b)))
 
 (define-metafunction directed-matching
-  match-top : L p t -> (b ...)
-  [(match-top L p t)
-   ; the no-dups could probably go in the :in-hole case
-   (no-dups (b_0 ...))
-   (where ((no-decomp b_0) ...) (non-decompositions (match L p t)))])
+  matches : L p t -> (b ...)
+  [(matches L p t)
+   ,(set-comp b (in (• b) (M L p t)))])
 
 (define-metafunction directed-matching
-  non-decompositions : (m ...) -> (m ...)
-  [(non-decompositions ())
-   ()]
-  [(non-decompositions ((name d_0 (no-decomp b_0)) m_1 ...))
-   (d_0 m_1’ ...)
-   (where (m_1’ ...) (non-decompositions (m_1 ...)))]
-  [(non-decompositions (((C_0 t_0) b_0) m_1 ...))
-   (non-decompositions (m_1 ...))])
-
-(define-metafunction directed-matching
-  match : L p t -> (m ...)
-  [(match L :hole :hole)
-   (((no-frame :hole) ())
-    (no-decomp ()))]
-  [(match L :hole t) ; t ≠ :hole
-   (((no-frame t) ()))]
-  [(match L a a) ; a ≠ :hole
-   ((no-decomp ()))]
-  [(match L (:name x p) t)
-   ((d ([x (named d t)] [x_0 v_0] ...)) ...)
-   (where ((d ([x_0 v_0] ...)) ...) (match L p t))]
-  [(match (name L (n_0 ... [x_i (p_0 ...)] n_i+1 ...)) (:nt x_i) t)
-   (no-dups (concat ((d_0 ()) ...) ...))
-   (where (((d_0 b_0) ...) ...) ((match L p_0 t) ...))]
-  [(match L (:in-hole p_c p_h) t)
-   (concat (in-hole-merge m_0 (match L p_h t_0)) ...)
-   (where ((name m_0 ((C_0 t_0) b_0)) ...) (decompositions (match L p_c t)))]
-  [(match L (:cons p_1 p_2) (:cons t_1 t_2))
-   (cons-merge/many-many t_1 (match L p_1 t_1)
-                         t_2 (match L p_2 t_2))]
-  [(match L p t) ; else 
-   ()])
+  M : L p t -> (m ...)
+  [(M L :hole :hole)
+   (set (((no-context) :hole) (no-bindings)) (• (no-bindings)))]
+  [(M L :hole t) ; t ≠ :hole
+   (set (((no-context) t) (no-bindings)))]
+  [(M L a a) ; a ≠ :hole
+   (set (• (no-bindings)))]
+  [(M L (:name x p) t)
+   ,(set-comp (d b_^’) (guard (neq b_^’ #f)) (eq b_^’ (⊓ (set (x (named d t))) b))
+                       (in (d b) (M L p t)))]
+  [(M L (:nt x) t)
+   ,(set-comp (d (no-bindings)) (in (d b) (M L p t)) (in p (productions L x)))]
+  [(M L (:in-hole p_c p_h) t)
+   ,(set-comp (d b) (eq d (combine C d_h))
+                    (guard (neq b #f))
+                    (eq b (⊓ b_c b_h))
+                    (in (d_h b_h) (M L p_h t_c))
+                    (in ((C t_c) b_c) (M L p_c t)))]
+  [(M L (:cons p_l p_r) (:cons t_l t_r))
+   ,(set-comp (d b) (in d (select t_l d_l t_r d_r))
+                    (guard (neq b #f))
+                    (eq b (⊓ b_l b_r))
+                    (in (d_r b_r) (M L p_r t_r))
+                    (in (d_l b_l) (M L p_l t_l)))]
+  [(M L p t) ; else 
+   (set)])
 
 (define-metafunction directed-matching
   named : d t -> v
-  [(named no-decomp t) t]
+  [(named • t) t]
   [(named (C t) u) C])
 
 (define-metafunction directed-matching
-  decompositions : (m ...) -> (m ...)
-  [(decompositions ())
-   ()]
-  [(decompositions (((C_0 t_0) b_0) m_1 ...))
-   (((C_0 t_0) b_0) m_1’ ...)
-   (where (m_1’ ...) (decompositions (m_1 ...)))]
-  [(decompositions ((no-decomp b_0) m_1 ...))
-   (decompositions (m_1 ...))])
+  select : t d t d -> (d) or ()
+  [(select t • u •)
+   (set •)]
+  [(select t (C t_^’) u •)
+   (set ((: (left u) C) t_^’))]
+  [(select t • u (C u_^’))
+   (set ((: (right t) C) u_^’))]
+  [(select t (C t_^’) u (C_^’ u_^’))
+   (set)])
 
 (define-metafunction directed-matching
-  in-hole-merge : ((C t) b) (m ...) -> (m ...)
-  [(in-hole-merge ((C t) b) ())
-   ()]
-  [(in-hole-merge ((C_0 t_0) b_0) ((d_1 b_1) m_2 ...))
-   (((merge-decomps C_0 t_0 d_1) b) m ...)
-   (where b (merge-binds b_0 b_1))
-   (where (m ...) (in-hole-merge ((C_0 t_0) b_0) (m_2 ...)))]
-  [(in-hole-merge ((C_0 t_0) b_0) ((d_1 b_1) m_2 ...))
-   (in-hole-merge ((C_0 t_0) b_0) (m_2 ...))
-   (where #f (merge-binds b_0 b_1))])
+  combine : C d -> d
+  [(combine C •) •]
+  [(combine C_1 (C_2 t))
+   ((append-contexts C_1 C_2) t)])
 
 (define-metafunction directed-matching
-  merge-decomps : C t d -> d
-  [(merge-decomps C t no-decomp)
-   no-decomp]
-  [(merge-decomps C_1 t_1 (C_2 t_2))
-   ((append-contexts C_1 C_2) t_2)])
-
-(define-metafunction directed-matching
-  cons-merge/many-many : t (m ...) t (m ...) -> (m ...)
-  [(cons-merge/many-many t_1 () t_2 (m ...))
-   ()]
-  [(cons-merge/many-many t_1 (m_0 m_1 ...) t_2 (m_i ...))
-   (concat (cons-merge/one-many t_1 m_0 t_2 (m_i ...))
-           (cons-merge/many-many t_1 (m_1 ...) t_2 (m_i ...)))])
-
-(define-metafunction directed-matching
-  cons-merge/one-many : t m t (m ...) -> (m ...)
-  [(cons-merge/one-many t m u ())
-   ()]
-  [(cons-merge/one-many t m_0 u (m_1 m_2 ...))
-   (concat (cons-merge/one-one t m_0 u m_1)
-           (cons-merge/one-many t m_0 u (m_2 ...)))])
-
-(define-metafunction directed-matching
-  cons-merge/one-one : t m t m -> (m ...)
-  [(cons-merge/one-one t_1 (d_1 b_1) t_2 (d_2 b_2))
-   ()
-   (where #f (merge-binds b_1 b_2))]
-  [(cons-merge/one-one t_1 (d_1 b_1) t_2 (d_2 b_2))
-   ((d b) ...)
-   (where b (merge-binds b_1 b_2))
-   (where (d ...) (select-decomp t_1 d_1 t_2 d_2))])
-
-(define-metafunction directed-matching
-  select-decomp : t d t d -> (d ...)
-  [(select-decomp t no-decomp u no-decomp)
-   (no-decomp)]
-  [(select-decomp t (C t_0) u no-decomp)
-   ((((left u) C) t_0))]
-  [(select-decomp t no-decomp u (C u_0))
-   ((((right t) C) u_0))]
-  [(select-decomp t (C_t t_0) u (C_u u_0))
-   ()])
-
-(define-metafunction directed-matching
-  merge-binds : b b -> b or #f
-  [(merge-binds () b)
+  ⊓ : b b -> b or #f
+  [(⊓ () b)
    b]
-  [(merge-binds ([x_0 v_0] [x_1 v_1] ...) b)
-   (merge-binds ([x_1 v_1] ...) b_1)
+  [(⊓ ([x_0 v_0] [x_1 v_1] ...) b)
+   (⊓ ([x_1 v_1] ...) b_1)
    (where b_1 (merge-binding x_0 v_0 b))]
-  [(merge-binds b_1 b_2) ; else
+  [(⊓ b_1 b_2) ; else
    #f])
 
 (define-metafunction directed-matching
@@ -157,20 +101,25 @@
   [(merge-value v_1 v_2) ; else
    #f])
 
+;; metafunctions to facilitate typesetting
 (define-metafunction directed-matching
-  concat : (any ...) ... -> (any ...)
-  [(concat)
-   ()]
-  [(concat (any_0 ...) any ...)
-   (any_0 ... any_i ...)
-   (where (any_i ...) (concat any ...))])
+  [(set any ...) (any ...)])
+(define-metafunction directed-matching
+  [(neq any_1 any_1) #f]
+  [(neq any_!_1 any_!_1) #t])
+(define-metafunction directed-matching
+  [(no-context) ,'no-context])
+(define-metafunction directed-matching
+  [(no-bindings) ()])
+(define-metafunction directed-matching
+  [(productions (n_0 ... [x_i (p ...)] n_i+1 ...) x_i)
+   (p ...)])
+(define-metafunction directed-matching
+  [(left t) (,'left t)])
+(define-metafunction directed-matching
+  [(right t) (,'right t)])
+(define-metafunction directed-matching
+  [(: F C) (F C)])
 
-(define-metafunction directed-matching
-  no-dups : (any ...) -> (any ...)
-  [(no-dups ()) ()]
-  [(no-dups (any_0 any_1 ... any_0 any_i ...))
-   (no-dups (any_0 any_1 ... any_i ...))]
-  [(no-dups (any_0 any_1 ...))
-   (any_0 any_1’ ...)
-   (side-condition (not (member (term any_0) (term (any_1 ...)))))
-   (where (any_1’ ...) (no-dups (any_1 ...)))])
+(define-syntax-rule (set-comp subforms ...)
+  (:set-comp directed-matching subforms ...))

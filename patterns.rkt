@@ -25,12 +25,12 @@
   
   (F (left t)
      (right t))
-  (C no-frame
+  (C no-context
      (F C)))
 
 (define-metafunction patterns
   uncontext : C -> t
-  [(uncontext no-frame)
+  [(uncontext no-context)
    :hole]
   [(uncontext ((left t) C))
    (:cons (uncontext C) t)]
@@ -39,7 +39,7 @@
 
 (define-metafunction patterns
   append-contexts : C C -> C
-  [(append-contexts no-frame C)
+  [(append-contexts no-context C)
    C]
   [(append-contexts (F C_1) C_2)
    (F (append-contexts C_1 C_2))])
@@ -55,7 +55,7 @@
 (define decode-term
   (term-match/single
    patterns
-   [no-frame (term :hole)]
+   [no-context (term :hole)]
    [((left t) C)
     (cons (decode-term (term C))
           (decode-term (term t)))]

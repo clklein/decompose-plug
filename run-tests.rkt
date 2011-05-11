@@ -2,4 +2,5 @@
 
 (require "non-syntax-directed-match-test.rkt"
          "syntax-directed-match-test.rkt"
-         "syntax-directed-match-total-test.rkt")
+         "syntax-directed-match-total-test.rkt"
+         "set-comp.rkt")

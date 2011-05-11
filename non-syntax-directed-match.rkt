@@ -40,7 +40,7 @@
 (define decomposes ; (L t C t p b)
   (relation
    [(L t) ; hole
-    (L t 'no-frame t ':hole empty)]
+    (L t 'no-context t ':hole empty)]
    [(L t1 C t2 x p t b) ; name
     (L t1 C t2 `(:name ,x ,p) (cons (list x t) b))
     (decomposes L t1 C t2 p b)

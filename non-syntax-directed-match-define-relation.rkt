@@ -27,7 +27,7 @@
 
 (define-relation non-directed-matching
   decomposes ⊆ L × t × C × t × p × b
-  [(decomposes L t no-frame t :hole {})]
+  [(decomposes L t no-context t :hole {})]
   [(decomposes L t_1 C t_2 (:name x p) (∪ {[x C]} b))
    (decomposes L t_1 C t_2 p b)]
   [(decomposes L (:cons t_1 t_2) ((left t_2) C) t_1’ (:cons p_1 p_2) (∪ b_1 b_2))
