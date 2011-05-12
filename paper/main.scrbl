@@ -14,7 +14,7 @@
 @include-section["2-context.scrbl"]
 @include-section["3-semantics.scrbl"]
 @include-section["4-algorithm.scrbl"]
-@section{How Redex Should Change}
+@include-section["5-reduction.scrbl"]
 
 @section{Related Work}
 
