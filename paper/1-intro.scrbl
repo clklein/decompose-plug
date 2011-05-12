@@ -2,6 +2,7 @@
 @(require scribble/manual
           redex/reduction-semantics
           redex/pict
+          slideshow/pict
           "citations.rkt")
 
 @(define-language ex1
@@ -11,6 +12,10 @@
 
 @(define-language ex2
    (C (in-hole C (f hole)) hole))
+
+@(define raw1 (render-language ex1))
+@(define raw2 (render-language ex2))
+@(define bkg (blank (max (pict-width raw1) (pict-width raw2)) 0))
 
 @title{Introduction}
 
@@ -33,9 +38,9 @@ been nailed down in the literature. Although an intuitive definition
 is easy to understand from a few examples, this intuition does not
 cover the full power of contexts. For example, what is the precise
 language matched by this definition (note that values and contexts are mututally referential)?
-@centered{@(render-language ex1)}
+@centered{@(lc-superimpose bkg raw1)}
 or this bizarre, small one?
-@centered{@(render-language ex2)}
+@centered{@(lc-superimpose bkg raw2)}
 To remedy this lack, we have developed
 a semantics for matching that supports contexts in their full glory
 that is able to explain both of these examples, as well as match the
