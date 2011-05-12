@@ -98,6 +98,7 @@
 
 (define-extended-language Λdk/red Λk/red
   (e .... (\# e) call/comp)
+  (v .... call/comp)
   (M hole
      (in-hole M (\# E))))
 
