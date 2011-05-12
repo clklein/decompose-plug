@@ -34,6 +34,7 @@
 
 (define-extended-language Λ/red Λ
   (v (λ (x ...) e) call/cc
+     
      + number)
   (E (v ... E e ...) hole))
 
@@ -104,8 +105,7 @@
   (reduction-relation
    Λdk/red
    (--> (in-hole M (\# (in-hole E (call/comp v))))
-        (in-hole M (\# (in-hole E (v (cont E)))))
-        "call/comp")))
+        (in-hole M (\# (in-hole E (v (cont E))))))))
 
 
 (define-metafunction Λneed/red
