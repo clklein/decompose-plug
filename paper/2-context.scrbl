@@ -6,27 +6,42 @@
           "kont-model/model.rkt"
           "kont-model/util.rkt")
 
-@(define-language unfortunate-loop
-   (L hole
-      (in-hole (L e) (λ x hole)))
-   (A hole
-      (in-hole L A)))
-
 @title{Matching and Contexts}
 
-@figure["fig:cont" "Continuation Language"]{
-  @(render-language Λk #:nts (remove 'x (language-nts Λk)))
-}
+arithmetic:
 
-@Figure-ref["fig:cont"] shows the grammar of the language we
-are considering. It contains application expressions,
-variables, λ expressions, @rr[call/cc], the addition operator
-and numbers. 
+@(render-language arith)
 
-@figure["fig:contred" "Continuation Reduction"]{
-  @(render-language Λk/red)
-  @(render-reduction-relation red)
-}
+@(render-language arith/red)
 
-@(render-language unfortunate-loop)
+@(render-reduction-relation arith-red)
+
+cbv LC:
+
+@(render-language Λ #:nts (remove* '(x y) (language-nts Λ)))
+
+@(render-language Λ/red)
+
+@(render-reduction-relation cbv-red)
+
+cbn LC:
+
+@(render-language Λneed/red #:nts '(E))
+
+@(parameterize ([render-reduction-relation-rules '("deref")])
+   (render-reduction-relation cbn-red))
+
+continuations:
+
+@(render-language Λk/red)
+
+@(render-reduction-relation cont-red)
+
+delimited control (coming):
+
+bizarro thing:
+
+@(define-language ex2
+   (C (in-hole C (f hole)) hole))
+@(render-language ex2)
 

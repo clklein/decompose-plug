@@ -37,46 +37,46 @@
 
 ;; reduction rules tests
 
-(test--> red
+(test--> cbv-red
          (term ((λ (x) x) 1))
          (term 1))
-(test--> red
+(test--> cbv-red
          (term ((λ (x) (λ (y) x)) 1))
          (term (λ (y) 1)))
-(test--> red
+(test--> cbv-red
          (term ((λ (x) (λ (x) x)) 1))
          (term (λ (x) x)))
-(test--> red
+(test--> cbv-red
          (term ((λ (x) (λ (y) x)) (λ (z) y)))
          (term (λ (y1) (λ (z) y))))
-(test-->> red
+(test-->> cbv-red
           (term ((λ (f x y) (f x y))
                  (λ (g x) (g x))
                  (λ (x) x)
                  2))
           (term 2))
-(test--> red
+(test--> cbv-red
          (term (+ 1 2))
          (term 3))
 
-(test--> red
+(test--> cont-red
          (term (+ 1 ((cont hole) 2)))
          (term 2))
 
-(test-->> red
+(test-->> cont-red
           (term (+ (call/cc (λ (k) (k 1))) 2))
           (term 3))
 
-(test-->> red
+(test-->> cont-red
           (term (+ (call/cc (λ (k) (k 2))) x))
           (term (+ 2 x)))
 
 ;; no irreducible terms reachable from here (and also a finite graph)
-(test-->> red 
+(test-->> cont-red 
           #:cycles-ok
           (term ((λ (x) ((call/cc call/cc) x))
                  (call/cc call/cc))))
-(test-->> red
+(test-->> cbv-red
           #:cycles-ok
           (term ((λ (x) (x x)) (λ (y) (y y)))))
 
@@ -89,7 +89,51 @@
           (term (+ (+ 1 2) (+ 3 4)))
           (term 10))
 
-(test-results)
+(define (cbn-equiv a1 a2)
+  (equal? (term (subst-A ,a1))
+          (term (subst-A ,a2))))
 
+(test-equal (term (subst-A ((λ (x) 1) 2)))
+            (term 1))
+(test-equal (term (subst-A ((λ (x) ((λ (y) 17) 2)) (+ 1 2))))
+            (term 17))
+(test-equal (term (subst-A ((λ (x) (λ (y) x)) 2)))
+            (term (λ (y) 2)))
+(test-equal (term (subst-A ((λ (x) (λ (y) (+ x y))) 2)))
+            (term (λ (y1) (+ 2 y1))))
+
+;; cbn tests
+(test-->> cbn-red
+          #:equiv cbn-equiv
+          (term ((λ (x) 1) (+ 1 2)))
+          (term ((λ (x) 1) (+ 1 2))))
+(test-->> cbn-red
+          #:equiv cbn-equiv
+          (term ((λ (x) x) (+ 1 2)))
+          (term ((λ (x) 3) 3)))
+(test-->> cbn-red
+          #:equiv cbn-equiv
+          (term (+ (+ 1 2) 3))
+          (term 6))
+(test-->> cbn-red
+          #:equiv cbn-equiv
+          (term (((λ (x) x) (λ (y) (+ y 1))) 2))
+          (term 3))
+(test-->> cbn-red
+          #:equiv cbn-equiv
+          (term (((λ (x) (λ (y) (+ x y))) 2) 1))
+          (term ((λ (x) ((λ (y) 3) 2)) 1)))
+(test-->> cbn-red
+          #:equiv cbn-equiv
+          (term (((λ (x) (λ (y) (+ y x))) 2) 1))
+          (term ((λ (x) ((λ (y) 3) 2)) 1)))
+(test-->> cbn-red
+          #:equiv cbn-equiv
+          (term (((λ (f) (λ (x) (f (f (f x)))))
+                  (λ (x) (+ x 1)))
+                 0))
+          (term 3))
+
+(test-results)
 
 

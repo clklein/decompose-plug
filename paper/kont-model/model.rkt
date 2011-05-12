@@ -1,16 +1,28 @@
 #lang racket
 (require redex/reduction-semantics)
 
-(provide Λ Λ/red Λk/red red subst subst-1 Σ
-         arith arith-red)
+;; to add: delimited continuations (to show the cycle)
+
+(provide arith arith/red 
+         Λ 
+         Λ/red Λk/red Λneed/red
+         arith-red
+         cbv-red 
+         cont-red
+         cbn-red
+         
+         Σ 
+         subst subst-1 subst-A)
 
 (define-language arith
-  (e (+ e ...) number)
+  (e (+ e ...) number))
+
+(define-extended-language arith/red arith
   (C (+ e ... C e ...) hole))
 
 (define arith-red
   (reduction-relation
-   arith
+   arith/red
    (--> (in-hole C (+ number ...))
         (in-hole C (Σ number ...)))))
  
@@ -31,9 +43,9 @@
      hole))
 
 ;; TAG: red
-(define red
+(define cbv-red
   (reduction-relation 
-   Λk/red
+   Λ/red
    (--> (in-hole E ((λ (x ..._1) e) v ..._1))
         (in-hole E (subst e (x v) ...))
         "βv")
@@ -57,28 +69,43 @@
         "cont")))
 
 (define cont-red
-  (union-reduction-relations cont-partial-red red))
+  (union-reduction-relations cont-partial-red
+                             (extend-reduction-relation cbv-red Λk/red)))
 
-(define-extended-language Λneed/red Λ/red
+(define-extended-language Λneed/red Λ
   (E hole 
      (E e)
-     (λ (x_1 ... x x_2 ...) (in-hole E x))
-     ((λ (x ...) E) e))
-  (A v ((λ (x ...) A) e)))
+     ((λ (x) E) e)
+     ((λ (x) (in-hole E x)) E)
+     (+ v ... E e ...))
+  (A v ((λ (x) A) e))
+  (v number (λ (x) e) +))
 
-(define need-red
-  (--> (in-hole E (+ number ...))
-       (in-hole E (Σ number ...))
-       "+")
-  (--> (in-hole E_1 ((λ (x) (in-hole E_2 x)) V))
-       (in-hole E_1 ((λ (x) (in-hole E_2 V)) V))
-       "deref")
-  (--> (in-hole E (((λ (x) A) e_1) e_2))
-       (in-hole E ((λ (x) (A e_1)) e_2))
-       "lift")
-  (--> (in-hole E_1 ((λ (x) (in-hole E_2 x)) ((λ (y) A) e)))
-       (in-hole E_1 ((λ (y) ((λ (x) (in-hole E_2 x)) A)) e))
-       "assoc"))
+(define cbn-red
+  (reduction-relation
+   Λneed/red
+   (--> (in-hole E (+ number ...))
+        (in-hole E (Σ number ...))
+        "+")
+   (--> (in-hole E_1 ((λ (x) (in-hole E_2 x)) v))
+        (in-hole E_1 ((λ (x) (in-hole E_2 v)) v))
+        "deref")
+   (--> (in-hole E (((λ (x) A) e_1) e_2))
+        (in-hole E ((λ (x_2) ((subst A (x x_2)) e_2)) e_1))
+        (fresh x_2)
+        "lift")
+   (--> (in-hole E_1 ((λ (x) (in-hole E_2 x)) ((λ (y) A) e)))
+        (in-hole E_1 ((λ (y_2) ((λ (x) (in-hole E_2 x)) 
+                                (subst A (y y_2)))) 
+                      e))
+        (fresh y_2)
+        "assoc")))
+
+(define-metafunction Λneed/red
+  subst-A : A -> e
+  [(subst-A ((λ (x) A) e))
+   (subst (subst-A A) (x e))]
+  [(subst-A v) v])
 
 ;; TAG: Σ
 (define-metafunction Λk/red
@@ -92,9 +119,9 @@
 
 ;; TAG: subst
 (define-metafunction Λk/red
-  subst : e (x v) ... -> e
-  [(subst e (x_1 v_1) (x_2 v_2) ...)
-   (subst-1 x_1 v_1 (subst e (x_2 v_2) ...))]
+  subst : e (x any) ... -> e
+  [(subst e (x_1 any_1) (x_2 any_2) ...)
+   (subst-1 x_1 any_1 (subst e (x_2 any_2) ...))]
   [(subst e) e])
 
 (define-metafunction Λk/red
