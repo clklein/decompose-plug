@@ -5,11 +5,12 @@
 
 (provide arith arith/red 
          Λ 
-         Λ/red Λk/red Λneed/red
+         Λ/red Λk/red Λneed/red Λdk/red
          arith-red
          cbv-red 
          cont-red
          cbn-red
+         delim-red
          
          Σ 
          subst subst-1 subst-A)
@@ -27,22 +28,15 @@
         (in-hole C (Σ number ...)))))
  
 (define-language Λ
-  (e (e e ...)
-     x
-     (λ (x ...) e)
-     +
-     number)
+  (e (e e ...) x (λ (x ...) e)
+     + number)
   ((x y) variable-not-otherwise-mentioned))
 
 (define-extended-language Λ/red Λ
-  (v (λ (x ...) e)
-     call/cc
-     +
-     number)
-  (E (v ... E e ...)
-     hole))
+  (v (λ (x ...) e) call/cc
+     + number)
+  (E (v ... E e ...) hole))
 
-;; TAG: red
 (define cbv-red
   (reduction-relation 
    Λ/red
@@ -101,13 +95,25 @@
         (fresh y_2)
         "assoc")))
 
+(define-extended-language Λdk/red Λk/red
+  (e .... (\# e) call/comp)
+  (M hole
+     (in-hole M (\# E))))
+
+(define delim-red
+  (reduction-relation
+   Λdk/red
+   (--> (in-hole M (\# (in-hole E (call/comp v))))
+        (in-hole M (\# (in-hole E (v (cont E)))))
+        "call/comp")))
+
+
 (define-metafunction Λneed/red
   subst-A : A -> e
   [(subst-A ((λ (x) A) e))
    (subst (subst-A A) (x e))]
   [(subst-A v) v])
 
-;; TAG: Σ
 (define-metafunction Λk/red
   [(Σ number ...)
    ,(foldr + 0 (term (number ...)))])
@@ -117,7 +123,6 @@
 ;; except that subst-n is called subst and
 ;; that subst is called subst-1
 
-;; TAG: subst
 (define-metafunction Λk/red
   subst : e (x any) ... -> e
   [(subst e (x_1 any_1) (x_2 any_2) ...)
