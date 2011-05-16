@@ -13,7 +13,7 @@
 (define-syntax (set-comp stx)
   (syntax-case stx (guard in eq)
     [(_ language element)
-     #'(term (element))]
+     #'(list (term element))]
     [(form language element clause ... (guard t))
      #'(if (term t)
            (form language element clause ...)

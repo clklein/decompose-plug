@@ -2,7 +2,7 @@
 
 (require redex
          "patterns.rkt"
-         (rename-in "set-comp.rkt" [set-comp :set-comp]))
+         "set-comp.rkt")
 (provide matches)
 
 (define-extended-language directed-matching patterns
@@ -13,7 +13,7 @@
 (define-metafunction directed-matching
   matches : L p t -> (b ...)
   [(matches L p t)
-   ,(set-comp b (in (• b) (M L p t)))])
+   ,(set-comp* (term (b (in (• b) (M L p t)))))])
 
 (define-metafunction directed-matching
   M : L p t -> (m ...)
@@ -24,22 +24,22 @@
   [(M L a a) ; a ≠ :hole
    (set (• (no-bindings)))]
   [(M L (:name x p) t)
-   ,(set-comp (d b_^’) (guard (neq b_^’ #f)) (eq b_^’ (⊓ (set (x (named d t))) b))
-                       (in (d b) (M L p t)))]
+   ,(set-comp* (term ((d b_^’) (guard (neq b_^’ #f)) (eq b_^’ (⊓ (set (x (named d t))) b))
+                               (in (d b) (M L p t)))))]
   [(M L (:nt x) t)
-   ,(set-comp (d (no-bindings)) (in (d b) (M L p t)) (in p (productions L x)))]
+   ,(set-comp* (term ((d (no-bindings)) (in (d b) (M L p t)) (in p (productions L x)))))]
   [(M L (:in-hole p_c p_h) t)
-   ,(set-comp (d b) (eq d (combine C d_h))
-                    (guard (neq b #f))
-                    (eq b (⊓ b_c b_h))
-                    (in (d_h b_h) (M L p_h t_c))
-                    (in ((C t_c) b_c) (M L p_c t)))]
+   ,(set-comp* (term ((d b) (eq d (combine C d_h))
+                            (guard (neq b #f))
+                            (eq b (⊓ b_c b_h))
+                            (in (d_h b_h) (M L p_h t_c))
+                            (in ((C t_c) b_c) (M L p_c t)))))]
   [(M L (:cons p_l p_r) (:cons t_l t_r))
-   ,(set-comp (d b) (in d (select t_l d_l t_r d_r))
-                    (guard (neq b #f))
-                    (eq b (⊓ b_l b_r))
-                    (in (d_r b_r) (M L p_r t_r))
-                    (in (d_l b_l) (M L p_l t_l)))]
+   ,(set-comp* (term ((d b) (in d (select t_l d_l t_r d_r))
+                            (guard (neq b #f))
+                            (eq b (⊓ b_l b_r))
+                            (in (d_r b_r) (M L p_r t_r))
+                            (in (d_l b_l) (M L p_l t_l)))))]
   [(M L p t) ; else 
    (set)])
 
@@ -121,5 +121,7 @@
 (define-metafunction directed-matching
   [(: F C) (F C)])
 
-(define-syntax-rule (set-comp subforms ...)
-  (:set-comp directed-matching subforms ...))
+(define-syntax set-comp*
+  (syntax-rules (term)
+    [(_ (term (stuff ...)))
+     (set-comp directed-matching stuff ...)]))
