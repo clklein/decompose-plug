@@ -3,7 +3,7 @@
 (require redex
          "patterns.rkt"
          "set-comp.rkt")
-(provide matches)
+(provide (all-defined-out))
 
 (define-extended-language directed-matching patterns
   (d (C t)
