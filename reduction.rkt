@@ -11,15 +11,7 @@
   (s a
      (:cons s s)
      (:in-hole s s)
-     (:var x))
-  (rr ((p s) ...)))
-
-(define-metafunction reduction
-  lookup : x b -> v
-  [(lookup x ((x_1 v_1) ... (x v) (x_2 v_2) ...))
-   v]
-  [(lookup x ((x_1 v_1) ...)) ; binding not found
-   x])
+     (:var x)))
 
 (define-metafunction reduction
   eval : s b -> v
@@ -39,8 +31,8 @@
   [(eval (:in-hole s_1 s_2) b)
    (plug-ctxt C_1 (eval s_2 b))
    (where C_1 (eval s_1 b))]
-  [(eval (:var x) b)
-   (lookup x b)])
+  [(eval (:var x_i) ([x_0 v_0] ... [x_i v_i] [x_i+1 v_i+1] ...))
+   v_i])
 
 (define-metafunction reduction
   plug-ctxt : v v -> v
@@ -59,7 +51,7 @@
    (where t_* (plug-ctxt C v))])
 
 (define-metafunction reduction
-  reduce : L rr t -> (v ...)
+  reduce : L ((p s) ...) t -> (v ...)
   [(reduce L () t)
    ()]
   [(reduce L ((p s)) t)
