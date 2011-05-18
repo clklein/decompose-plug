@@ -76,19 +76,34 @@
                  (:cons and (:cons (:cons or (:cons true false)) false))
                  ((:cons and (:cons true false))))
 
-(define a-lang
-  '((a (aa))))
-
-(define a-rr
-  '(((:in-hole (:name x :hole) (:name a (:nt a)))
-     (:cons (:var x) (:var a)))
-    ((:name a (:nt a))
-     (:var a))))
-
-(test-reductions ,a-lang
-                 ,a-rr
+(test-reductions ((a (aa)))
+                 (((:in-hole (:name x :hole) (:name a (:nt a)))
+                   (:cons (:var x) (:var a)))
+                  ((:name a (:nt a))
+                   (:var a)))
                  aa
                  (aa ((left aa) no-context)))
+(test-reductions ((a (aa)))
+                 (((:in-hole (:name x :hole) (:name a (:nt a)))
+                   (:cons (:var a) (:var x))))
+                 aa
+                 (((right aa) no-context)))
+
+(test-reductions ()
+                 ([a (:cons a a)])
+                 a
+                 ((:cons a a)))
+
+(test-reductions ()
+                 ([(:in-hole (:name x (:cons :hole b)) a)
+                   (:in-hole (:var x) (:var x))])
+                 (:cons a b)
+                 (((left b) ((left b) no-context))))
+(test-reductions ()
+                 ([(:in-hole (:name x (:cons a :hole)) b)
+                   (:in-hole (:var x) (:var x))])
+                 (:cons a b)
+                 (((right a) ((right a) no-context))))
 
 (test-reductions ([C (:hole (:cons (:nt C) mt))]
                   [n (1 (:cons (:nt n) mt))]) 
