@@ -8,7 +8,9 @@
     [(_ language relation to-reduce expected)
      #`(let ([actual (reductions `language `relation `to-reduce)])
          #,(syntax/loc stx
-             (test-equal (apply set actual) (apply set `expected))))]))
+             (test-equal (alphabetical actual) (alphabetical `expected))))]))
+(define (alphabetical xs)
+  (sort xs string<=? #:key (λ (x) (format "~s" x))))
 
 (define bool-lang
   '((B (true
