@@ -3,14 +3,12 @@
 (require "reduction.rkt"
          redex)
 
-(define (equal-values? bs cs)
-  (equal? (apply set bs) (apply set cs)))
-
-(define test-reduction
-  (match-lambda
-    [`(test:reduce ,L ,rr ,t ,vs)
-     (begin (printf "~s\n" (term (reduce ,L ,rr ,t)))
-            (equal-values? (term (reduce ,L ,rr ,t)) vs))]))
+(define-syntax (test-reduction stx)
+  (syntax-case stx ()
+    [(_ language relation to-reduce expected)
+     #`(let ([actual (term (reduce language relation to-reduce))])
+         #,(syntax/loc stx
+             (test-equal (apply set actual) (apply set `expected))))]))
 
 (define bool-lang
   '((B (true
@@ -31,50 +29,50 @@
      ((:in-hole (:name C (:nt C)) (:cons or (:cons true (:name B (:nt B)))))
       (:in-hole (:var C) true))))
 
-(test-reduction `(test:reduce ,bool-lang
-                              ,bool-rr
-                              true
-                              ()))
-(test-reduction `(test:reduce ,bool-lang
-                              ,bool-rr
-                              false
-                              ()))
-(test-reduction `(test:reduce ,bool-lang
-                              ,bool-rr
-                              (:cons and (:cons true true))
-                              (true)))
-(test-reduction `(test:reduce ,bool-lang
-                              ,bool-rr
-                              (:cons and (:cons false true))
-                              (false)))
-(test-reduction `(test:reduce ,bool-lang
-                              ,bool-rr
-                              (:cons and (:cons true (:cons and (:cons true true))))
-                              ((:cons and (:cons true true)))))
-(test-reduction `(test:reduce ,bool-lang
-                              ,bool-rr
-                              (:cons and (:cons false  (:cons and (:cons true true))))
-                              (false)))
-(test-reduction `(test:reduce ,bool-lang
-                              ,bool-rr
-                              (:cons or (:cons true true))
-                              (true)))
-(test-reduction `(test:reduce ,bool-lang
-                              ,bool-rr
-                              (:cons or (:cons false true))
-                              (true)))
-(test-reduction `(test:reduce ,bool-lang
-                              ,bool-rr
-                              (:cons or (:cons true (:cons and (:cons true true))))
-                              (true)))
-(test-reduction `(test:reduce ,bool-lang
-                              ,bool-rr
-                              (:cons or (:cons false (:cons and (:cons true true))))
-                              ((:cons and (:cons true true)))))
-(test-reduction `(test:reduce ,bool-lang
-                              ,bool-rr
-                              (:cons and (:cons (:cons or (:cons true false)) false))
-                              ((:cons and (:cons true false)))))
+(test-reduction ,bool-lang
+                ,bool-rr
+                true
+                ())
+(test-reduction ,bool-lang
+                ,bool-rr
+                false
+                ())
+(test-reduction ,bool-lang
+                ,bool-rr
+                (:cons and (:cons true true))
+                (true))
+(test-reduction ,bool-lang
+                ,bool-rr
+                (:cons and (:cons false true))
+                (false))
+(test-reduction ,bool-lang
+                ,bool-rr
+                (:cons and (:cons true (:cons and (:cons true true))))
+                ((:cons and (:cons true true))))
+(test-reduction ,bool-lang
+                ,bool-rr
+                (:cons and (:cons false  (:cons and (:cons true true))))
+                (false))
+(test-reduction ,bool-lang
+                ,bool-rr
+                (:cons or (:cons true true))
+                (true))
+(test-reduction ,bool-lang
+                ,bool-rr
+                (:cons or (:cons false true))
+                (true))
+(test-reduction ,bool-lang
+                ,bool-rr
+                (:cons or (:cons true (:cons and (:cons true true))))
+                (true))
+(test-reduction ,bool-lang
+                ,bool-rr
+                (:cons or (:cons false (:cons and (:cons true true))))
+                ((:cons and (:cons true true))))
+(test-reduction ,bool-lang
+                ,bool-rr
+                (:cons and (:cons (:cons or (:cons true false)) false))
+                ((:cons and (:cons true false))))
 
 (define a-lang
   '((a (aa))))
@@ -85,7 +83,9 @@
     ((:name a (:nt a))
      (:var a))))
 
-(test-reduction `(test:reduce ,a-lang
+(test-reduction ,a-lang
                 ,a-rr
                 aa
-                (aa ((left aa) no-context))))
+                (aa ((left aa) no-context)))
+
+(test-results)
