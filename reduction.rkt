@@ -2,10 +2,9 @@
 
 (require (except-in redex plug)
          "patterns.rkt"
-         "syntax-directed-match.rkt")
+         "syntax-directed-match-total.rkt")
 
-(provide reduce
-         reduction)
+(provide reductions)
 
 (define-extended-language reduction patterns
   (s a
@@ -46,14 +45,11 @@
   [(plug ((right t_1) C) t_2)
    (:cons t_1 (plug C t_2))])
 
-(define-metafunction reduction
-  reduce : L ((p s) ...) t -> (v ...)
-  [(reduce L () t)
-   ()]
-  [(reduce L ((p s)) t)
-   ((eval s b_*) ...)
-   (where (b_* ...) (matches L p t))]
-  [(reduce L ((p_1 s_1) (p_2 s_2) ...) t)
-   ,(remove-duplicates (term (v_* ... v_** ...)))
-   (where (v_* ...) (reduce L ((p_1 s_1)) t))
-   (where (v_** ...) (reduce L ((p_2 s_2) ...) t))])
+(define (reductions language rules to-reduce)
+  (remove-duplicates
+   (append-map 
+    (match-lambda
+      [(list p s)
+       (map (λ (b) (term (eval ,s ,b)))
+            (matches language p to-reduce))])
+    rules)))
