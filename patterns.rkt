@@ -82,8 +82,19 @@
 
 (define (merge-bindings b1 b2)
   (let/ec return
-    (define (c t u)
-      (if (equal? t u)
-          t
+    (define (c v w)
+      (or (term (merge-value ,v ,w))
           (return false)))
     (dict-union b1 b2 #:combine c)))
+
+(define-metafunction patterns
+  merge-value : v v -> v or #f
+  [(merge-value v v) v]
+  [(merge-value C t)
+   C
+   (where t (uncontext C))]
+  [(merge-value t C)
+   C
+   (where t (uncontext C))]
+  [(merge-value v_1 v_2) ; else
+   #f])

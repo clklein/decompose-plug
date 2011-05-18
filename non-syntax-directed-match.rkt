@@ -19,7 +19,7 @@
     (L a a empty)
     (is-atom a)]
    [(L t x p b) ; name
-    (L t `(:name ,x ,p) (cons (list x t) b))
+    (L t `(:name ,x ,p) (cons (cons x t) b))
     (matches L t p b)]
    [(L t x p ps b) ; non-terminal
     (L t `(:nt ,x) empty)
@@ -42,7 +42,7 @@
    [(L t) ; hole
     (L t 'no-context t ':hole empty)]
    [(L t1 C t2 x p t b) ; name
-    (L t1 C t2 `(:name ,x ,p) (cons (list x t) b))
+    (L t1 C t2 `(:name ,x ,p) (cons (cons x t) b))
     (decomposes L t1 C t2 p b)
     (%is/nonvar (C) t (uncontext/proc C))]
    [(L t1 t2 C t p1 p2 b1 b2 b) ; cons-left

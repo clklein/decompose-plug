@@ -89,18 +89,6 @@
   [(merge-binding x v b) ; else
    #f])
 
-(define-metafunction directed-matching
-  merge-value : v v -> v or #f
-  [(merge-value v v) v]
-  [(merge-value C t)
-   C
-   (where t (uncontext C))]
-  [(merge-value t C)
-   C
-   (where t (uncontext C))]
-  [(merge-value v_1 v_2) ; else
-   #f])
-
 ;; metafunctions to facilitate typesetting
 (define-metafunction directed-matching
   [(set any ...) (any ...)])
