@@ -1,6 +1,6 @@
 #lang racket
 
-(require redex
+(require (except-in redex plug)
          "patterns.rkt"
          "syntax-directed-match.rkt")
 
@@ -29,26 +29,22 @@
    (where t_1 (eval s_1 b))
    (where t_2 (eval s_2 b))]
   [(eval (:in-hole s_1 s_2) b)
-   (plug-ctxt C_1 (eval s_2 b))
+   (plug C_1 (eval s_2 b))
    (where C_1 (eval s_1 b))]
   [(eval (:var x_i) ([x_0 v_0] ... [x_i v_i] [x_i+1 v_i+1] ...))
    v_i])
 
 (define-metafunction reduction
-  plug-ctxt : v v -> v
-  [(plug-ctxt no-context v) v]
-  [(plug-ctxt ((left t) C) v)
-   ((left t) C_*)
-   (where C_* (plug-ctxt C v))]
-  [(plug-ctxt ((left t) C) v)
-   (:cons t_* t)
-   (where t_* (plug-ctxt C v))]
-  [(plug-ctxt ((right t) C) v)
-   ((right t) C_*)
-   (where C_* (plug-ctxt C v))]
-  [(plug-ctxt ((right t) C) v)
-   (:cons t t_*)
-   (where t_* (plug-ctxt C v))])
+  plug : v v -> v
+  [(plug no-context v) v]
+  [(plug ((left t) C_1) C_2)
+   ((left t) (plug C_1 C_2))]
+  [(plug ((left t_1) C) t_2)
+   (:cons (plug C t_2) t_1)]
+  [(plug ((right t) C_1) C_2)
+   ((right t) (plug C_1 C_2))]
+  [(plug ((right t_1) C) t_2)
+   (:cons t_1 (plug C t_2))])
 
 (define-metafunction reduction
   reduce : L ((p s) ...) t -> (v ...)
