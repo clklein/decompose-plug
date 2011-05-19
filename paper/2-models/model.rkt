@@ -16,35 +16,35 @@
          subst subst-1 subst-A)
 
 (define-language arith
-  (a (+ a ...) number))
+  (a (+ a a) number))
 
 (define-extended-language arith/red arith
-  (C (+ a ... C a ...) hole))
+  (C (+ C a) (+ a C) hole))
 
 (define arith-red
   (reduction-relation
    arith/red
-   (--> (in-hole C (+ number ...))
-        (in-hole C (Σ number ...)))))
+   (--> (in-hole C (+ number_1 number_2))
+        (in-hole C (Σ number_1 number_2)))))
  
 (define-language Λ
-  (e (e e ...) x (λ (x ...) e)
-     + number)
+  (e (e e) x (λ (x) e)
+     |+1| number)
   ((x y) variable-not-otherwise-mentioned))
 
 (define-extended-language Λ/red Λ
-  (v (λ (x ...) e) + number)
-  (E (v ... E e ...) hole))
+  (v (λ (x) e) |+1| number)
+  (E (E e) (v E) hole))
 
 (define cbv-red
   (reduction-relation 
    Λ/red
-   (--> (in-hole E ((λ (x ..._1) e) v ..._1))
-        (in-hole E (subst e (x v) ...))
+   (--> (in-hole E ((λ (x) e) v))
+        (in-hole E (subst e (x v)))
         "βv")
-   (--> (in-hole E (+ number ...))
-        (in-hole E (Σ number ...))
-        "+")))
+   (--> (in-hole E (|+1| number))
+        (in-hole E (Σ number 1))
+        "+1")))
 
 (define-extended-language Λk/red Λ/red
   (e .... call/cc (cont (hide-hole E)))
@@ -70,16 +70,16 @@
      (E e)
      ((λ (x) E) e)
      ((λ (x) (in-hole E x)) E)
-     (+ v ... E e ...))
+     (|+1| E))
   (A v ((λ (x) A) e))
-  (v number (λ (x) e) +))
+  (v number (λ (x) e) |+1|))
 
 (define cbn-red
   (reduction-relation
    Λneed/red
-   (--> (in-hole E (+ number ...))
-        (in-hole E (Σ number ...))
-        "+")
+   (--> (in-hole E (|+1| number))
+        (in-hole E (Σ number 1))
+        "+1")
    (--> (in-hole E_1 ((λ (x) (in-hole E_2 x)) v))
         (in-hole E_1 ((λ (x) (in-hole E_2 v)) v))
         "deref")

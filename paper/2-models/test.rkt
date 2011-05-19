@@ -9,8 +9,8 @@
 (test-equal (term (subst-1 x y (x (y z)))) (term (y (y z))))
 (test-equal (term (subst-1 x y ((λ (x) x) ((λ (y1) y1) (λ (x) z)))))
             (term ((λ (x) x) ((λ (y2) y2) (λ (x) z)))))
-(test-equal (term (subst-1 x y (if0 (+ 1 x) x x)))
-            (term (if0 (+ 1 y) y y)))
+(test-equal (term (subst-1 x y (if0 (|+1| x) x x)))
+            (term (if0 (|+1| y) y y)))
 (test-equal (term (subst-1 x (λ (z) y) (λ (y) x)))
             (term (λ (y1) (λ (z) y))))
 (test-equal (term (subst-1 x 1 (λ (y) x)))
@@ -32,8 +32,8 @@
 (test-equal (term (subst-1 x 1 (λ (x x) x)))
             (term (λ (x x) x)))
 
-(test-equal (term (subst (+ x y) (x 1) (y 2)))
-            (term (+ 1 2)))
+(test-equal (term (subst ((|+1| x) y) (x 1) (y 2)))
+            (term ((|+1| 1) 2)))
 
 ;; reduction rules tests
 
@@ -50,14 +50,17 @@
          (term ((λ (x) (λ (y) x)) (λ (z) y)))
          (term (λ (y1) (λ (z) y))))
 (test-->> cbv-red
-          (term ((λ (f x y) (f x y))
-                 (λ (g x) (g x))
-                 (λ (x) x)
+          (term ((((λ (f) (λ (x) (λ (y) ((f x) y))))
+                  (λ (g) (λ (x) (g x))))
+                  (λ (x) x))
                  2))
           (term 2))
 (test--> cbv-red
-         (term (+ 1 2))
+         (term (|+1| 2))
          (term 3))
+(test-->> cbv-red
+          (term (((λ (f) (λ (x) (f (f x)))) |+1|) 3))
+          (term 5))
 
 ;; in this language, call/cc is not a value, but a free variable
 ;; so this expression doesn't reduce
@@ -65,16 +68,20 @@
          (term ((λ (x) x) call/cc)))
 
 (test--> cont-red
-         (term (+ 1 ((cont hole) 2)))
+         (term (|+1| ((cont hole) 2)))
          (term 2))
 
 (test-->> cont-red
-          (term (+ (call/cc (λ (k) (k 1))) 2))
-          (term 3))
+          (term (|+1| (call/cc (λ (k) (k 1)))))
+          (term 2))
 
 (test-->> cont-red
-          (term (+ (call/cc (λ (k) (k 2))) x))
-          (term (+ 2 x)))
+          (term (((λ (x) x) (call/cc (λ (k) (k 2)))) x))
+          (term (2 x)))
+
+(test-->> cbv-red
+          (term (((λ (f) (λ (x) (f (f x)))) |+1|) 3))
+          (term 5))
 
 ;; no irreducible terms reachable from here (and also a finite graph)
 (test-->> cont-red 
@@ -100,44 +107,48 @@
 
 (test-equal (term (subst-A ((λ (x) 1) 2)))
             (term 1))
-(test-equal (term (subst-A ((λ (x) ((λ (y) 17) 2)) (+ 1 2))))
+(test-equal (term (subst-A ((λ (x) ((λ (y) 17) 2)) (|+1| 2))))
             (term 17))
 (test-equal (term (subst-A ((λ (x) (λ (y) x)) 2)))
             (term (λ (y) 2)))
-(test-equal (term (subst-A ((λ (x) (λ (y) (+ x y))) 2)))
-            (term (λ (y1) (+ 2 y1))))
+(test-equal (term (subst-A ((λ (x) (λ (y) ((x |+1|) y))) 2)))
+            (term (λ (y1) ((2 |+1|) y1))))
 
 ;; cbn tests
 (test-->> cbn-red
           #:equiv cbn-equiv
-          (term ((λ (x) 1) (+ 1 2)))
-          (term ((λ (x) 1) (+ 1 2))))
+          (term ((λ (x) 1) (|+1| 2)))
+          (term ((λ (x) 1) (|+1| 2))))
 (test-->> cbn-red
           #:equiv cbn-equiv
-          (term ((λ (x) x) (+ 1 2)))
+          (term ((λ (x) x) (|+1| 2)))
           (term ((λ (x) 3) 3)))
 (test-->> cbn-red
           #:equiv cbn-equiv
-          (term (+ (+ 1 2) 3))
-          (term 6))
+          (term (|+1| (|+1| 2)))
+          (term 4))
 (test-->> cbn-red
           #:equiv cbn-equiv
-          (term (((λ (x) x) (λ (y) (+ y 1))) 2))
+          (term (((λ (x) x) (λ (y) (|+1| y))) 2))
           (term 3))
 (test-->> cbn-red
           #:equiv cbn-equiv
-          (term (((λ (x) (λ (y) (+ x y))) 2) 1))
-          (term ((λ (x) ((λ (y) 3) 2)) 1)))
+          (term (((λ (x) (λ (y) (|+1| x))) 2) 1))
+          (term ((λ (x) ((λ (y) 3) 1)) 2)))
 (test-->> cbn-red
           #:equiv cbn-equiv
-          (term (((λ (x) (λ (y) (+ y x))) 2) 1))
-          (term ((λ (x) ((λ (y) 3) 2)) 1)))
+          (term (((λ (x) (λ (y) (|+1| y))) 2) 1))
+          (term ((λ (x) ((λ (y) 2) 1)) 2)))
 (test-->> cbn-red
           #:equiv cbn-equiv
           (term (((λ (f) (λ (x) (f (f (f x)))))
-                  (λ (x) (+ x 1)))
+                  (λ (x) (|+1| x)))
                  0))
           (term 3))
+(test-->> cbn-red
+          #:equiv cbn-equiv
+          (term (((λ (f) (λ (x) (f (f x)))) |+1|) 3))
+          (term 5))
 
 (test-results)
 
