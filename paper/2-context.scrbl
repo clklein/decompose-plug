@@ -3,8 +3,8 @@
 @(require redex/pict
           redex/reduction-semantics
           (only-in scribble/core table paragraph style element)
-          "kont-model/model.rkt"
-          "kont-model/util.rkt"
+          "2-models/model.rkt"
+          "2-models/util.rkt"
           "wfigure.rkt"
           "citations.rkt")
 
