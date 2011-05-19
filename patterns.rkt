@@ -75,10 +75,12 @@
         (for/list ([m b])
           (match m
             [(list x v)
-             (list x
-                   (if (context? v)
-                       (term (uncontext ,v))
-                       v))]))))))
+             (list x (term (non-context ,v)))]))))))
+
+(define-metafunction patterns
+  non-context : v -> t
+  [(non-context t) t]
+  [(non-context C) (uncontext C)])
 
 (define (merge-bindings b1 b2)
   (let/ec return

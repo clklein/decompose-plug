@@ -82,12 +82,12 @@
                   ((:name a (:nt a))
                    (:var a)))
                  aa
-                 (aa ((left aa) no-context)))
+                 (aa (:cons :hole aa)))
 (test-reductions ((a (aa)))
                  (((:in-hole (:name x :hole) (:name a (:nt a)))
                    (:cons (:var a) (:var x))))
                  aa
-                 (((right aa) no-context)))
+                 ((:cons aa :hole)))
 
 (test-reductions ()
                  ([a (:cons a a)])
@@ -98,12 +98,12 @@
                  ([(:in-hole (:name x (:cons :hole b)) a)
                    (:in-hole (:var x) (:var x))])
                  (:cons a b)
-                 (((left b) ((left b) no-context))))
+                 ((:cons (:cons :hole b) b)))
 (test-reductions ()
                  ([(:in-hole (:name x (:cons a :hole)) b)
                    (:in-hole (:var x) (:var x))])
                  (:cons a b)
-                 (((right a) ((right a) no-context))))
+                 ((:cons a (:cons a :hole))))
 
 (test-reductions ([C (:hole (:cons (:nt C) mt))]
                   [n (1 (:cons (:nt n) mt))]) 

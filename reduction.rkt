@@ -50,6 +50,6 @@
    (append-map 
     (match-lambda
       [(list p s)
-       (map (λ (b) (term (eval ,s ,b)))
+       (map (λ (b) (term (non-context (eval ,s ,b))))
             (matches language p to-reduce))])
     rules)))
