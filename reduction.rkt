@@ -35,7 +35,7 @@
   [(eval (:var x_i) ([x_0 v_0] ... [x_i v_i] [x_i+1 v_i+1] ...))
    v_i]
   [(eval (:app f s) b)
-   ,((term f) (term (eval s b)))])
+   ,((term f) (term (non-context (eval s b))))])
 
 (define-metafunction reduction
   plug : v v -> v

@@ -117,5 +117,9 @@
                           (:cons (:var x) (:var y)))])
                  (:cons 1 3)
                  (4))
-
+(test-reductions () 
+                 ([(:in-hole (:name x (:cons :hole 2)) 1)
+                    (:app ,values (:var x))])
+                 (:cons 1 2)
+                 ((:cons :hole 2)))
 (test-results)
