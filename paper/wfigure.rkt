@@ -2,17 +2,26 @@
 (require (for-syntax racket/base)
          scribble/core
          scribble/latex-properties
-         scribble/decode)
+         scribble/decode
+         scriblib/figure
+         setup/main-collects)
 (provide wfigure)
 
 (define-syntax (wfigure stx)
    (syntax-case stx ()
-     [(_ #:size s . args)
-      #'(wfigure/proc s (list . args))]
-     [(_ . args)
-      #'(wfigure #:size 2 . args)]))
-                                        
-(define (wfigure/proc size args)
+     [(_ #:size s tag caption . args)
+      #'(wfigure/proc tag caption s (list . args))]
+     [(_ tag caption . args)
+      #'(wfigure #:size 2 tag caption . args)]))
+
+;; abstraction breaking ...
+(define figure-style-extras
+  (let ([abs (lambda (s)
+               (path->main-collects-relative
+                (collection-file-path s "scriblib")))])
+    (list (make-tex-addition (abs "figure.tex")))))
+
+(define (wfigure/proc tag caption size args)
   (define rendered-size
     (cond
       [(equal? size 2) "T"]
@@ -23,5 +32,13 @@
   (nested-flow
    (style (format "Wfigure~a" rendered-size)
           (list (make-tex-addition "wfigure.tex")))
-   f))
+   (append 
+    f
+    (list
+     (make-paragraph
+      plain
+      (list
+       (make-element (make-style "Legend" figure-style-extras)
+                     (list (Figure-target tag) ": " 
+                           caption))))))))
 
