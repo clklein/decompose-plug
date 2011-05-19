@@ -111,4 +111,11 @@
                  (:cons 1 mt)
                  (2))
 
+(test-reductions ([n (1 2 3 4 5)]) 
+                 ([(:cons (:name x (:nt n)) (:name y (:nt n)))
+                    (:app ,(match-lambda [`(:cons ,x ,y) (+ x y)])
+                          (:cons (:var x) (:var y)))])
+                 (:cons 1 3)
+                 (4))
+
 (test-results)

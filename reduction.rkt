@@ -10,7 +10,9 @@
   (s a
      (:cons s s)
      (:in-hole s s)
-     (:var x)))
+     (:var x)
+     (:app f s))
+  (f (side-condition any_1 (procedure? (term any_1)))))
 
 (define-metafunction reduction
   eval : s b -> v
@@ -31,7 +33,9 @@
    (plug C_1 (eval s_2 b))
    (where C_1 (eval s_1 b))]
   [(eval (:var x_i) ([x_0 v_0] ... [x_i v_i] [x_i+1 v_i+1] ...))
-   v_i])
+   v_i]
+  [(eval (:app f s) b)
+   ,((term f) (term (eval s b)))])
 
 (define-metafunction reduction
   plug : v v -> v
