@@ -500,3 +500,16 @@
                                 #:pages '(265 301))
    #:date "1997"))
   
+(define berendrecht 
+  (make-bib 
+    #:author "H. P. Barendregt"
+    #:title "The Lambda Calculus: Its Syntax and Semantics"
+    #:location (book-location #:publisher "North Holland")
+    #:date 1984))
+
+(define racket-vm
+  (make-bib
+    #:title "The Racket Virtual Machine and Randomized Testing"
+    #:author (authors "Casey Klein" "Matthew Flatt" "Robert Bruce Findler")
+    #:url "http://plt.eecs.northwestern.edu/racket-machine/"
+    #:date "to appear"))

@@ -18,6 +18,9 @@
 
 @section{Related Work}
 
+Contexts date back at least to Berendrecht@~cite[berendrecht], who used them to define the compatible closure
+of a reduction relation. 
+
 @~cite[context-sensitive-rewriting-fundamentals]
 
 @(generate-bibliography)
