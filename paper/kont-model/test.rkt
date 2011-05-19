@@ -59,6 +59,11 @@
          (term (+ 1 2))
          (term 3))
 
+;; in this language, call/cc is not a value, but a free variable
+;; so this expression doesn't reduce
+(test--> cbv-red
+         (term ((λ (x) x) call/cc)))
+
 (test--> cont-red
          (term (+ 1 ((cont hole) 2)))
          (term 2))

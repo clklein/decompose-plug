@@ -5,7 +5,7 @@
          scribble/decode
          scriblib/figure
          setup/main-collects)
-(provide wfigure)
+(provide wfigure figure-ref Figure-ref)
 
 (define-syntax (wfigure stx)
    (syntax-case stx ()

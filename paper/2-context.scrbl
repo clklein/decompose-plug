@@ -2,6 +2,7 @@
 
 @(require redex/pict
           redex/reduction-semantics
+          (only-in scribble/core table paragraph style element)
           "kont-model/model.rkt"
           "kont-model/util.rkt"
           "wfigure.rkt"
@@ -10,21 +11,41 @@
 
 @title{Matching and Contexts}
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras posuere, lectus a tincidunt ultrices, enim neque dictum diam, sit amet pretium sapien eros sed enim. Suspendisse potenti. Quisque tortor leo, sagittis quis rhoncus nec, sagittis eget est. Maecenas eu metus at risus porta posuere et sed elit. Nunc vulputate ultricies tellus, vitae accumsan nisl sollicitudin eu. Nam dapibus dui in erat elementum pulvinar. Quisque scelerisque, neque facilisis ullamcorper mattis, nunc purus tincidunt massa, eget mollis libero arcu vitae mi. Aliquam lobortis nisl in metus commodo sed auctor dolor volutpat. Morbi risus erat, ultricies at mollis et, sagittis ac tellus. Fusce consequat lorem id lectus semper semper. Aenean facilisis purus eget nunc viverra nec sagittis tortor tempor. Vestibulum scelerisque, orci at ultrices pharetra, ligula neque ullamcorper dolor, eget vestibulum nisi justo eu neque. Vestibulum lacinia volutpat felis, ac fermentum justo aliquam id.
-
 @wfigure["fig:arith" "Arithmetic Expressions"]{
 @(render-language arith)
 
 @(render-language arith/red)
 
+@paragraph[(style "vspace" '()) '(".1in")]
+
 @(render-reduction-relation arith-red)
 }
 
+This section introduces the notion of a context and explains, through a series of examples, how pattern matching for contexts works.
+In its essence, a pattern of the form @rr[(in-hole C e)] matches an expression when the expression can be split into two parts,
+an outer part (the context) that matches @rr[C] and an inner part that matches @rr[e]. The outer part also marks where the inner
+part appears with a hole, written @rr[hole]. In other words, if you think of an expression as a tree, matching against
+@rr[(in-hole C e)] finds some subtree of the expression that matches @rr[e], and then replaces that subterm with the hole
+to build a new expression in such a way that that new expression matches @rr[C].
 
-Aliquam tempor, enim quis dignissim viverra, nisi lacus consequat justo, vitae cursus orci lacus id elit. Ut placerat convallis venenatis. Fusce lacinia imperdiet feugiat. Suspendisse potenti. Phasellus in nunc diam. Praesent vel feugiat erat. Suspendisse urna quam, dictum porttitor eleifend in, lacinia vitae mauris. Suspendisse at eros vel libero pulvinar sodales. Phasellus magna nulla, gravida vitae congue at, tempor ac odio. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. In hac habitasse platea dictumst. Duis id leo vitae enim sodales aliquam. In quis libero in risus ultrices ultrices. Maecenas volutpat, risus vitae dapibus tristique, est risus bibendum justo, et volutpat risus risus quis enim. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nullam scelerisque quam at sem vestibulum a tempus mauris sagittis. Duis metus neque, malesuada sit amet commodo in, gravida sed purus. Proin auctor varius molestie. Quisque dui ligula, tempor ut ultrices eu, volutpat venenatis orci.
+To get warmed up, consider @figure-ref["fig:arith"]. In this language @rr[a] matches addition expressions and @rr[C] matches
+addition expressions with a hole at any subexpression. (The ellipses are our notation for the Kleene star operator, allowing
+whatever appears before the ellipsis to match as many or as few times as necessary.)
+For example, the expression @rr[(+ 1 2)] matches  @rr[(in-hole C a)] three ways:
+@centered{
+@table[(style #f '())
+       (list (list @paragraph[(style #f '()) @list{@rr[C] = @rr[hole]}]
+                   @paragraph[(style "hspace" '())]{.1in}
+                   @paragraph[(style #f '()) @list{@rr[a] = @rr[(+ 1 2)]}])
+             (list @paragraph[(style #f '()) @list{@rr[C] = @rr[(+ hole 2)]}]
+                   @paragraph[(style "hspace" '())]{.1in}
+                   @paragraph[(style #f '()) @list{@rr[a] = @rr[1]}])
+             (list @paragraph[(style #f '()) @list{@rr[C] = @rr[(+ 1 hole)]}]
+                   @paragraph[(style "hspace" '())]{.1in}
+                   @paragraph[(style #f '()) @list{@rr[a] = @rr[2]}]))]}
 
-
-Aliquam tempor, enim quis dignissim viverra, nisi lacus consequat justo, vitae cursus orci lacus id elit. Ut placerat convallis venenatis. Fusce lacinia imperdiet feugiat. Suspendisse potenti. Phasellus in nunc diam. Praesent vel feugiat erat. Suspendisse urna quam, dictum porttitor eleifend in, lacinia vitae mauris. Suspendisse at eros vel libero pulvinar sodales. Phasellus magna nulla, gravida vitae congue at, tempor ac odio. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. In hac habitasse platea dictumst. Duis id leo vitae enim sodales aliquam. In quis libero in risus ultrices ultrices. Maecenas volutpat, risus vitae dapibus tristique, est risus bibendum justo, et volutpat risus risus quis enim. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nullam scelerisque quam at sem vestibulum a tempus mauris sagittis. Duis metus neque, malesuada sit amet commodo in, gravida sed purus. Proin auctor varius molestie. Quisque dui ligula, tempor ut ultrices eu, volutpat venenatis orci.
+Accordingly, the reduction relation given in @figure-ref["fig:arith"] reduces addition expressions wherever they appear
+in an expression, reducing @rr[(+ (+ 1 2) (+ 3 4))] to both @rr[(+ 3 (+ 3 4))] and @rr[(+ (+ 1 2) 7)].
 
 
 @wfigure[#:size 2.2 "fig:lc" "λ-calculus"]{
@@ -32,12 +53,22 @@ Aliquam tempor, enim quis dignissim viverra, nisi lacus consequat justo, vitae c
 
 @(render-language Λ/red)
 
+@paragraph[(style "vspace" '()) '(".1in")]
+
+
 @(render-reduction-relation cbv-red)
 }
 
-Curabitur lobortis luctus libero. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi venenatis metus nec sem tincidunt accumsan in ac neque. Proin viverra sapien a sapien feugiat quis feugiat mi sagittis. Duis quis justo sem. Quisque id augue risus, quis convallis urna. Fusce facilisis luctus ligula at cursus. Vivamus eget erat eget erat ultrices luctus id sed tortor. Mauris pellentesque odio in tortor semper a aliquam ligula pulvinar. Phasellus egestas metus eu ligula interdum ac pulvinar massa lobortis. Aenean bibendum ultrices dui at mattis. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Suspendisse in velit ut augue malesuada sodales in a dui. Vivamus mattis viverra neque, eget molestie dolor malesuada non. Sed auctor, nulla vitae lobortis interdum, ipsum ante sollicitudin nunc, ac feugiat odio dolor quis nulla. Vestibulum eget dui a neque sagittis facilisis et vel tellus.
+A common use of contexts is to restrict the places where a reduction may occur in order to model a call-by-value lambda calculus. @Figure-ref["fig:lc"] 
+gives a definition of @rr[E] that enforces this restriction. Specifically, consider the first production of @rr[E]. It allows
+the hole to appear only to the right of values. For example, this expression
+@rr[(f (+ 1 2) (+ 3 4))]
+decomposes into this context
+@rr[(f hole (+ 3 4))]
+but not this one:
+@rr[(f (+ 1 2) hole)]
 
-Curabitur lobortis luctus libero. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi venenatis metus nec sem tincidunt accumsan in ac neque. Proin viverra sapien a sapien feugiat quis feugiat mi sagittis. Duis quis justo sem. Quisque id augue risus, quis convallis urna. Fusce facilisis luctus ligula at cursus. Vivamus eget erat eget erat ultrices luctus id sed tortor. Mauris pellentesque odio in tortor semper a aliquam ligula pulvinar. Phasellus egestas metus eu ligula interdum ac pulvinar massa lobortis. Aenean bibendum ultrices dui at mattis. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Suspendisse in velit ut augue malesuada sodales in a dui. Vivamus mattis viverra neque, eget molestie dolor malesuada non. Sed auctor, nulla vitae lobortis interdum, ipsum ante sollicitudin nunc, ac feugiat odio dolor quis nulla. Vestibulum eget dui a neque sagittis facilisis et vel tellus.
+
 
 @wfigure["fig:cbn" "Call-by-need"]{
 @(render-language Λneed/red #:nts '(E))

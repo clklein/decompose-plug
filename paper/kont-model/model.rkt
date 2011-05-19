@@ -16,10 +16,10 @@
          subst subst-1 subst-A)
 
 (define-language arith
-  (e (+ e ...) number))
+  (a (+ a ...) number))
 
 (define-extended-language arith/red arith
-  (C (+ e ... C e ...) hole))
+  (C (+ a ... C a ...) hole))
 
 (define arith-red
   (reduction-relation
@@ -33,9 +33,7 @@
   ((x y) variable-not-otherwise-mentioned))
 
 (define-extended-language Λ/red Λ
-  (v (λ (x ...) e) call/cc
-     
-     + number)
+  (v (λ (x ...) e) + number)
   (E (v ... E e ...) hole))
 
 (define cbv-red
