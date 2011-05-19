@@ -15,27 +15,27 @@
   (f (side-condition any_1 (procedure? (term any_1)))))
 
 (define-metafunction reduction
-  eval : s b -> v
-  [(eval a b) a]
-  [(eval (:cons s_1 s_2) b)
+  inst : s b -> v
+  [(inst a b) a]
+  [(inst (:cons s_1 s_2) b)
    ((left t) C)
-   (where C (eval s_1 b))
-   (where t (eval s_2 b))]
-  [(eval (:cons s_1 s_2) b)
+   (where C (inst s_1 b))
+   (where t (inst s_2 b))]
+  [(inst (:cons s_1 s_2) b)
    ((right t) C)
-   (where t (eval s_1 b))
-   (where C (eval s_2 b))]
-  [(eval (:cons s_1 s_2) b)
+   (where t (inst s_1 b))
+   (where C (inst s_2 b))]
+  [(inst (:cons s_1 s_2) b)
    (:cons t_1 t_2)
-   (where t_1 (eval s_1 b))
-   (where t_2 (eval s_2 b))]
-  [(eval (:in-hole s_1 s_2) b)
-   (plug C_1 (eval s_2 b))
-   (where C_1 (eval s_1 b))]
-  [(eval (:var x_i) ([x_0 v_0] ... [x_i v_i] [x_i+1 v_i+1] ...))
+   (where t_1 (inst s_1 b))
+   (where t_2 (inst s_2 b))]
+  [(inst (:in-hole s_1 s_2) b)
+   (plug C_1 (inst s_2 b))
+   (where C_1 (inst s_1 b))]
+  [(inst (:var x_i) ([x_0 v_0] ... [x_i v_i] [x_i+1 v_i+1] ...))
    v_i]
-  [(eval (:app f s) b)
-   ,((term f) (term (non-context (eval s b))))])
+  [(inst (:app f s) b)
+   ,((term f) (term (non-context (inst s b))))])
 
 (define-metafunction reduction
   plug : v v -> v
@@ -54,6 +54,6 @@
    (append-map 
     (match-lambda
       [(list p s)
-       (map (λ (b) (term (non-context (eval ,s ,b))))
+       (map (λ (b) (term (non-context (inst ,s ,b))))
             (matches language p to-reduce))])
     rules)))
