@@ -59,6 +59,9 @@
          (term (|+1| 2))
          (term 3))
 (test-->> cbv-red
+          (term (|+1| (|+1| (|+1| (|+1| 2)))))
+          (term 6))
+(test-->> cbv-red
           (term (((λ (f) (λ (x) (f (f x)))) |+1|) 3))
           (term 5))
 
@@ -66,6 +69,10 @@
 ;; so this expression doesn't reduce
 (test--> cbv-red
          (term ((λ (x) x) call/cc)))
+
+(test-->> cbv-red
+          (term (((λ (f) (λ (x) (f (f x)))) |+1|) 3))
+          (term 5))
 
 (test--> cont-red
          (term (|+1| ((cont hole) 2)))
@@ -78,10 +85,9 @@
 (test-->> cont-red
           (term (((λ (x) x) (call/cc (λ (k) (k 2)))) x))
           (term (2 x)))
-
-(test-->> cbv-red
-          (term (((λ (f) (λ (x) (f (f x)))) |+1|) 3))
-          (term 5))
+(test-->> cont-red
+          (term (|+1| (|+1| (|+1| (|+1| 2)))))
+          (term 6))
 
 ;; no irreducible terms reachable from here (and also a finite graph)
 (test-->> cont-red 
@@ -127,6 +133,10 @@
           #:equiv cbn-equiv
           (term (|+1| (|+1| 2)))
           (term 4))
+(test-->> cbn-red
+          #:equiv cbn-equiv
+          (term (|+1| (|+1| (|+1| (|+1| 2)))))
+          (term 6))
 (test-->> cbn-red
           #:equiv cbn-equiv
           (term (((λ (x) x) (λ (y) (|+1| y))) 2))

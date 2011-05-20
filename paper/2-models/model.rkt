@@ -34,7 +34,7 @@
 
 (define-extended-language Λ/red Λ
   (v (λ (x) e) |+1| number)
-  (E (E e) (v E) hole))
+  (E (E e) (v E) (|+1| E) hole))
 
 (define cbv-red
   (reduction-relation 
