@@ -10,8 +10,8 @@
 ;; in section 2.
 (define-extended-language typesetting-lang
   Λk/red
-  (C λ)
-  (a λ)
+  ((M C) E)
+  (a e)
   ((f g) x))
   
 (define-syntax-rule 

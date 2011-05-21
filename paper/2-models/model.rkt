@@ -95,16 +95,16 @@
         "assoc")))
 
 (define-extended-language Λdk/red Λk/red
-  (e .... (\# e) call/comp)
+  (e .... (|#| e) call/comp)
   (v .... call/comp)
-  (M hole
-     (in-hole M (\# E))))
+  (E (E e) (v E) (|+1| E) hole)
+  (M hole (in-hole M (|#| E))))
 
 (define delim-red
   (reduction-relation
    Λdk/red
-   (--> (in-hole M (\# (in-hole E (call/comp v))))
-        (in-hole M (\# (in-hole E (v (cont E))))))))
+   (--> (in-hole M (|#| (in-hole E (call/comp v))))
+        (in-hole M (|#| (in-hole E (v (cont E))))))))
 
 
 (define-metafunction Λneed/red
