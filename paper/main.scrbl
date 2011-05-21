@@ -1,6 +1,6 @@
 #lang scribble/lncs
 
-@(require scribble/core "citations.rkt")
+@(require "citations.rkt")
 
 @authors[@author[#:inst "1"]{Casey Klein}
          @author[#:inst "2"]{Jay McCarthy}
@@ -15,12 +15,6 @@
 @include-section["3-semantics.scrbl"]
 @include-section["4-algorithm.scrbl"]
 @include-section["5-reduction.scrbl"]
-
-@section{Related Work}
-
-Contexts date back at least to Berendrecht@~cite[berendrecht], who used them to define the compatible closure
-of a reduction relation. 
-
-@~cite[context-sensitive-rewriting-fundamentals]
+@include-section["6-related.scrbl"]
 
 @(generate-bibliography)

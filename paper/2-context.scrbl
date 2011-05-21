@@ -10,7 +10,7 @@
           "citations.rkt")
 
 
-@title{Matching and Contexts}
+@title[#:tag "sec:examples"]{Matching and Contexts}
 
 @wfigure["fig:arith" "Arithmetic Expressions"]{
 @(render-language arith)
