@@ -4,8 +4,8 @@
           redex/reduction-semantics
           (only-in scribble/core table paragraph style element)
           (only-in slideshow/pict vl-append)
-          "2-models/model.rkt"
-          "2-models/util.rkt"
+          "../2-models/model.rkt"
+          "../2-models/util.rkt"
           "wfigure.rkt"
           "citations.rkt")
 

@@ -3,7 +3,7 @@
 @(require scriblib/figure
           redex/pict
           "typesetting-setup.rkt"
-          "../non-syntax-directed-match-define-relation.rkt")
+          "../sem-sem/non-syntax-directed-match-define-relation.rkt")
 
 @title{A Semantics for Matching}
 
