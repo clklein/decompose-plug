@@ -191,11 +191,6 @@ the rule for grabbing a continuation exploits this factoring
 to record only the portion of the context between
 @rr[call/comp] and the nearest enclosing prompt in a continuation.
 
-@(define-language ex2
-   (C (in-hole C (f hole)) hole))
-@wfigure["fig:wacky" "Wacky Context"]{
-@(render-language ex2)
-}
 The interesting aspect of this system is how @rr[M] refers to @rr[E] 
 and how that makes it difficult to support an algorithm
 that matches @rr[M]. For all of the example systems so far in
@@ -205,9 +200,20 @@ the entire term and, once a match has been found, attempting to
 match what appeared at the hole against @rr[e]. With @rr[M], however,
 this leads to an infinite loop because @rr[M] expands to a
 decomposition that includes @rr[M] in the first position.
-A simple fix that works for this example is to simply such
+
+@(define-language ex2
+   (C (in-hole C (f hole)) hole))
+@wfigure["fig:wacky" "Wacky Context"]{
+@(render-language ex2)
+}
+
+A simple fix that works for the delimited continuations 
+example is to treat such
 cycles as a failure to match, but that fix does not work
 for the context given in @figure-ref["fig:wacky"]. 
+Specifically, @rr[C] would match nothing with an algorithm
+that treated those cycles as a failure to match, but the
+context @rr[(f hole)] should match @rr[C].
 (A more complex version of this context came up when one of our Redex
 users was developing an extension to the call-by-need model. 
 We do not yet have a useful model that includes this peculiarity,
