@@ -1,6 +1,5 @@
 #lang racket
-(require redex/reduction-semantics
-         "double.rkt")
+(require redex/reduction-semantics)
 
 (provide arith arith/red 
          Λ 
@@ -14,7 +13,7 @@
          Σ 
          subst subst-1 subst-A)
 
-(define-double-language arith :arith
+(define-language arith :arith
   (a (+ a a) number))
 
 (define-extended-language arith/red arith
