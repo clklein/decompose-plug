@@ -18,11 +18,11 @@
   inst : s b -> v
   [(inst a b) a]
   [(inst (:cons s_1 s_2) b)
-   ((left t) C)
+   ((:left t) C)
    (where C (inst s_1 b))
    (where t (inst s_2 b))]
   [(inst (:cons s_1 s_2) b)
-   ((right t) C)
+   ((:right t) C)
    (where t (inst s_1 b))
    (where C (inst s_2 b))]
   [(inst (:cons s_1 s_2) b)
@@ -39,14 +39,14 @@
 
 (define-metafunction reduction
   plug : v v -> v
-  [(plug no-context v) v]
-  [(plug ((left t) C_1) C_2)
-   ((left t) (plug C_1 C_2))]
-  [(plug ((left t_1) C) t_2)
+  [(plug :no-context v) v]
+  [(plug ((:left t) C_1) C_2)
+   ((:left t) (plug C_1 C_2))]
+  [(plug ((:left t_1) C) t_2)
    (:cons (plug C t_2) t_1)]
-  [(plug ((right t) C_1) C_2)
-   ((right t) (plug C_1 C_2))]
-  [(plug ((right t_1) C) t_2)
+  [(plug ((:right t) C_1) C_2)
+   ((:right t) (plug C_1 C_2))]
+  [(plug ((:right t_1) C) t_2)
    (:cons t_1 (plug C t_2))])
 
 (define (reductions language rules to-reduce)

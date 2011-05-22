@@ -32,9 +32,9 @@
     (match pat
       [':hole
        (if (eq? ':hole term)
-           (set (mtch (decomp 'no-context ':hole) empty-bindings)
+           (set (mtch (decomp ':no-context ':hole) empty-bindings)
                 (mtch (no-decomp) empty-bindings))
-           (set (mtch (decomp 'no-context term) empty-bindings)))]
+           (set (mtch (decomp ':no-context term) empty-bindings)))]
       [(? atom?)
        (if (eq? pat term)
            (set (mtch (no-decomp) empty-bindings))
@@ -48,7 +48,7 @@
        (==> (go p1 term seen)
             (match-lambda
               [(mtch (and (decomp C t1)) b1)
-               (==> (go p2 t1 (if (eq? C 'no-context) seen (set)))
+               (==> (go p2 t1 (if (eq? C ':no-context) seen (set)))
                     (match-lambda
                       [(mtch d2 b2)
                        (merge-decomp C b1 d2 b2)]))]
@@ -112,9 +112,9 @@
                         [((no-decomp) (no-decomp))
                          (set (mtch (no-decomp) b))]
                         [((decomp C t) (no-decomp))
-                         (set (mtch (decomp `((left ,t2) ,C) t) b))]
+                         (set (mtch (decomp `((:left ,t2) ,C) t) b))]
                         [((no-decomp) (decomp C t))
-                         (set (mtch (decomp `((right ,t1) ,C) t) b))]
+                         (set (mtch (decomp `((:right ,t1) ,C) t) b))]
                         [((decomp C1 u1) (decomp C2 u2))
                          (set)])])]))
 

@@ -18,9 +18,9 @@
 (define-metafunction directed-matching
   M : L p t -> (m ...)
   [(M L :hole :hole)
-   (set (((no-context) :hole) (no-bindings)) (• (no-bindings)))]
+   (set (((:no-context) :hole) (no-bindings)) (• (no-bindings)))]
   [(M L :hole t) ; t ≠ :hole
-   (set (((no-context) t) (no-bindings)))]
+   (set (((:no-context) t) (no-bindings)))]
   [(M L a a) ; a ≠ :hole
    (set (• (no-bindings)))]
   [(M L (:name x p) t)
@@ -53,9 +53,9 @@
   [(select t • u •)
    (set •)]
   [(select t (C t_^’) u •)
-   (set ((: (left u) C) t_^’))]
+   (set ((: (:left u) C) t_^’))]
   [(select t • u (C u_^’))
-   (set ((: (right t) C) u_^’))]
+   (set ((: (:right t) C) u_^’))]
   [(select t (C t_^’) u (C_^’ u_^’))
    (set)])
 
@@ -96,16 +96,16 @@
   [(neq any_1 any_1) #f]
   [(neq any_!_1 any_!_1) #t])
 (define-metafunction directed-matching
-  [(no-context) ,'no-context])
+  [(:no-context) ,':no-context])
 (define-metafunction directed-matching
   [(no-bindings) ()])
 (define-metafunction directed-matching
   [(productions (n_0 ... [x_i (p ...)] n_i+1 ...) x_i)
    (p ...)])
 (define-metafunction directed-matching
-  [(left t) (,'left t)])
+  [(:left t) (,':left t)])
 (define-metafunction directed-matching
-  [(right t) (,'right t)])
+  [(:right t) (,':right t)])
 (define-metafunction directed-matching
   [(: F C) (F C)])
 

@@ -90,7 +90,7 @@
                ()
                (:in-hole (:name x (:cons a (:cons :hole c))) b) 
                (:cons a (:cons b c))
-               (((x ((right a) ((left c) no-context))))))
+               (((x ((:right a) ((:left c) :no-context))))))
    
    (build-test test:bind
                ()
@@ -139,8 +139,8 @@
                 :hole)
                (:cons (:cons :hole b)
                       (:cons :hole b))
-               (((C ((left (:cons :hole b)) ((left b) no-context))))
-                ((C ((right (:cons :hole b)) ((left b) no-context))))))
+               (((C ((:left (:cons :hole b)) ((:left b) :no-context))))
+                ((C ((:right (:cons :hole b)) ((:left b) :no-context))))))
    
    (build-test test:bind
                ()
@@ -149,7 +149,7 @@
                       (:name x (:cons :hole a)))
                (:cons (:cons :hole a)
                       (:cons :hole a))
-               (((x ((left a) no-context)))))
+               (((x ((:left a) :no-context)))))
    
    (build-test test:bind
                ()
@@ -157,7 +157,7 @@
                                             (:cons :hole c)))
                          b)
                (:cons a (:cons b c))
-               (((x ((right a) ((left c) no-context))))))
+               (((x ((:right a) ((:left c) :no-context))))))
    
    (let ([λv `([e ((:cons (:nt e) (:cons (:nt e) mt))
                    (:nt x)
@@ -182,14 +182,14 @@
                        (:in-hole (:name E (:nt E)) (:name e (:nt e)))
                        ,(encode-term '((λ (x) x) (λ (y) y)))
                        (((e ,(encode-term '((λ (x) x) (λ (y) y))))
-                         (E no-context))
+                         (E :no-context))
                         ((e ,(encode-term '(λ (x) x)))
-                         (E ((left ,(encode-term '((λ (y) y))))
-                             no-context)))
+                         (E ((:left ,(encode-term '((λ (y) y))))
+                             :no-context)))
                         ((e ,(encode-term '(λ (y) y)))
-                         (E ((right ,(encode-term '(λ (x) x)))
-                             ((left mt)
-                              no-context))))))
+                         (E ((:right ,(encode-term '(λ (x) x)))
+                             ((:left mt)
+                              :no-context))))))
            
            (build-test test:bind
                        ,λv 
@@ -200,9 +200,9 @@
                                       (:cons (:nt v) mt))))
                        ,(encode-term '(:hole ((λ (x) x) (λ (y) y))))
                        (((r ,(encode-term '((λ (x) x) (λ (y) y))))
-                         (E ((right :hole)
-                             ((left mt)
-                              no-context))))))
+                         (E ((:right :hole)
+                             ((:left mt)
+                              :no-context))))))
            
            (build-test test:match ,λv (:nt v) ,(encode-term '(:hole :hole)))
            
@@ -211,11 +211,11 @@
                        (:in-hole (:name E (:nt E)) (:name e (:nt e)))
                        ,(encode-term '(:hole :hole))
                        (((e (:cons :hole (:cons :hole mt)))
-                         (E no-context))
+                         (E :no-context))
                         ((e :hole)
-                         (E ((left (:cons :hole mt)) no-context)))
+                         (E ((:left (:cons :hole mt)) :no-context)))
                         ((e :hole)
-                         (E ((right :hole) ((left mt) no-context))))))
+                         (E ((:right :hole) ((:left mt) :no-context))))))
            
            (build-test test:bind
                        ,λv
@@ -282,7 +282,7 @@
    (build-test test:no-match () (:in-hole :hole a) b)
    
    (build-test test:bind () (:in-hole (:name x (:cons a :hole)) b) (:cons a b)
-               (((x ((right a) no-context)))))
+               (((x ((:right a) :no-context)))))
    
    (build-test test:match () (:in-hole (:cons :hole b) a) (:cons a b))
    (build-test test:match () (:in-hole (:cons a :hole) b) (:cons a b))
@@ -303,8 +303,8 @@
                                        (:nt hole-or-n)))
                          (:nt n))
                (:cons 1 2)
-               (((x ((left 2) no-context)))
-                ((x ((right 1) no-context)))))
+               (((x ((:left 2) :no-context)))
+                ((x ((:right 1) :no-context)))))
    
    (build-test test:match
                () 
@@ -314,7 +314,7 @@
                () 
                (:in-hole (:name x (:in-hole (:cons a :hole) (:cons b :hole))) c)
                (:cons a (:cons b c))
-               (((x ((right a) ((right b) no-context))))))))
+               (((x ((:right a) ((:right b) :no-context))))))))
 
 (define flattened-tests
   (foldr (λ (test/list tests)

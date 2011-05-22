@@ -23,23 +23,23 @@
   (L (n ...))
   (n [x (p ...)])
   
-  (F (left t)
-     (right t))
-  (C no-context
+  (F (:left t)
+     (:right t))
+  (C :no-context
      (F C)))
 
 (define-metafunction patterns
   uncontext : C -> t
-  [(uncontext no-context)
+  [(uncontext :no-context)
    :hole]
-  [(uncontext ((left t) C))
+  [(uncontext ((:left t) C))
    (:cons (uncontext C) t)]
-  [(uncontext ((right t) C))
+  [(uncontext ((:right t) C))
    (:cons t (uncontext C))])
 
 (define-metafunction patterns
   append-contexts : C C -> C
-  [(append-contexts no-context C)
+  [(append-contexts :no-context C)
    C]
   [(append-contexts (F C_1) C_2)
    (F (append-contexts C_1 C_2))])
@@ -56,10 +56,10 @@
   (term-match/single
    patterns
    [no-context (term :hole)]
-   [((left t) C)
+   [((:left t) C)
     (cons (decode-term (term C))
           (decode-term (term t)))]
-   [((right t) C)
+   [((:right t) C)
     (cons (decode-term (term t))
           (decode-term (term C)))]
    [mt '()]
