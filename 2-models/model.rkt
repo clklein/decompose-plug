@@ -13,7 +13,7 @@
          Σ 
          subst subst-1 subst-A)
 
-(define-language arith :arith
+(define-language arith 
   (a (+ a a) number))
 
 (define-extended-language arith/red arith
