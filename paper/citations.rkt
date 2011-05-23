@@ -513,3 +513,14 @@
     #:author (authors "Casey Klein" "Matthew Flatt" "Robert Bruce Findler")
     #:url "http://plt.eecs.northwestern.edu/racket-machine/"
     #:date "to appear"))
+
+(define example-of-using-contexts-with-explicit-deompose-and-plug
+  (make-bib
+   #:title "An Operational Foundation for Delimited Continuations in the CPS Hierarchy"
+   #:author (authors "Mal Gorzata Biernacka"
+                     "Dariusz Biernacki"
+                     "Olivier Danvy")
+   #:location (journal-location "Logical Methods in Computer Science"
+                                #:volume 1)
+   
+   #:date 2005))
