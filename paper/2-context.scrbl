@@ -69,10 +69,10 @@ a realistic programming language's order of evaluation
 in the lambda calculus. @Figure-ref["fig:lc"] 
 gives a definition of @rr[E] that enforces left-to-right order of evaluation. 
 For example, consider this nested set of function calls, 
-@rr[((f x) (g x))],
+@rr[((f x) (g y))],
 where the result of @rr[(g y)] is passed to the result of @rr[(f x)].
 It decomposes into the context
-@rr[(hole (g x))]
+@rr[(hole (g y))]
 allowing
 evaluation in the first position of the
 application,
