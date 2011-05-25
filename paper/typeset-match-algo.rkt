@@ -1,31 +1,14 @@
 #lang racket
 
-(require redex
+(require redex/pict
+         "common-rewriters.rkt"
          "../sem-sem/syntax-directed-match.rkt")
 (provide render-algorithm)
 
-(define set-rw
+(define rewrite-set
   (match-lambda
     [(list _ _ elems ... _)
      `("{" ,@(intersperse elems ", ") "}")]))
-
-(define productions-rw
-  (match-lambda
-    [(list _ _ lang non-term _)
-     (list "" lang "(" non-term ")")]))
-
-(define (infix-binop-rw op)
-  (match-lambda
-    [(list h _ l r _)
-     (list l (just-after (format " ~a " op) l) r)]))
-
-(define lub-rw (infix-binop-rw '⊓))
-(define neq-rw (infix-binop-rw '≠))
-
-(define (no-context-rw _)
-  (list "[]"))
-(define (no-bindings-rw _)
-  (list "∅"))
 
 (define (intersperse xs y)
   (match xs
@@ -35,12 +18,11 @@
      (list* x1 (just-after y x1) (intersperse (cons x2 xs) y))]))
 
 (define compound-rewriters
-  (list (list 'set set-rw)
-        (list 'no-context no-context-rw)
-        (list 'no-bindings no-bindings-rw)
-        (list '⊓ lub-rw)
-        (list 'neq neq-rw)
-        (list 'productions productions-rw)))
+  (list (list 'set rewrite-set)
+        (list 'no-bindings rewrite-no-bindings)
+        (list '⊓ rewrite-lub)
+        (list 'neq rewrite-neq)
+        (list 'productions rewrite-productions)))
 
 (define (unquote-rewriter unquoted)
   (define rewrite
@@ -64,8 +46,8 @@
                 [(guard) (replace (list (struct-copy lw (first (lw-e c)) [e ""] [column-span 0])
                                         'spring
                                         (third (lw-e c))))]
-                [(eq) (replace ((infix-binop-rw "=") (lw-e c)))]
-                [(in) (replace ((infix-binop-rw "∈") (lw-e c)))]))
+                [(eq) (replace (rewrite-eq (lw-e c)))]
+                [(in) (replace (rewrite-in (lw-e c)))]))
             ",")
          ,(just-after "}" (last conds)))]))
   (struct-copy lw unquoted

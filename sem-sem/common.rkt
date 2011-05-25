@@ -94,8 +94,6 @@
   [(neq any_1 any_1) #f]
   [(neq any_!_1 any_!_1) #t])
 (define-metafunction patterns
-  [(:no-context) ,':no-context])
-(define-metafunction patterns
   [(no-bindings) ()])
 (define-metafunction patterns
   [(productions (D_0 ... [n_i (p ...)] D_i+1 ...) n_i)

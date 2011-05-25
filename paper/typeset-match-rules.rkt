@@ -1,6 +1,7 @@
-#lang racket/base
+#lang racket
 (require redex/pict
-         slideshow/pict)
+         slideshow/pict
+         "common-rewriters.rkt")
 (provide with-rewriters
          rule-schema)
 
@@ -13,24 +14,11 @@
   (frame (inset (render-lw language (to-lw schema)) 3 3)))
 
 (define (with-rewriters/proc thunk)
-  (with-compound-rewriter
-   'append-contexts rewrite-append-contexts
-   (with-compound-rewriter
-    '~ rewrite-~
-    (with-compound-rewriter
-     'matches rewrite-matches
-     (with-compound-rewriter
-      'decomposes rewrite-decomposes
-      (thunk))))))
-
-(define (rewrite-append-contexts lws)
-  (list ""
-        (list-ref lws 2)
-        " ++ "
-        (list-ref lws 3)
-        " = "
-        (list-ref lws 4)
-        ""))
+  (let loop ([rs compound-rewriters])
+    (match rs
+      ['() (thunk)]
+      [(cons (list name rewriter) rs*)
+       (with-compound-rewriter name rewriter (loop rs*))])))
 
 (define (rewrite-~ lws)
   (list ""
@@ -63,3 +51,20 @@
         (list-ref lws 6)
         " | "
         (list-ref lws 7)))
+
+(define (rewrite-nt-has-prod lws)
+  (list ""
+        (list-ref lws 4)
+        " ∈ "
+        (list-ref lws 3)
+        "("
+        (list-ref lws 2)
+        ")"))
+
+(define compound-rewriters
+  (list (list 'append-contexts rewrite-append-contexts)
+        (list '~ rewrite-~)
+        (list 'matches rewrite-matches)
+        (list 'decomposes rewrite-decomposes)
+        (list 'no-bindings rewrite-no-bindings)
+        (list 'nt-has-prod rewrite-nt-has-prod)))

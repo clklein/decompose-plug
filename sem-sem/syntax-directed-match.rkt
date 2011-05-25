@@ -21,9 +21,9 @@
 (define-metafunction directed-matching
   M : L p t -> (m ...)
   [(M L :hole :hole)
-   (set (((:no-context) :hole) (no-bindings)) (• (no-bindings)))]
+   (set ((:no-context :hole) (no-bindings)) (• (no-bindings)))]
   [(M L :hole t) ; t ≠ :hole
-   (set (((:no-context) t) (no-bindings)))]
+   (set ((:no-context t) (no-bindings)))]
   [(M L a a) ; a ≠ :hole
    (set (• (no-bindings)))]
   [(M L (:name x p) t)
