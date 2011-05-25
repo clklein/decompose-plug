@@ -1,7 +1,8 @@
 #lang racket
 
 (require redex
-         "../syntax-directed-match.rkt")
+         "../sem-sem/syntax-directed-match.rkt")
+(provide render-algorithm)
 
 (define set-rw
   (match-lambda
@@ -71,7 +72,7 @@
                [e (rewrite (lw-e unquoted))]
                [unq? false]))
 
-(define (render)
+(define (render-algorithm)
   (let loop ([rws compound-rewriters])
     (match rws
       ['() 

@@ -1,5 +1,7 @@
 #lang scribble/base
-@(require scribble/manual)
+@(require scribble/manual
+          scriblib/figure
+          "typeset-match-algo.rkt")
 
 @title{An Algorithm for Matching}
 @itemlist[
