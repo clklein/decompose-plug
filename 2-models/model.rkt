@@ -1,8 +1,8 @@
 #lang racket
-(require redex/reduction-semantics)
+(require redex/reduction-semantics
+         "double.rkt")
 
-(provide arith arith/red 
-         Λ 
+(provide arith :arith 
          Λ/red Λk/red Λneed/red Λdk/red
          arith-red
          cbv-red 
@@ -13,26 +13,21 @@
          Σ 
          subst subst-1 subst-A)
 
-(define-language arith 
-  (a (+ a a) number))
-
-(define-extended-language arith/red arith
+(define-double-language arith :arith 
+  (a (+ a a) number)
   (C (+ C a) (+ a C) hole))
 
 (define arith-red
   (reduction-relation
-   arith/red
+   arith
    (--> (in-hole C (+ number_1 number_2))
         (in-hole C (Σ number_1 number_2)))))
  
-(define-language Λ
-  (e (e e) x (λ (x) e)
-     |+1| number)
-  ((x y) variable-not-otherwise-mentioned))
-
-(define-extended-language Λ/red Λ
+(define-language Λ/red
+  (e (e e) x v)
+  ((x y) variable-not-otherwise-mentioned)
   (v (λ (x) e) |+1| number)
-  (E (E e) (v E) (|+1| E) hole))
+  (E (E e) (v E) hole))
 
 (define cbv-red
   (reduction-relation 
@@ -63,7 +58,7 @@
   (union-reduction-relations cont-partial-red
                              (extend-reduction-relation cbv-red Λk/red)))
 
-(define-extended-language Λneed/red Λ
+(define-extended-language Λneed/red Λ/red
   (E hole 
      (E e)
      ((λ (x) E) e)

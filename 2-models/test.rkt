@@ -1,5 +1,6 @@
 #lang racket
 (require "model.rkt"
+         "double.rkt"
          redex/reduction-semantics)
 
 ;; substitution tests
@@ -34,6 +35,29 @@
 
 (test-equal (term (subst ((|+1| x) y) (x 1) (y 2)))
             (term ((|+1| 1) 2)))
+
+;; arith tests
+(test-double-match arith :arith 
+                   a
+                   1
+                   (((a 1))))
+(test-double-match arith :arith 
+                   a
+                   blahblah
+                   #f)
+(test-double-match arith :arith 
+                   a 
+                   (+ 1 2)
+                   (((a (+ 1 2)))))
+(test-double-match arith :arith 
+                   (in-hole C a) 
+                   (+ 1 2)
+                   (((a 1)
+                     (C (+ hole 2)))
+                    ((a 2)
+                     (C (+ 1 hole)))
+                    ((a (+ 1 2))
+                     (C hole))))
 
 ;; reduction rules tests
 

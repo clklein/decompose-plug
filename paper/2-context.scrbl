@@ -15,8 +15,6 @@
 @wfigure["fig:arith" "Arithmetic Expressions"]{
 @(render-language arith)
 
-@(render-language arith/red)
-
 @paragraph[(style "vspace" '()) '(".1in")]
 
 @(render-reduction-relation arith-red)
@@ -54,16 +52,8 @@ any given term.
 
 
 @wfigure["fig:lc" "λ-calculus"]{
-@(vl-append ;; not quite right; we really want to line up with the ::='s in there.
-  (render-language Λ #:nts (remove* '(x y) (language-nts Λ)))
-  (render-language Λ/red))
-
-@paragraph[(style "vspace" '()) '(".1in")]
-
-@(with-rewriters
-  (render-reduction-relation cbv-red))
+@(render-language Λ/red #:nts (remove* '(x y) (language-nts Λ/red)))
 }
-
 A common use of contexts is to restrict the places where a reduction may occur in order to model 
 a realistic programming language's order of evaluation
 in the lambda calculus. @Figure-ref["fig:lc"] 
@@ -92,10 +82,6 @@ decompose each expression form, depending on the subexpressions of
 that form (application expressions
 in this case).
 
-@wfigure[#:size 2 "fig:cbn" "Call-by-need Contexts"]{
-@(render-language Λneed/red #:nts '(E))
-}
-
 Contexts can also be used in clever ways to model the call-by-need λ-calculus.
 Like call-by-name, call-by-need evaluates the argument to a function only if
 the value is actually needed by the body. 
@@ -106,6 +92,9 @@ a language with call-by-need uses state to track if an argument has been evaluat
 but it is also possible to give a direct explanation, expoiting the expressive
 nature of contexts to control where evaluation occurs.
 
+@wfigure[#:size 2 "fig:cbn" "Call-by-need Contexts"]{
+@(render-language Λneed/red #:nts '(E))
+}
 @Figure-ref["fig:cbn"] shows the contexts from @citet[cbn-calculus]'s model of call-by-need.
 The first two productions of @rr[E] are standard, allowing evaluation wherever @rr[E]
 may be, as well as in the function position of an application, regardless of what
