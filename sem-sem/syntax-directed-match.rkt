@@ -3,6 +3,7 @@
 (require redex/reduction-semantics
          racket/list
          "patterns.rkt"
+         "common.rkt"
          "set-comp.rkt")
 
 (provide (all-defined-out))

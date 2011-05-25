@@ -4,6 +4,7 @@
          redex
          unstable/dict
          unstable/debug
+         "common.rkt"
          "patterns.rkt")
 
 (provide (all-defined-out))

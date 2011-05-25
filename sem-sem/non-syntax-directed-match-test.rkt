@@ -3,6 +3,7 @@
 (require "non-syntax-directed-match.rkt"
          "shared-test-cases.rkt"
          "patterns.rkt"
+         "common.rkt"
          redex
          racklog
          rackunit)
@@ -23,6 +24,15 @@
      (equal-bindings?
       (all-matches L p t) 
       (no-contexts-bindings bs))]))
+
+(define no-contexts-bindings
+  (let ([context? (redex-match patterns C)])
+    (λ (bs)
+      (for/list ([b bs])
+        (for/list ([m b])
+          (match m
+            [(list x v)
+             (list x (term (non-context ,v)))]))))))
 
 (run-tests test-non-syntax-directed)
 

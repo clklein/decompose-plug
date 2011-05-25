@@ -1,7 +1,7 @@
 #lang racket
 
 (require "shared-test-cases.rkt"
-         "patterns.rkt"
+         "common.rkt"
          "syntax-directed-match-total.rkt"
          rackunit)
 

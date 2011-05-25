@@ -4,6 +4,7 @@
          racket/list
          racket/match
          "patterns.rkt"
+         "common.rkt"
          "syntax-directed-match-total.rkt")
 
 (provide reductions)

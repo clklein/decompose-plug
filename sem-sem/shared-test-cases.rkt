@@ -1,6 +1,7 @@
 #lang racket
 
-(require "patterns.rkt")
+(require "common.rkt"
+         "patterns.rkt")
 (provide run-tests
          equal-bindings?
          (struct-out test:match)

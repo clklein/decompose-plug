@@ -1,6 +1,7 @@
 #lang racket/base
 
 (require "patterns.rkt"
+         "common.rkt"
          redex/reduction-semantics
          unstable/debug
          unstable/contract
