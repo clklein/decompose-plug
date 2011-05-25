@@ -1,6 +1,7 @@
 #lang scribble/lncs
 
-@(require "citations.rkt")
+@(require "citations.rkt"
+          scribble/core)
 
 @authors[@author[#:inst "1"]{Casey Klein}
          @author[#:inst "2"]{Jay McCarthy}
@@ -18,3 +19,9 @@
 @include-section["6-related.scrbl"]
 
 @(generate-bibliography)
+
+@(element (style "paragraph" '()) '("Acknowledgments"))
+Thanks to Stephen Chang for his many 
+interesting examples of contexts that challenged our
+understanding of evaluation context semantics.
+
