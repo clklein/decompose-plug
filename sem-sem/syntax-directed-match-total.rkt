@@ -9,10 +9,10 @@
          racket/set
          racket/match)
 (provide/contract
- [matches (-> (dict/c symbol? (listof pattern?)) pattern? any/c (set/c any/c))])
+ [matches (-> language? pattern? term? (listof bindings?))])
 
 ; decomposition : (or/c decomp no-decomp)
-; binding : (set/c (dict/c symbol term))
+; binding : bindings?
 (define-struct mtch (decomposition binding) #:transparent)
 
 (define-struct decomp (context contractum) #:transparent)

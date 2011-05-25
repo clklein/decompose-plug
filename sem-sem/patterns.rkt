@@ -33,6 +33,10 @@
      (F C)))
 
 (define pattern? (redex-match patterns p))
+(define value? (redex-match patterns v))
+(define term? (redex-match patterns t))
+(define bindings? (redex-match patterns b))
+(define language? (redex-match patterns L))
 
 (define-metafunction patterns
   uncontext : C -> t
