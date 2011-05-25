@@ -12,9 +12,7 @@
 (define-struct decomp (context contractum) #:transparent)
 (define-struct no-decomp () #:transparent)
 
-(define empty-bindings (hash))
-(define add-binding hash-set)
-(define (exposed-bindings b) (hash-map b list))
+(define empty-bindings '())
 
 ; matches : language pattern term -> (set/c mtch)
 ; language ≡ (dict symbol (listof pattern))
@@ -43,7 +41,9 @@
        (==> (go p term seen)
             (match-lambda
               [(mtch d b)
-               (set (mtch d (add-binding b x (named d term))))]))]
+               (match (⊓/proc `([,x ,(named d term)]) b)
+                 [#f (set)]
+                 [b+ (set (mtch d b+))])]))]
       [`(:in-hole ,p1 ,p2)
        (==> (go p1 term seen)
             (match-lambda
@@ -86,8 +86,7 @@
                     [(mtch (decomp C t) b)
                      top-matches]
                     [(mtch (no-decomp) b)
-                     (cons (exposed-bindings b)
-                           top-matches)])))))
+                     (cons b top-matches)])))))
 
 (define (named d t)
   (match d
@@ -95,7 +94,7 @@
     [(no-decomp) t]))
 
 (define (merge-decomp C1 b1 d2 b2)
-  (match (merge-bindings b1 b2)
+  (match (⊓/proc b1 b2)
     [#f (set)]
     [b (match d2
          [(decomp C2 t2)
@@ -106,7 +105,7 @@
 (define (merge-cons m1 t1 m2 t2)
   (match* (m1 m2)
           [((mtch d1 b1) (mtch d2 b2))
-           (match (merge-bindings b1 b2)
+           (match (⊓/proc b1 b2)
              [#f (set)]
              [b (match* (d1 d2)
                         [((no-decomp) (no-decomp))

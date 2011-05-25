@@ -84,12 +84,32 @@
   [(non-context t) t]
   [(non-context C) (uncontext C)])
 
-(define (merge-bindings b1 b2)
-  (let/ec return
-    (define (c v w)
-      (or (term (merge-value ,v ,w))
-          (return false)))
-    (dict-union b1 b2 #:combine c)))
+(define (⊓/proc b1 b2)
+  (term (⊓ ,b1 ,b2)))
+
+(define-metafunction patterns
+  ⊓ : b b -> b or #f
+  [(⊓ () b)
+   b]
+  [(⊓ ([x_0 v_0] [x_1 v_1] ...) b)
+   (⊓ ([x_1 v_1] ...) b_1)
+   (where b_1 (merge-binding x_0 v_0 b))]
+  [(⊓ b_1 b_2) ; else
+   #f])
+
+(define-metafunction patterns
+  merge-binding : x v b -> b or #f
+  [(merge-binding x v ())
+   ([x v])]
+  [(merge-binding x v ([x v_0] [x_1 v_1] ...))
+   ([x v_m] [x_1 v_1] ...)
+   (where v_m (merge-value v v_0))]
+  [(merge-binding x v ([x_0 v_0] [x_1 v_1] ...))
+   ([x_0 v_0] [x_1’ v_1’] ...)
+   (side-condition (not (equal? (term x) (term x_0))))
+   (where ([x_1’ v_1’] ...) (merge-binding x v ([x_1 v_1] ...)))]
+  [(merge-binding x v b) ; else
+   #f])
 
 (define-metafunction patterns
   merge-value : v v -> v or #f

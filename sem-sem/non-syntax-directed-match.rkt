@@ -18,9 +18,10 @@
    [(L a) ; atom
     (L a a empty)
     (is-atom a)]
-   [(L t x p b) ; name
-    (L t `(:name ,x ,p) (cons (cons x t) b))
-    (matches L t p b)]
+   [(L t x p b b+) ; name
+    (L t `(:name ,x ,p) b+)
+    (matches L t p b)
+    (merges (list (list x t)) b b+)]
    [(L t x p ps b) ; non-terminal
     (L t `(:nt ,x) empty)
     (productions L x ps)
@@ -41,10 +42,11 @@
   (relation
    [(L t) ; hole
     (L t ':no-context t ':hole empty)]
-   [(L t1 C t2 x p t b) ; name
-    (L t1 C t2 `(:name ,x ,p) (cons (cons x t) b))
+   [(L t1 C t2 x p t b b+) ; name
+    (L t1 C t2 `(:name ,x ,p) b+)
     (decomposes L t1 C t2 p b)
-    (%is/nonvar (C) t (uncontext/proc C))]
+    (%is/nonvar (C) t (uncontext/proc C))
+    (merges (list (list x t)) b b+)]
    [(L t1 t2 C t p1 p2 b1 b2 b) ; cons-left
     (L `(:cons ,t1 ,t2) `((:left ,t2) ,C) t `(:cons ,p1 ,p2) b)
     (decomposes L t1 C t p1 b1)
@@ -77,7 +79,7 @@
   (relation
    [(b1 b2 b)
     (b1 b2 b)
-    (%is/nonvar (b1 b2) b (merge-bindings b1 b2))
+    (%is/nonvar (b1 b2) b (⊓/proc b1 b2))
     (%/= b false)]))
 
 (define (uncontext/proc C)

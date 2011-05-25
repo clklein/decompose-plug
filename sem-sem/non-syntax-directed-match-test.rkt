@@ -11,9 +11,7 @@
   (match (%find-all (b) (matches lang term pat b))
     [`(#f) empty]
     [`(((b . ,bindings)) ...)
-     (remove-duplicates 
-      (for/list ([binding bindings])
-        (dict-map binding list)))]))
+     (remove-duplicates bindings)]))
 
 (define test-non-syntax-directed
   (match-lambda
@@ -28,14 +26,14 @@
 
 (run-tests test-non-syntax-directed)
 
-(check-equal? (%find-all (x) (merges '([a . 1] [b . 2]) '([a . 1] [b . 2]) x))
-              '(((x . ([a . 1] [b . 2])))))
-(check-equal? (%find-all (x) (merges '([a . 1] [b . 2]) '([a . 1] [b . 3]) x))
+(check-equal? (%find-all (x) (merges '([a 1] [b 2]) '([a 1] [b 2]) x))
+              '(((x . ([a 1] [b 2])))))
+(check-equal? (%find-all (x) (merges '([a 1] [b 2]) '([a 1] [b 3]) x))
               '(#f))
-(check-equal? (%find-all (x) (merges '([a . 1] [b . 2]) '([b . 2] [a . 1]) x))
-              '(((x . ([a . 1] [b . 2])))))
-(check-equal? (%find-all (x) (merges '([a . 1]) '([b . 2]) x))
-              '(((x . ([a . 1] [b . 2])))))
+(check-equal? (%find-all (x) (merges '([a 1] [b 2]) '([b 2] [a 1]) x))
+              '(((x . ([b 2] [a 1])))))
+(check-equal? (%find-all (x) (merges '([a 1]) '([b 2]) x))
+              '(((x . ([b 2] [a 1])))))
 
 (check-equal? (%find-all () (is-atom 'adfd))
               '(()))

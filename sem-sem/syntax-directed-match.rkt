@@ -65,30 +65,6 @@
   [(combine C_1 (C_2 t))
    ((append-contexts C_1 C_2) t)])
 
-(define-metafunction directed-matching
-  ⊓ : b b -> b or #f
-  [(⊓ () b)
-   b]
-  [(⊓ ([x_0 v_0] [x_1 v_1] ...) b)
-   (⊓ ([x_1 v_1] ...) b_1)
-   (where b_1 (merge-binding x_0 v_0 b))]
-  [(⊓ b_1 b_2) ; else
-   #f])
-
-(define-metafunction directed-matching
-  merge-binding : x v b -> b or #f
-  [(merge-binding x v ())
-   ([x v])]
-  [(merge-binding x v ([x v_0] [x_1 v_1] ...))
-   ([x v_m] [x_1 v_1] ...)
-   (where v_m (merge-value v v_0))]
-  [(merge-binding x v ([x_0 v_0] [x_1 v_1] ...))
-   ([x_0 v_0] [x_1’ v_1’] ...)
-   (side-condition (not (equal? (term x) (term x_0))))
-   (where ([x_1’ v_1’] ...) (merge-binding x v ([x_1 v_1] ...)))]
-  [(merge-binding x v b) ; else
-   #f])
-
 ;; metafunctions to facilitate typesetting
 (define-metafunction directed-matching
   [(set any ...) (any ...)])

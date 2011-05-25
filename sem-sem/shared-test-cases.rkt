@@ -314,7 +314,10 @@
                () 
                (:in-hole (:name x (:in-hole (:cons a :hole) (:cons b :hole))) c)
                (:cons a (:cons b c))
-               (((x ((:right a) ((:right b) :no-context))))))))
+               (((x ((:right a) ((:right b) :no-context))))))
+  
+   ;;;; other tests ;;;;
+   (build-test test:no-match () (:name x (:cons (:name x a) b)) (:cons a b))))
 
 (define flattened-tests
   (foldr (λ (test/list tests)
