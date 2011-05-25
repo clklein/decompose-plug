@@ -6,13 +6,15 @@
 (define-language patterns
   (p a
      (:name x p)
-     (:nt x)
+     (:nt n)
      (:in-hole p p)
      (:cons p p))
   (a :hole
-     variable-not-otherwise-mentioned
-     number)
+     literal)
+  (literal variable-not-otherwise-mentioned
+           number)
   (x variable-not-otherwise-mentioned)
+  (n variable-not-otherwise-mentioned)
   
   ((t u) a
          (:cons t t))
@@ -20,8 +22,8 @@
   (b ([x v] ...))
   (v t C)
   
-  (L (n ...))
-  (n [x (p ...)])
+  (L (D ...))
+  (D [x (p ...)])
   
   (F (:left t)
      (:right t))

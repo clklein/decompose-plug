@@ -26,8 +26,8 @@
   [(M L (:name x p) t)
    ,(set-comp* (term ((d b_^’) (guard (neq b_^’ #f)) (eq b_^’ (⊓ (set (x (named d t))) b))
                                (in (d b) (M L p t)))))]
-  [(M L (:nt x) t)
-   ,(set-comp* (term ((d (no-bindings)) (in (d b) (M L p t)) (in p (productions L x)))))]
+  [(M L (:nt n) t)
+   ,(set-comp* (term ((d (no-bindings)) (in (d b) (M L p t)) (in p (productions L n)))))]
   [(M L (:in-hole p_c p_h) t)
    ,(set-comp* (term ((d b) (eq d (combine C d_h))
                             (guard (neq b #f))
@@ -100,7 +100,7 @@
 (define-metafunction directed-matching
   [(no-bindings) ()])
 (define-metafunction directed-matching
-  [(productions (n_0 ... [x_i (p ...)] n_i+1 ...) x_i)
+  [(productions (D_0 ... [n_i (p ...)] D_i+1 ...) n_i)
    (p ...)])
 (define-metafunction directed-matching
   [(:left t) (,':left t)])

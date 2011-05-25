@@ -1,7 +1,7 @@
 #lang scribble/base
 @(require scribble/manual)
 
-@title{A Semantics for Reduction}
+@title[#:tag "sec:reduction"]{A Semantics for Reduction}
 @itemlist[
 @item{One possibility: defined as the rewriting community would -- t → t’ by the
       rule p → p’ when t matches p with bindings b, t’ matches p’ with bindings 
