@@ -23,9 +23,9 @@
     (L t `(:name ,x ,p) b+)
     (matches L t p b)
     (merges (list (list x t)) b b+)]
-   [(L t x p ps b) ; non-terminal
+   [(L t x ps p b) ; non-terminal
     (L t `(:nt ,x) empty)
-    (productions L x ps)
+    (%is/nonvar (L x) ps (productions/proc L x))
     (%member p ps)
     (matches L t p b)]
    [(L t1 t2 p1 p2 b1 b2 b) ; cons
@@ -64,17 +64,14 @@
     (decomposes L t1 C2 t2 p2 b2)
     (%is/nonvar (C1 C2) C (append-contexts/proc C1 C2))
     (merges b1 b2 b)]
-   [(L t C u x b p ps) ; non-terminal
+   [(L t C u x b ps p) ; non-terminal
     (L t C u `(:nt ,x) empty)
-    (productions L x ps)
+    (%is/nonvar (L x) ps (productions/proc L x))
     (%member p ps)
     (decomposes L t C u p b)]))
 
-(define productions
-  (relation
-   [(x L ps)
-    (L x ps)
-    (%is/nonvar (x L) ps (car (dict-ref L x)))]))
+(define (productions/proc L x)
+  (term (productions ,L ,x)))
 
 (define merges
   (relation

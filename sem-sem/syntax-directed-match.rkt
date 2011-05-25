@@ -27,7 +27,8 @@
   [(M L a a) ; a ≠ :hole
    (set (• (no-bindings)))]
   [(M L (:name x p) t)
-   ,(set-comp* (term ((d b_^’) (guard (neq b_^’ #f)) (eq b_^’ (⊓ (set (x (named d t))) b))
+   ,(set-comp* (term ((d b_^’) (guard (neq b_^’ #f)) 
+                               (eq b_^’ (⊓ (set (x (named d t))) b))
                                (in (d b) (M L p t)))))]
   [(M L (:nt n) t)
    ,(set-comp* (term ((d (no-bindings)) (in (d b) (M L p t)) (in p (productions L n)))))]
@@ -68,27 +69,11 @@
   [(combine C_1 (C_2 t))
    ((append-contexts C_1 C_2) t)])
 
-;; metafunctions to facilitate typesetting
-(define-metafunction directed-matching
-  [(set any ...) (any ...)])
-(define-metafunction directed-matching
-  [(neq any_1 any_1) #f]
-  [(neq any_!_1 any_!_1) #t])
-(define-metafunction directed-matching
-  [(:no-context) ,':no-context])
-(define-metafunction directed-matching
-  [(no-bindings) ()])
-(define-metafunction directed-matching
-  [(productions (D_0 ... [n_i (p ...)] D_i+1 ...) n_i)
-   (p ...)])
-(define-metafunction directed-matching
-  [(:left t) (,':left t)])
-(define-metafunction directed-matching
-  [(:right t) (,':right t)])
-(define-metafunction directed-matching
-  [(: F C) (F C)])
-
 (define-syntax set-comp*
   (syntax-rules (term)
     [(_ (term (stuff ...)))
      (set-comp directed-matching stuff ...)]))
+
+;; for typesetting
+(define-metafunction patterns
+  [(set any ...) (any ...)])
