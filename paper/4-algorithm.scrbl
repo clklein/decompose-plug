@@ -10,3 +10,7 @@ head or tail of the cons? (2) How many times should we unroll non-terminal
 definitions?}
 @item{Syntax-directed matching rules}
 @item{Jay's fixed-point idea.}]
+
+@figure["fig:core-algo" "Core matching algorithm"]{
+@(render-algorithm)
+}
