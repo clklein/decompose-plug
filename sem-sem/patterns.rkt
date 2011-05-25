@@ -1,6 +1,8 @@
-#lang racket
+#lang racket/base
 
-(require redex/reduction-semantics unstable/dict)
+(require redex/reduction-semantics 
+         unstable/dict
+         racket/match)
 (provide (all-defined-out))
 
 (define-language patterns
@@ -29,6 +31,8 @@
      (:right t))
   (C :no-context
      (F C)))
+
+(define pattern? (redex-match patterns p))
 
 (define-metafunction patterns
   uncontext : C -> t

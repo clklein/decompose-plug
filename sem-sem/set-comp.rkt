@@ -1,6 +1,8 @@
-#lang racket
+#lang racket/base
 
-(require redex)
+(require redex/reduction-semantics
+         racket/list
+         (for-syntax racket/base))
 (provide set-comp guard in eq)
 
 (define-for-syntax (keyword stx)

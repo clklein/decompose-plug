@@ -1,8 +1,10 @@
-#lang racket
+#lang racket/base
 
-(require redex
+(require redex/reduction-semantics
+         racket/list
          "patterns.rkt"
          "set-comp.rkt")
+
 (provide (all-defined-out))
 
 (define-extended-language directed-matching patterns

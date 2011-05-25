@@ -1,6 +1,8 @@
-#lang racket
+#lang racket/base
 
-(require (except-in redex plug)
+(require (except-in redex/reduction-semantics plug)
+         racket/list
+         racket/match
          "patterns.rkt"
          "syntax-directed-match-total.rkt")
 

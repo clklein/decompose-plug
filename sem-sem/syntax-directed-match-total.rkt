@@ -1,9 +1,15 @@
-#lang racket
+#lang racket/base
 
 (require "patterns.rkt"
-         redex
-         unstable/debug)
-(provide matches)
+         redex/reduction-semantics
+         unstable/debug
+         unstable/contract
+         racket/contract
+         racket/dict
+         racket/set
+         racket/match)
+(provide/contract
+ [matches (-> (dict/c symbol? (listof pattern?)) pattern? any/c (set/c any/c))])
 
 ; decomposition : (or/c decomp no-decomp)
 ; binding : (set/c (dict/c symbol term))
@@ -18,11 +24,11 @@
 ; language ≡ (dict symbol (listof pattern))
 (define (matches lang pat term)
   (define memo-table (make-hash))
-  (define continue? false)
+  (define continue? #false)
   (define (update-memo-table x t ds)
     (unless (equal? ds (hash-ref memo-table (cons x t) (set)))
       (hash-set! memo-table (cons x t) ds)
-      (set! continue? true)))
+      (set! continue? #true)))
   (define (memo-table-lookup x t)
     (hash-ref memo-table (cons x t) (set)))
   
@@ -79,9 +85,9 @@
     (define all-matches (go pat term (set)))
     (if continue?
         (begin
-          (set! continue? false)
+          (set! continue? #false)
           (loop))
-        (for/fold ([top-matches empty]) ([m all-matches])
+        (for/fold ([top-matches '()]) ([m all-matches])
                   (match m
                     [(mtch (decomp C t) b)
                      top-matches]
