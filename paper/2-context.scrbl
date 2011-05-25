@@ -114,8 +114,8 @@ a lambda expression that is in the function position of an application. Intuitiv
 this case says that once we have determined that the function to be applied, then
 we can begin to evaluate its body. Of course, the function is eventually going to
 need its argument and this is where the fourth production comes in. This production
-is the most interesting. It says: when the next thing that a function in the function position
-of some application does is use its argument, then you may evaluate its argument.
+is the most interesting. It says that when a function in the function position
+of some application needs its argument, then you may evaluate its argument.
 
 As an example, this expression
 @rr[((λ (x) (|+1| 1)) (|+1| 2))]
@@ -151,8 +151,8 @@ at the point that when a continuation is grabbed, the context in which it is gra
 is the continuation. @Figure-ref["fig:cont"] contains an extension of the 
 left-to-right call-by-value model in @figure-ref["fig:lc"], that adds in support
 for continuations.
-It adds in the @rr[call/cc] operator that grabs a continuation and the new value form
-@rr[(cont E)], that represents a continuation. For example, the next reduction step
+It adds @rr[call/cc], the operator that grabs a continuation, and the new value form
+@rr[(cont E)] that represents a continuation. For example, the next reduction step
 for this expression
 @rr[(|+1| (call/cc (λ (k) (k 2))))] 
 is to grab a continuation. In this model that continuation is represented as
@@ -163,9 +163,11 @@ in the original context, yielding this expression
 The next step is to substitute the continuation for @rr[k], 
 which yields this expression
 @rr[(|+1| ((cont (|+1| hole)) 2))].
-To invoke the continuation, we can simply replace the context
-of the continuation invocation with the continuation's context,
-plugging the argument passed to the continuation in the hole,
+This expression has a continuation value in the function
+position of an application, and the next step is to
+invoke the continuation. So, we can simply replace the context
+of the continuation invocation with the context inside the continuation,
+plugging the argument passed to the continuation in the hole:
 @rr[(|+1| 2)].
 This reduction system tells us that our context decomposition
 semantics must be able to support contexts that appear in a
@@ -203,17 +205,22 @@ decomposition that includes @rr[M] in the first position.
 
 @(define-language ex2
    (C (in-hole C (f hole)) hole))
+@(define-language ex3
+   (C (f C) hole))
 @wfigure["fig:wacky" "Wacky Context"]{
 @(render-language ex2)
+@(render-language ex3)
 }
 
 A simple fix that works for the delimited continuations 
 example is to treat such
 cycles as a failure to match, but that fix does not work
-for the context given in @figure-ref["fig:wacky"]. 
+for the first definition of @rr[C] given in @figure-ref["fig:wacky"]. 
 Specifically, @rr[C] would match nothing with an algorithm
 that treated those cycles as a failure to match, but the
-context @rr[(f hole)] should match @rr[C].
+context @rr[(f hole)] should match @rr[C] and, more generally,
+the two definitions of @rr[C] in @figure-ref["fig:wacky"]
+should be equivalent.
 (A more complex version of this context came up when one of our Redex
 users was developing an extension to the call-by-need model. 
 We do not yet have a useful model that includes this peculiarity,
