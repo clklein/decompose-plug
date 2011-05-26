@@ -13,7 +13,7 @@
     [(list _ _ l r _)
      (list l (just-after (format " ~a " op) l) r)]))
 
-(define rewrite-lub (make-infix-binop-rewriter '⊓))
+(define rewrite-lub (make-infix-binop-rewriter '⊔))
 (define rewrite-neq (make-infix-binop-rewriter '≠))
 (define rewrite-eq (make-infix-binop-rewriter '=))
 (define rewrite-in (make-infix-binop-rewriter '∈))

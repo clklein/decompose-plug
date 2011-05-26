@@ -50,17 +50,17 @@
   [(non-context t) t]
   [(non-context C) (uncontext C)])
 
-(define (⊓/proc b1 b2)
-  (term (⊓ ,b1 ,b2)))
+(define (⊔/proc b1 b2)
+  (term (⊔ ,b1 ,b2)))
 
 (define-metafunction patterns
-  ⊓ : b b -> b or #f
-  [(⊓ () b)
+  ⊔ : b b -> b or #f
+  [(⊔ () b)
    b]
-  [(⊓ ([x_0 v_0] [x_1 v_1] ...) b)
-   (⊓ ([x_1 v_1] ...) b_1)
+  [(⊔ ([x_0 v_0] [x_1 v_1] ...) b)
+   (⊔ ([x_1 v_1] ...) b_1)
    (where b_1 (merge-binding x_0 v_0 b))]
-  [(⊓ b_1 b_2) ; else
+  [(⊔ b_1 b_2) ; else
    #f])
 
 (define-metafunction patterns

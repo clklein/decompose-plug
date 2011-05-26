@@ -77,7 +77,7 @@
   (relation
    [(b1 b2 b)
     (b1 b2 b)
-    (%is/nonvar (b1 b2) b (⊓/proc b1 b2))
+    (%is/nonvar (b1 b2) b (⊔/proc b1 b2))
     (%/= b false)]))
 
 (define (uncontext/proc C)

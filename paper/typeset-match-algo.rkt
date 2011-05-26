@@ -20,7 +20,7 @@
 (define compound-rewriters
   (list (list 'set rewrite-set)
         (list 'no-bindings rewrite-no-bindings)
-        (list '⊓ rewrite-lub)
+        (list '⊔ rewrite-lub)
         (list 'neq rewrite-neq)
         (list 'productions rewrite-productions)))
 
