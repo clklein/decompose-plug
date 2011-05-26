@@ -191,13 +191,11 @@ match what appeared at the hole against @rr[e]. With @rr[M], however,
 this leads to an infinite loop because @rr[M] expands to a
 decomposition that includes @rr[M] in the first position.
 
-@(define-language ex2
-   (C (in-hole C (f hole)) hole))
-@(define-language ex3
-   (C (f C) hole))
 @wfigure["fig:wacky" "Wacky Context"]{
-@(render-language ex2)
-@(render-language ex3)
+@(vl-append 
+  4
+  (render-language wacky)
+  (render-language wacky-inside-out))
 }
 
 A simple fix that works for the delimited continuations 

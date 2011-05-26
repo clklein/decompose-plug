@@ -65,7 +65,7 @@
                    (((e ((f x) (g y))))))
 
 (test-double-match Λ/red :Λ/red 
-                   (in-hole E e) 
+                   (in-hole E e)
                    ((f x) (g y))
                    (((e (f x))
                      (E (hole (g y))))
@@ -73,6 +73,92 @@
                      (E hole))
                     ((e f)
                      (E ((hole x) (g y))))))
+
+(test-double-match Λneed/red :Λneed/red
+                   (in-hole E (|+1| v))
+                   ((λ (x) (|+1| 1)) (|+1| 2))
+                   (((E ((λ (x) hole) (|+1| 2)))
+                     (v 1))))
+
+(test-double-match Λneed/red :Λneed/red
+                   (in-hole E (|+1| v))
+                   ((λ (x) (|+1| x)) (|+1| 2))
+                   (((E ((λ (x) (|+1| x)) hole))
+                     (v 2))))
+
+(test-double-match Λk/red :Λk/red
+                   (in-hole E (call/cc v))
+                   (|+1| (call/cc (λ (k) (k 2))))
+                   (((E (|+1| hole))
+                     (v (λ (k) (k 2))))))
+
+(test-double-match Λk/red :Λk/red
+                   (in-hole E_1 ((cont E_2) v))
+                   (|+1| ((cont (|+1| hole)) 2))
+                   (((E_1 (|+1| hole))
+                     (E_2 (|+1| hole))
+                     (v 2))))
+
+(test-double-match Λk/red :Λk/red
+                   (in-hole E_1 ((cont E_2) v))
+                   (|+1| (|+1| ((cont (|+1| (|+1| (|+1| hole)))) 2)))
+                   (((E_1 (|+1| (|+1| hole)))
+                     (E_2 (|+1| (|+1| (|+1| hole))))
+                     (v 2))))
+
+(test-double-match #f :Λdk/red
+                   e
+                   (|+1| (|+1| (|#| (|+1| (|+1| (|+1| (call/comp (λ (k) (k 3)))))))))
+                   (((e (|+1| (|+1| (|#| (|+1| (|+1| (|+1| (call/comp (λ (k) (k 3)))))))))))))
+
+(test-double-match #f :Λdk/red
+                   (in-hole M e)
+                   (|+1| 2)
+                   (((M (|+1| hole))
+                     (e 2))
+                    ((M (hole 2))
+                     (e |+1|))
+                    ((M hole)
+                     (e (|+1| 2)))))
+
+(test-double-match #f :Λdk/red
+                   (in-hole M (|#| (in-hole E (call/comp v))))
+                   (|+1| (|+1| (|#| (|+1| (|+1| (|+1| (call/comp (λ (k) (k 3)))))))))
+                   (((M (|+1| (|+1| hole)))
+                     (E (|+1| (|+1| (|+1| hole))))
+                     (v (λ (k) (k 3))))))
+                   
+(test-double-match #f :wacky
+                   C
+                   (f hole)
+                   (((C (f hole)))))
+(test-double-match #f :wacky
+                   (in-hole C_1 C_2)
+                   (f (f (f hole)))
+                   (((C_1 (f (f (f hole))))
+                     (C_2 hole))
+                    ((C_1 (f (f hole)))
+                     (C_2 (f hole)))
+                    ((C_1 (f hole))
+                     (C_2 (f (f hole))))
+                    ((C_1 hole)
+                     (C_2 (f (f (f hole)))))))
+
+(test-double-match wacky-inside-out :wacky-inside-out
+                   C
+                   (f hole)
+                   (((C (f hole)))))
+(test-double-match wacky-inside-out :wacky-inside-out
+                   (in-hole C_1 C_2)
+                   (f (f (f hole)))
+                   (((C_1 (f (f (f hole))))
+                     (C_2 hole))
+                    ((C_1 (f (f hole)))
+                     (C_2 (f hole)))
+                    ((C_1 (f hole))
+                     (C_2 (f (f hole))))
+                    ((C_1 hole)
+                     (C_2 (f (f (f hole)))))))
 
 ;; reduction rules tests
 

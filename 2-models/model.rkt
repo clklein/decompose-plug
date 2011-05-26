@@ -4,7 +4,12 @@
 
 (provide arith :arith 
          Λ/red :Λ/red 
-         Λk/red Λneed/red Λdk/red
+         Λneed/red :Λneed/red
+         Λk/red :Λk/red
+         Λdk/red :Λdk/red
+         wacky :wacky
+         wacky-inside-out :wacky-inside-out
+         
          arith-red
          cbv-red 
          cont-red
@@ -41,26 +46,7 @@
         (in-hole E (Σ number 1))
         "+1")))
 
-(define-extended-language Λk/red Λ/red
-  (e .... call/cc (cont (hide-hole E)))
-  (v .... call/cc (cont (hide-hole E))))
-
-
-(define cont-partial-red
-  (reduction-relation 
-   Λk/red
-   (--> (in-hole E (call/cc v))
-        (in-hole E (v (cont E)))
-        "call/cc")
-   (--> (in-hole E_1 ((cont E_2) v))
-        (in-hole E_2 v)
-        "cont")))
-
-(define cont-red
-  (union-reduction-relations cont-partial-red
-                             (extend-reduction-relation cbv-red Λk/red)))
-
-(define-extended-language Λneed/red Λ/red
+(define-double-extended-language Λneed/red Λ/red :Λneed/red :Λ/red
   (E hole 
      (E e)
      ((λ (x) E) e)
@@ -89,17 +75,42 @@
         (fresh y_2)
         "assoc")))
 
-(define-extended-language Λdk/red Λk/red
+(define-double-extended-language Λk/red Λ/red :Λk/red :Λ/red
+  (e .... call/cc (cont (hide-hole E)))
+  (v .... call/cc (cont (hide-hole E))))
+
+
+(define cont-partial-red
+  (reduction-relation 
+   Λk/red
+   (--> (in-hole E (call/cc v))
+        (in-hole E (v (cont E)))
+        "call/cc")
+   (--> (in-hole E_1 ((cont E_2) v))
+        (in-hole E_2 v)
+        "cont")))
+
+(define cont-red
+  (union-reduction-relations cont-partial-red
+                             (extend-reduction-relation cbv-red Λk/red)))
+
+(define-double-extended-language Λdk/red Λk/red :Λdk/red :Λk/red
   (e .... (|#| e) call/comp)
   (v .... call/comp)
-  (E (E e) (v E) (|+1| E) hole)
-  (M hole (in-hole M (|#| E))))
+  (E (E e) (v E) hole)
+  (M E (in-hole M (|#| E))))
 
 (define delim-red
   (reduction-relation
    Λdk/red
    (--> (in-hole M (|#| (in-hole E (call/comp v))))
         (in-hole M (|#| (in-hole E (v (cont E))))))))
+
+
+(define-double-language wacky :wacky
+  (C (in-hole C (f hole)) hole))
+(define-double-language wacky-inside-out :wacky-inside-out
+  (C (f C) hole))
 
 
 (define-metafunction Λneed/red

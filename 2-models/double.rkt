@@ -17,10 +17,11 @@ for the sem-sem/ directory models
          (for-syntax racket/base))
 
 (provide define-double-language
-         
+         define-double-extended-language
          
          ;; (test-double-match lang :lang r-pat r-term p-bindings)
-         ;; lang should be an identifier bound to a Redex language
+         ;; lang should be an identifier bound to a Redex language or (literally) #f
+         ;;    if it is #f, then Redex isn't tested, only sem-sem
          ;; :lang should be bound to a lang struct (sem-sem language, as below)
          ;; r-pat should be a Redex pattern
          ;; r-term should be a Redex term, but without the (term ...) wrapper
@@ -31,10 +32,12 @@ for the sem-sem/ directory models
          
          sem-sem-match)
 
-;; nts : (list-of symbol)
+;; nts : (listof symbol)
 ;; lang : `([,nt ,pat ...] ...)   -- matches the language setup
 ;;                                -- of syntax directed match total
-(struct lang (nts lang kwds) #:transparent)
+;; kwds : (listof symbol)
+;; grammar : sexp representation of the original, input grammar (used for language extension)
+(struct lang (nts lang kwds grammar) #:transparent)
 
 (define-syntax (define-double-language stx)
   (syntax-case stx ()
@@ -44,18 +47,66 @@ for the sem-sem/ directory models
          (unless (identifier? nt)
            (raise-syntax-error #f "expected identifier" stx nt)))
        #'(begin
-           (define id2
-             (let ([nts '(nt ...)]
-                   [kwds (find-kwds '((nt prods ...) ...))]) 
-               (lang nts
-                     `((nt (,(rp->p nts kwds 'prods #f) ...)) 
-                       ...
-                       ,@built-in-nts)
-                     kwds)))
+           (define id2 (grammar->lang '((nt prods ...) ...) '()))
            (define-language id1 (nt prods ...) ...)))]))
 
+(define (grammar->lang orig-grammar extensions)
+  (define grammar (combine-grammars orig-grammar extensions))
+  (define nts (map car grammar))
+  (define kwds (find-kwds grammar))
+  (lang nts
+        (append (map (λ (nt/prods)
+                       (define nt (car nt/prods))
+                       (define prods (cdr nt/prods))
+                       `(,nt (,@(map (λ (prod) (rp->p nts kwds prod #f))
+                                     prods))))
+                     grammar)
+                built-in-nts)
+        kwds
+        grammar))
+
+(define (combine-grammars orig-grammar extensions)
+  (define extended-nts (map car extensions))
+  (define not-mentioned-in-extensions
+    (filter (λ (nt-prods)
+              (not (member (car nt-prods) extended-nts)))
+            orig-grammar))
+  (define extensions-filled-out
+    (for/list ([extension (in-list extensions)])
+      (define nt (car extension))
+      (define prods (cdr extension))
+      (define orig (for/or ([prod (in-list orig-grammar)])
+                     (and (eq? (car prod) nt)
+                          prod)))
+      (define full-prods
+        (apply append
+               (for/list ([x (in-list prods)])
+                 (cond
+                   [(equal? x '....)
+                    (unless orig
+                      (error 'combine-grammars "when building combined non-terminal ~s, could not find original productions"
+                             nt))
+                    orig]
+                   [else
+                    (list x)]))))
+      `(,nt ,@full-prods)))
+  (append extensions-filled-out
+          not-mentioned-in-extensions))
+          
+(define-syntax (define-double-extended-language stx)
+  (syntax-case stx ()
+    [(_ id1 id1-orig id2 id2-orig (nt prods ...) ...)
+     (begin
+       (for ([nt (in-list (syntax->list #'(nt ...)))])
+         (unless (identifier? nt)
+           (raise-syntax-error #f "expected identifier" stx nt)))
+       #'(begin
+           (define-extended-language id1 id1-orig (nt prods ...) ...)
+           (define id2 (grammar->lang (lang-grammar id2-orig)
+                                      '((nt prods ...) ...)))))]))
+
 (define (find-kwds grammar)
-  (define nts (append '(variable-not-otherwise-mentioned in-hole hole)
+  (define nts (append '(variable-not-otherwise-mentioned in-hole hole number)
                       (map car built-in-nts)
                       (map car grammar)))
   (define kwds (make-hash))
@@ -133,7 +184,8 @@ for the sem-sem/ directory models
     (y 1)
     (f 2)
     (g 3)
-    (blahblah 4)))
+    (k 4)
+    (blahblah 5)))
 
 (define (known-variable? v)
   (for/or ([x (in-list known-vars-table)])
@@ -245,9 +297,11 @@ for the sem-sem/ directory models
   (syntax-case stx ()
     [(_ lang :lang pat trm bindings)
      #`(begin
-         #,(syntax/loc #'lang
-             (test-equal (rb/f->b (redex-match lang pat (term trm)))
-                         (normalize-bindings (term bindings))))
+         #,@(if (syntax-e #'lang)
+                (list (syntax/loc #'lang
+                        (test-equal (rb/f->b (redex-match lang pat (term trm)))
+                                    (normalize-bindings (term bindings)))))
+                (list))
          #,(syntax/loc #':lang
              (test-equal (b->rb (sem-sem-match :lang 'pat 'trm))
                          (normalize-bindings (term bindings)))))]))
