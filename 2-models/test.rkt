@@ -59,6 +59,21 @@
                     ((a (+ 1 2))
                      (C hole))))
 
+(test-double-match Λ/red :Λ/red 
+                   e 
+                   ((f x) (g y))
+                   (((e ((f x) (g y))))))
+
+(test-double-match Λ/red :Λ/red 
+                   (in-hole E e) 
+                   ((f x) (g y))
+                   (((e (f x))
+                     (E (hole (g y))))
+                    ((e ((f x) (g y)))
+                     (E hole))
+                    ((e f)
+                     (E ((hole x) (g y))))))
+
 ;; reduction rules tests
 
 (test--> cbv-red

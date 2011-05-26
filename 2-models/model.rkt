@@ -1,9 +1,10 @@
-#lang racket
+#lang racket/base
 (require redex/reduction-semantics
          "double.rkt")
 
 (provide arith :arith 
-         Λ/red Λk/red Λneed/red Λdk/red
+         Λ/red :Λ/red 
+         Λk/red Λneed/red Λdk/red
          arith-red
          cbv-red 
          cont-red
@@ -23,9 +24,10 @@
    (--> (in-hole C (+ number_1 number_2))
         (in-hole C (Σ number_1 number_2)))))
  
-(define-language Λ/red
+(define-double-language Λ/red :Λ/red
   (e (e e) x v)
-  ((x y) variable-not-otherwise-mentioned)
+  (x variable-not-otherwise-mentioned)
+  (y x)
   (v (λ (x) e) |+1| number)
   (E (E e) (v E) hole))
 

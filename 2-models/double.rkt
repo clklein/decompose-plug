@@ -27,12 +27,14 @@ for the sem-sem/ directory models
          ;; bindings should be `(((,id ,r-term) ...) ...), ie a list of
          ;;    association tables that determine the match, or #f
          ;;    if this example should not matchs
-         test-double-match)
+         test-double-match
+         
+         sem-sem-match)
 
 ;; nts : (list-of symbol)
 ;; lang : `([,nt ,pat ...] ...)   -- matches the language setup
 ;;                                -- of syntax directed match total
-(struct lang (nts lang) #:transparent)
+(struct lang (nts lang kwds) #:transparent)
 
 (define-syntax (define-double-language stx)
   (syntax-case stx ()
@@ -43,19 +45,39 @@ for the sem-sem/ directory models
            (raise-syntax-error #f "expected identifier" stx nt)))
        #'(begin
            (define id2
-             (let ([nts '(nt ...)]) 
-               (lang nts `((nt (,(rp->p nts 'prods #f) ...)) 
-                           ...
-                           ,@number-nts
-                           ))))
+             (let ([nts '(nt ...)]
+                   [kwds (find-kwds '((nt prods ...) ...))]) 
+               (lang nts
+                     `((nt (,(rp->p nts kwds 'prods #f) ...)) 
+                       ...
+                       ,@built-in-nts)
+                     kwds)))
            (define-language id1 (nt prods ...) ...)))]))
+
+(define (find-kwds grammar)
+  (define nts (append '(variable-not-otherwise-mentioned in-hole hole)
+                      (map car built-in-nts)
+                      (map car grammar)))
+  (define kwds (make-hash))
+  (let loop ([x (map cdr grammar)])
+    (cond
+      [(pair? x)
+       (loop (car x))
+       (loop (cdr x))]
+      [(symbol? x)
+       (unless (member x nts)
+         (hash-set! kwds x #t))]))
+  (sort (hash-map kwds (λ (x y) x))
+        string<=?
+        #:key symbol->string))
 
 ;; add this non-terminal into each language 
 ;; and translate number constants back and
 ;; forth from this notation; eg the number
 ;; 123 is (:cons 1 (:cons 2 (:cons 3 empty)))
-(define number-nts
+(define built-in-nts
   `([num ((:cons num (:nt digits)))]
+    [var ((:cons var (:nt digits)))]
     [digits ((:cons 0 (:nt digits))
              (:cons 1 (:nt digits))
              (:cons 2 (:nt digits))
@@ -68,13 +90,27 @@ for the sem-sem/ directory models
              (:cons 9 (:nt digits))
              empty)]))
 
-(define/contract (rp->p nts pat [name-nts? #t])
-  (->* ((listof symbol?) any/c) (boolean?) any/c)
+(define/contract (rt->t nts kwds pat)
+  (-> (listof symbol?) (listof symbol?) any/c any/c)
+  (let loop ([pat pat])
+    (match pat
+      ['hole ':hole]
+      [(? number?) (number->p-number pat)]
+      [(? pair?) `(:cons ,(loop (car pat)) ,(loop (cdr pat)))]
+      [(? null?) `empty]
+      [(? symbol?) 
+       (cond
+         [(member pat kwds) pat]
+         [else (symbol->p-symbol pat)])])))
+
+(define/contract (rp->p nts kwds pat [name-nts? #t])
+  (->* ((listof symbol?) (listof symbol?) any/c) (boolean?) any/c)
   (let loop ([pat pat])
     (match pat
       ['hole ':hole]
       [(? number?) (number->p-number pat)]
       ['number `(:nt num)]
+      ['variable-not-otherwise-mentioned `(:nt var)]
       [(? symbol?)
        (define-values (prefix has-suffix?)
          (let ([m (regexp-match #rx"^([^_])_(.*)" (symbol->string pat))])
@@ -86,23 +122,44 @@ for the sem-sem/ directory models
           (if name-nts?
               `(:name ,pat (:nt ,prefix))
               `(:nt ,prefix))]
-         [else pat])]
+         [(member pat kwds) pat]
+         [else (symbol->p-symbol pat)])]
       [`(in-hole ,p1 ,p2) `(:in-hole ,(loop p1) ,(loop p2))]
       [(? pair?) `(:cons ,(loop (car pat)) ,(loop (cdr pat)))]
       [(? null?) `empty])))
 
+(define known-vars-table
+  '((x 0)
+    (y 1)
+    (f 2)
+    (g 3)
+    (blahblah 4)))
+
+(define (known-variable? v)
+  (for/or ([x (in-list known-vars-table)])
+    (eq? (car x) v)))
+
+(define/contract (symbol->p-symbol v)
+  (-> symbol? any/c)
+  (unless (known-variable? v)
+    (error 'double.rkt "found a variable that doesn't have an entry in the table: ~s" v))
+  `(:cons var ,(number->p-digits (cadr (assoc v known-vars-table)))))
+
 (define/contract (number->p-number n)
   (-> exact-nonnegative-integer? any)
+  `(:cons num
+          ,(number->p-digits n)))
+
+(define (number->p-digits n)
   (define digits
     (let loop ([n n])
       (cond
         [(= n 0) '()]
         [else (cons (modulo n 10) (loop (quotient n 10)))])))
-  `(:cons num
-          ,(let loop ([ds (reverse digits)])
-             (cond
-               [(null? ds) 'empty]
-               [else `(:cons ,(car ds) ,(loop (cdr ds)))]))))
+  (let loop ([ds (reverse digits)])
+    (cond
+      [(null? ds) 'empty]
+      [else `(:cons ,(car ds) ,(loop (cdr ds)))])))
 
 (check-equal? (number->p-number 0) '(:cons num empty))
 (check-equal? (number->p-number 1) '(:cons num (:cons 1 empty)))
@@ -116,7 +173,8 @@ for the sem-sem/ directory models
     (match p
       [`:hole (term hole)]
       [`(:in-hole ,a ,b) `(in-hole ,(loop a) ,(loop b))]
-      [`(:cons num ,stuff) (p-number->number stuff)]
+      [`(:cons var ,stuff) (p-variable->variable stuff)]
+      [`(:cons num ,stuff) (p-digits->number stuff)]
       [`(:cons ,a ,b) (cons (loop a) (loop b))]
       [`empty '()]
       [`(:name ,x (:nt ,b)) x]
@@ -127,7 +185,7 @@ for the sem-sem/ directory models
       [`:no-context (c->rt p)]
       [else p])))
 
-(define/contract (p-number->number stuff)
+(define/contract (p-digits->number stuff)
   (-> any/c exact-nonnegative-integer?)
   (define digits
     (let loop ([stuff stuff])
@@ -141,6 +199,13 @@ for the sem-sem/ directory models
       [else
        (+ (car digits)
           (* 10 (loop (cdr digits))))])))
+
+(define (p-variable->variable stuff)
+  (define n (p-digits->number stuff))
+  (define v (assoc n (map reverse known-vars-table)))
+  (unless v
+    (error 'p-variable->variable "unknown encoded variable: ~s ~s" stuff n))
+  (cadr v))
 
 (check-equal? (p->rt '(:cons num empty)) 0)
 (check-equal? (p->rt '(:cons num (:cons 1 empty))) 1)
@@ -168,12 +233,6 @@ for the sem-sem/ directory models
   (C hole (+ C a) (+ a C))
   (a (+ a a) 1 2))
 
-#;
-(b->rb
- (matches (lang-lang b)
-          (rp->p (lang-nts b) '(in-hole C a))
-          (rp->p (lang-nts b) '(+ 1 2))))
-
 (define (rb/f->b b)
   (normalize-bindings
    (and b
@@ -186,10 +245,10 @@ for the sem-sem/ directory models
   (syntax-case stx ()
     [(_ lang :lang pat trm bindings)
      #`(begin
-         #,(syntax/loc stx
+         #,(syntax/loc #'lang
              (test-equal (rb/f->b (redex-match lang pat (term trm)))
                          (normalize-bindings (term bindings))))
-         #,(syntax/loc stx
+         #,(syntax/loc #':lang
              (test-equal (b->rb (sem-sem-match :lang 'pat 'trm))
                          (normalize-bindings (term bindings)))))]))
 
@@ -202,8 +261,8 @@ for the sem-sem/ directory models
              #:cache-keys? #t)))
 
 (define (sem-sem-match lang r-pat r-term)
-  (define pat (rp->p (lang-nts lang) r-pat))
-  (define trm (rp->p (lang-nts lang) r-term))
+  (define pat (rp->p (lang-nts lang) (lang-kwds lang) r-pat))
+  (define trm (rt->t (lang-nts lang) (lang-kwds lang) r-term))
   (matches (lang-lang lang) pat trm))
 
 #|
