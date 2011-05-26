@@ -106,6 +106,11 @@ need its argument and this is where the fourth production comes in. This product
 is the most interesting. It says that when a function in the function position
 of some application needs its argument, then you may evaluate its argument.
 
+@wfigure["fig:cont" "Continuations"]{
+@(render-language Λk/red)
+
+@(render-reduction-relation cont-red)
+}
 As an example, this expression
 @rr[((λ (x) (|+1| 1)) (|+1| 2))]
 reduces by simplifying the body of the
@@ -128,12 +133,6 @@ able to support a sophisticated form of nesting, namely that
 a decomposition must occur in one part of a term in order
 for a decomposition to occur in another.
 
-
-@wfigure["fig:cont" "Continuations"]{
-@(render-language Λk/red)
-
-@(render-reduction-relation cont-red)
-}
 When building a model for continuations, there is an easy connection to make, namely that
 an evaluation context is itself a natural representation for a continuation. That is,
 at the point that when a continuation is grabbed, the context in which it is grabbed
