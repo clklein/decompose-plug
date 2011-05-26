@@ -54,12 +54,22 @@
 
 (define (rewrite-nt-has-prod lws)
   (list ""
-        (list-ref lws 4)
+        (list-ref lws 2)
         " ∈ "
         (list-ref lws 3)
         "("
-        (list-ref lws 2)
+        (list-ref lws 4)
         ")"))
+
+(define (rewrite-lub-not-top lws)
+  (list ""
+        (list-ref lws 2)
+        " ⊔ "
+        (list-ref lws 3)
+        " = "
+        (list-ref lws 4)
+        " ≠ "
+        "⊤"))
 
 (define compound-rewriters
   (list (list 'append-contexts rewrite-append-contexts)
@@ -67,4 +77,5 @@
         (list 'matches rewrite-matches)
         (list 'decomposes rewrite-decomposes)
         (list 'no-bindings rewrite-no-bindings)
-        (list 'nt-has-prod rewrite-nt-has-prod)))
+        (list 'nt-has-prod rewrite-nt-has-prod)
+        (list 'lub-not-top rewrite-lub-not-top)))
