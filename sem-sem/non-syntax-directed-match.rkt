@@ -78,7 +78,7 @@
    [(b1 b2 b)
     (b1 b2 b)
     (%is/nonvar (b1 b2) b (⊔/proc b1 b2))
-    (%/= b false)]))
+    (%/= b '⊤)]))
 
 (define (uncontext/proc C)
   (term (uncontext ,C)))

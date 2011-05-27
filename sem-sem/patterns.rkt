@@ -30,7 +30,9 @@
   (F (:left t)
      (:right t))
   (C :no-context
-     (F C)))
+     (F C))
+  
+  (otherwise-mentioned ⊤))
 
 (define pattern? (redex-match patterns p))
 (define value? (redex-match patterns v))

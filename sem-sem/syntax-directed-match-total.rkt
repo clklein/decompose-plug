@@ -49,7 +49,7 @@
             (match-lambda
               [(mtch d b)
                (match (⊔/proc `((pair ,x ,(named d term))) b)
-                 [#f (set)]
+                 ['⊤ (set)]
                  [b+ (set (mtch d b+))])]))]
       [`(:in-hole ,p1 ,p2)
        (==> (go p1 term seen)
@@ -102,7 +102,7 @@
 
 (define (merge-decomp C1 b1 d2 b2)
   (match (⊔/proc b1 b2)
-    [#f (set)]
+    ['⊤ (set)]
     [b (match d2
          [(decomp C2 t2)
           (set (mtch (decomp (term (append-contexts ,C1 ,C2)) t2) b))]
@@ -113,7 +113,7 @@
   (match* (m1 m2)
           [((mtch d1 b1) (mtch d2 b2))
            (match (⊔/proc b1 b2)
-             [#f (set)]
+             ['⊤ (set)]
              [b (match* (d1 d2)
                         [((no-decomp) (no-decomp))
                          (set (mtch (no-decomp) b))]

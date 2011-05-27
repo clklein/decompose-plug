@@ -27,20 +27,20 @@
   [(M L a a) ; a ≠ :hole
    (set (pair • (no-bindings)))]
   [(M L (:name x p) t)
-   ,(set-comp* (term ((pair d b_^’) (guard (neq b_^’ #f)) 
+   ,(set-comp* (term ((pair d b_^’) (guard (neq b_^’ ⊤)) 
                                     (eq b_^’ (⊔ (set (pair x (named d t))) b))
                                     (in (pair d b) (M L p t)))))]
   [(M L (:nt n) t)
    ,(set-comp* (term ((pair d (no-bindings)) (in (pair d b) (M L p t)) (in p (productions L n)))))]
   [(M L (:in-hole p_c p_h) t)
    ,(set-comp* (term ((pair d b) (eq d (combine C d_h))
-                                 (guard (neq b #f))
+                                 (guard (neq b ⊤))
                                  (eq b (⊔ b_c b_h))
                                  (in (pair d_h b_h) (M L p_h t_c))
                                  (in (pair (pair C t_c) b_c) (M L p_c t)))))]
   [(M L (:cons p_l p_r) (:cons t_l t_r))
    ,(set-comp* (term ((pair d b) (in d (select t_l d_l t_r d_r))
-                                 (guard (neq b #f))
+                                 (guard (neq b ⊤))
                                  (eq b (⊔ b_l b_r))
                                  (in (pair d_r b_r) (M L p_r t_r))
                                  (in (pair d_l b_l) (M L p_l t_l)))))]
