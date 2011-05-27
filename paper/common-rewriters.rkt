@@ -10,8 +10,11 @@
 
 (define (make-infix-binop-rewriter op)
   (match-lambda
-    [(list _ _ l r _)
-     (list l (just-after (format " ~a " op) l) r)]))
+    [(list s _ l r _)
+     (list (struct-copy lw s [e ""] [column-span (- (lw-column l) (lw-column s))])
+           l 
+           (just-after (format " ~a " op) l)
+           r)]))
 
 (define rewrite-lub (make-infix-binop-rewriter '⊔))
 (define rewrite-neq (make-infix-binop-rewriter '≠))

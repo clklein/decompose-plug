@@ -29,14 +29,17 @@
          ,(just-after " |" elem)
          ,@(intersperse
             (for/list ([c conds])
-              (define (replace with)
-                (struct-copy lw c [e with]))
+              (define (replace lws)
+                (define space
+                  (list (struct-copy lw (first (lw-e c)) 
+                                     [e ""]
+                                     [column-span 0])
+                        'spring))
+                (struct-copy lw c [e (append space lws)]))
               (case (lw-e (second (lw-e c)))
-                [(guard) (replace (list (struct-copy lw (first (lw-e c)) [e ""] [column-span 0])
-                                        'spring
-                                        (third (lw-e c))))]
+                [(guard) (replace (list (third (lw-e c))))]
                 [(eq) (replace (rewrite-eq (lw-e c)))]
-                [(in) (replace (rewrite-in (lw-e c)))]))
+                [(in) (replace (rewrite-eq (lw-e c)))]))
             ",")
          ,(just-after "}" (last conds)))]))
   (struct-copy lw unquoted
