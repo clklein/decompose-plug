@@ -35,7 +35,7 @@
                                      [e ""]
                                      [column-span 0])
                         'spring))
-                (struct-copy lw c [e (append space lws)]))
+                (struct-copy lw c [e (append space lws '(spring))]))
               (case (lw-e (second (lw-e c)))
                 [(guard) (replace (list (third (lw-e c))))]
                 [(eq) (replace (rewrite-eq (lw-e c)))]
