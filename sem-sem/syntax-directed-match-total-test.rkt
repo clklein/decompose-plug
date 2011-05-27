@@ -12,7 +12,7 @@
     [(test:no-match _ L p t)
      (empty? (matches L p t))]
     [(test:bind _ L p t bs)
-     (equal-bindings? (matches L p t) bs)]))
+     (equal-bindings? (map unpaired-bindings (matches L p t)) bs)]))
 
 (run-tests test-syntax-directed-total)
 
@@ -70,16 +70,18 @@
     shift-reset
     '(:in-hole (:in-hole (:name M (:nt M)) (:name C (:nt C))) r)
     (encode-term '((λ x x) (reset (succ (reset ((λ x x) (r 2))))))))
-   `(((C ((:right ,(encode-term '(λ x x)))
-          ((:left mt)
-           ((:left ,(encode-term '(2)))
-            :no-context))))
-      (M ((:right ,(encode-term '(λ x x)))
-          ((:left mt)
-           ((:right reset)
-            ((:left mt)
-             ((:right succ)
-              ((:left mt)
-               ((:right reset)
-                ((:left mt)
-                 :no-context)))))))))))))
+   `(((pair C
+            ((:right ,(encode-term '(λ x x)))
+             ((:left mt)
+              ((:left ,(encode-term '(2)))
+               :no-context))))
+      (pair M
+            ((:right ,(encode-term '(λ x x)))
+             ((:left mt)
+              ((:right reset)
+               ((:left mt)
+                ((:right succ)
+                 ((:left mt)
+                  ((:right reset)
+                   ((:left mt)
+                    :no-context)))))))))))))

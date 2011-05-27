@@ -29,3 +29,18 @@
         " = "
         (list-ref lws 4)
         ""))
+
+(define (rewrite-pair lws)
+  (list "(" (list-ref lws 2) ", " (list-ref lws 3) ")"))
+
+(define rewrite-set
+  (match-lambda
+    [(list _ _ elems ... _)
+     `("{" ,@(intersperse elems ", ") "}")]))
+
+(define (intersperse xs y)
+  (match xs
+    [(list) (list)]
+    [(list x) (list x)]
+    [(list-rest x1 x2 xs)
+     (list* x1 (just-after y x1) (intersperse (cons x2 xs) y))]))

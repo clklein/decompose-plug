@@ -78,4 +78,6 @@
         (list 'decomposes rewrite-decomposes)
         (list 'no-bindings rewrite-no-bindings)
         (list 'nt-has-prod rewrite-nt-has-prod)
-        (list 'lub-not-top rewrite-lub-not-top)))
+        (list 'lub-not-top rewrite-lub-not-top)
+        (list 'pair rewrite-pair)
+        (list 'set rewrite-set)))

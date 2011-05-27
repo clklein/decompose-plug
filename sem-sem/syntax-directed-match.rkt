@@ -28,7 +28,7 @@
    (set (• (no-bindings)))]
   [(M L (:name x p) t)
    ,(set-comp* (term ((d b_^’) (guard (neq b_^’ #f)) 
-                               (eq b_^’ (⊔ (set (x (named d t))) b))
+                               (eq b_^’ (⊔ (set (pair x (named d t))) b))
                                (in (d b) (M L p t)))))]
   [(M L (:nt n) t)
    ,(set-comp* (term ((d (no-bindings)) (in (d b) (M L p t)) (in p (productions L n)))))]

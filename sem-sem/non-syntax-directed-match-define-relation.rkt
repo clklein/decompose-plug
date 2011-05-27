@@ -10,7 +10,7 @@
   [(matches L a a (no-bindings))]
   [(matches L t (:name x p) b_^’)
    (matches L t p b)
-   (lub-not-top {[x t]} b b_^’)]
+   (lub-not-top (set (pair x t)) b b_^’)]
   [(matches L t (:nt n) (no-bindings))
    (nt-has-prod p L n)
    (matches L t p b)]
@@ -28,7 +28,7 @@
   [(decomposes L t :no-context t :hole (no-bindings))]
   [(decomposes L t_1 C t_2 (:name x p) b_^’)
    (decomposes L t_1 C t_2 p b)
-   (lub-not-top {[x C]} b b_^’)]
+   (lub-not-top (set (pair x C)) b b_^’)]
   [(decomposes L (:cons t_1 t_2) ((:left t_2) C) t_1’ (:cons p_1 p_2) b)
    (decomposes L t_1 C t_1’ p_1 b_1)
    (matches L t_2 p_2 b_2)

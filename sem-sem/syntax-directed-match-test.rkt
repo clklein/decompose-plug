@@ -2,6 +2,7 @@
 
 (require "syntax-directed-match.rkt"
          "shared-test-cases.rkt"
+         "common.rkt"
          redex)
 
 (define test-syntax-directed
@@ -11,6 +12,6 @@
     [(test:no-match _ L p t)
      (empty? (term (matches ,L ,p ,t)))]
     [(test:bind _ L p t bs)
-     (equal-bindings? (term (matches ,L ,p ,t)) bs)]))
+     (equal-bindings? (map unpaired-bindings (term (matches ,L ,p ,t))) bs)]))
 
 (run-tests test-syntax-directed)

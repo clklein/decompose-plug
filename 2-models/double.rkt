@@ -279,7 +279,7 @@ for the sem-sem/ directory models
         (for/list ([b (in-list b)])
           (for/list ([pr (in-list b)])
             (match pr
-              [`(,x ,p) `(,x ,(p->rt p))]))))))
+              [`(pair ,x ,p) `(,x ,(p->rt p))]))))))
 
 (define-double-language a b
   (C hole (+ C a) (+ a C))

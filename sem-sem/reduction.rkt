@@ -35,7 +35,7 @@
   [(inst (:in-hole s_1 s_2) b)
    (plug C_1 (inst s_2 b))
    (where C_1 (inst s_1 b))]
-  [(inst (:var x_i) ([x_0 v_0] ... [x_i v_i] [x_i+1 v_i+1] ...))
+  [(inst (:var x_i) ((pair x_0 v_0) ... (pair x_i v_i) (pair x_i+1 v_i+1) ...))
    v_i]
   [(inst (:app f s) b)
    ,((term f) (term (non-context (inst s b))))])

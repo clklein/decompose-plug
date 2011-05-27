@@ -48,7 +48,7 @@
        (==> (go p term seen)
             (match-lambda
               [(mtch d b)
-               (match (⊔/proc `([,x ,(named d term)]) b)
+               (match (⊔/proc `((pair ,x ,(named d term))) b)
                  [#f (set)]
                  [b+ (set (mtch d b+))])]))]
       [`(:in-hole ,p1 ,p2)

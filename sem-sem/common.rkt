@@ -57,8 +57,8 @@
   ⊔ : b b -> b or #f
   [(⊔ () b)
    b]
-  [(⊔ ([x_0 v_0] [x_1 v_1] ...) b)
-   (⊔ ([x_1 v_1] ...) b_1)
+  [(⊔ ((pair x_0 v_0) (pair x_1 v_1) ...) b)
+   (⊔ ((pair x_1 v_1) ...) b_1)
    (where b_1 (merge-binding x_0 v_0 b))]
   [(⊔ b_1 b_2) ; else
    #f])
@@ -66,14 +66,14 @@
 (define-metafunction patterns
   merge-binding : x v b -> b or #f
   [(merge-binding x v ())
-   ([x v])]
-  [(merge-binding x v ([x v_0] [x_1 v_1] ...))
-   ([x v_m] [x_1 v_1] ...)
+   ((pair x v))]
+  [(merge-binding x v ((pair x v_0) (pair x_1 v_1) ...))
+   ((pair x v_m) (pair x_1 v_1) ...)
    (where v_m (merge-value v v_0))]
-  [(merge-binding x v ([x_0 v_0] [x_1 v_1] ...))
-   ([x_0 v_0] [x_1’ v_1’] ...)
+  [(merge-binding x v ((pair x_0 v_0) (pair x_1 v_1) ...))
+   ((pair x_0 v_0) (pair x_1’ v_1’) ...)
    (side-condition (not (equal? (term x) (term x_0))))
-   (where ([x_1’ v_1’] ...) (merge-binding x v ([x_1 v_1] ...)))]
+   (where ((pair x_1’ v_1’) ...) (merge-binding x v ((pair x_1 v_1) ...)))]
   [(merge-binding x v b) ; else
    #f])
 
@@ -88,6 +88,9 @@
    (where t (uncontext C))]
   [(merge-value v_1 v_2) ; else
    #f])
+
+(define (unpaired-bindings bs)
+  (map (match-lambda [`(pair ,x ,v) `(,x ,v)]) bs))
 
 ;; metafunctions to facilitate typesetting
 (define-metafunction patterns

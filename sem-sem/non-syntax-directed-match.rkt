@@ -22,7 +22,7 @@
    [(L t x p b b+) ; name
     (L t `(:name ,x ,p) b+)
     (matches L t p b)
-    (merges (list (list x t)) b b+)]
+    (merges (list `(pair ,x ,t)) b b+)]
    [(L t x ps p b) ; non-terminal
     (L t `(:nt ,x) empty)
     (%is/nonvar (L x) ps (productions/proc L x))
@@ -47,7 +47,7 @@
     (L t1 C t2 `(:name ,x ,p) b+)
     (decomposes L t1 C t2 p b)
     (%is/nonvar (C) t (uncontext/proc C))
-    (merges (list (list x t)) b b+)]
+    (merges (list `(pair ,x ,t)) b b+)]
    [(L t1 t2 C t p1 p2 b1 b2 b) ; cons-left
     (L `(:cons ,t1 ,t2) `((:left ,t2) ,C) t `(:cons ,p1 ,p2) b)
     (decomposes L t1 C t p1 b1)

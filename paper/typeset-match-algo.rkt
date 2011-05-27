@@ -5,20 +5,9 @@
          "../sem-sem/syntax-directed-match.rkt")
 (provide render-algorithm)
 
-(define rewrite-set
-  (match-lambda
-    [(list _ _ elems ... _)
-     `("{" ,@(intersperse elems ", ") "}")]))
-
-(define (intersperse xs y)
-  (match xs
-    [(list) (list)]
-    [(list x) (list x)]
-    [(list-rest x1 x2 xs)
-     (list* x1 (just-after y x1) (intersperse (cons x2 xs) y))]))
-
 (define compound-rewriters
   (list (list 'set rewrite-set)
+        (list 'pair rewrite-pair)
         (list 'no-bindings rewrite-no-bindings)
         (list '⊔ rewrite-lub)
         (list 'neq rewrite-neq)
