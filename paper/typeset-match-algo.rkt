@@ -39,7 +39,7 @@
               (case (lw-e (second (lw-e c)))
                 [(guard) (replace (list (third (lw-e c))))]
                 [(eq) (replace (rewrite-eq (lw-e c)))]
-                [(in) (replace (rewrite-eq (lw-e c)))]))
+                [(in) (replace (rewrite-in (lw-e c)))]))
             ",")
          ,(just-after "}" (last conds)))]))
   (struct-copy lw unquoted
