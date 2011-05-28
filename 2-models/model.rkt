@@ -83,12 +83,11 @@
 (define cont-partial-red
   (reduction-relation 
    Λk/red
+   ;; no labels on these rules so the figure fits in the paper
    (--> (in-hole E (call/cc v))
-        (in-hole E (v (cont E)))
-        "call/cc")
+        (in-hole E (v (cont E))))
    (--> (in-hole E_1 ((cont E_2) v))
-        (in-hole E_2 v)
-        "cont")))
+        (in-hole E_2 v))))
 
 (define cont-red
   (union-reduction-relations cont-partial-red

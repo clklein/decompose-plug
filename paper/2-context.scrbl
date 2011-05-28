@@ -89,8 +89,7 @@ Unlike call-by-name, however, each
 function argument is evaluated at most once. 
 A typical implementation of
 a language with call-by-need uses state to track if an argument has been evaluated,
-but it is also possible to give a direct explanation, expoiting the expressive
-nature of contexts to control where evaluation occurs.
+but it is also possible to give a direct explanation, expoiting contexts to control where evaluation occurs.
 
 @wfigure[#:size 2 "fig:cbn" "Call-by-need Contexts"]{
 @(render-language Λneed/red #:nts '(E))
@@ -106,11 +105,6 @@ need its argument and this is where the fourth production comes in. This product
 is the most interesting. It says that when a function in the function position
 of some application needs its argument, then you may evaluate its argument.
 
-@wfigure["fig:cont" "Continuations"]{
-@(render-language Λk/red)
-
-@(render-reduction-relation cont-red)
-}
 As an example, this expression
 @rr[((λ (x) (|+1| 1)) (|+1| 2))]
 reduces by simplifying the body of the
@@ -133,6 +127,12 @@ able to support a sophisticated form of nesting, namely that
 a decomposition must occur in one part of a term in order
 for a decomposition to occur in another.
 
+@wfigure[#:size 2.5 "fig:cont" "Continuations"]{
+@(render-language Λk/red)
+
+@(parameterize ([rule-pict-style 'horizontal])
+   (render-reduction-relation cont-red))
+}
 When building a model for continuations, there is an easy connection to make, namely that
 an evaluation context is itself a natural representation for a continuation. That is,
 at the point that when a continuation is grabbed, the context in which it is grabbed
@@ -146,9 +146,9 @@ for this expression
 is to grab a continuation. In this model that continuation is represented as
 @rr[(cont (|+1| hole))], 
 which is then applied to @rr[call/cc]'s argument
-in the original context, yielding this expression
+in the original context, yielding 
 @rr[(|+1| ((λ (k) (k 2)) (cont (|+1| hole))))].
-The next step is to substitute the continuation for @rr[k], 
+The next step is to substitute for @rr[k], 
 which yields this expression
 @rr[(|+1| ((cont (|+1| hole)) 2))].
 This expression has a continuation value in the function
