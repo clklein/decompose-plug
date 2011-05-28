@@ -1,4 +1,5 @@
 compiled/
-*.scrbl~
+*~
 main.pdf
 scratch
+*-txt.tex

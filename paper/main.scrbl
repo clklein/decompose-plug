@@ -25,3 +25,5 @@ Thanks to Stephen Chang for his many
 interesting examples of contexts that challenged our
 understanding of evaluation context semantics.
 
+@section{Appendix}
+@element[(style "input" '(exact-chars)) '("core-algorithm-correctness-txt.tex")]
