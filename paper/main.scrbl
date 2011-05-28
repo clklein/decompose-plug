@@ -20,10 +20,13 @@
 
 @(generate-bibliography)
 
+@section[#:style (style #f '(hidden unnumbered))]{}
 @(element (style "paragraph" '()) '("Acknowledgments"))
 Thanks to Stephen Chang for his many 
 interesting examples of contexts that challenged our
 understanding of evaluation context semantics.
+Thanks also to Matthias Felleisen and Matthew Flatt for
+helpful discussions on the work.
 
 @section{Appendix}
 @element[(style "input" '(exact-chars)) '("core-algorithm-correctness-txt.tex")]
