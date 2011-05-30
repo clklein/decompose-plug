@@ -328,7 +328,9 @@ Also has hide-hole removing capabilities
     [(_ arg)
      (let loop ([arg #'arg])
        (syntax-case arg (hide-hole)
-         [(hide-hole exp) (loop #'exp)]
+         [(hide-hole exp) 
+          (let ([res (loop #'exp)])
+            (datum->syntax res (syntax-e res) arg))]
          [_
           (cond
             [(syntax? arg)
