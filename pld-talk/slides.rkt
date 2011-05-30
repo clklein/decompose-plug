@@ -77,12 +77,12 @@
  ((λ (x) (|+1| x)) (|+1| 3)))
 
 (example
- Λk/red ()
+ Λk/red/no-hide-hole ()
  (in-hole E (call/cc v))
  (|+1| (call/cc (λ (k) (|+1| (k 2))))))
 
 (example
- Λk/red ()
+ Λk/red/no-hide-hole ()
  (in-hole E_1 ((cont E_2) v))
  ((|+1| ((cont (|+1| hole)) 2))))
 
