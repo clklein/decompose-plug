@@ -9,14 +9,27 @@
 (default-style (literal-style))
 (non-terminal-subscript-style '(subscript . "Inconsolata"))
 
+(default-font-size 55)
+(label-font-size (default-font-size))
+(metafunction-font-size (default-font-size))
+
+
 (define-syntax-rule (pat arg)
-  (scale (rr arg) 2))
+  (rr arg))
 
 (define (lesson . args)
   (define p 
-    (colorize (inset (apply para #:fill? #f (scale/improve-new-text (bt "Lesson:") 2) args) 20 10) "white"))
+    (inset (colorize (ht-append (scale/improve-new-text (bt "Lesson: ") 2)
+                                (apply para #:width 400 #:fill? #f args))
+                     "white")
+           20 10))
   (slide 
    (cc-superimpose
     (colorize (filled-rectangle (pict-width p) (pict-height p))
               "black")
     p)))
+
+
+
+
+

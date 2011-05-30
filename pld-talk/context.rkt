@@ -11,7 +11,7 @@
       (2:image-width i)
       (2:image-height i)))
 
-(define txt-scale 2)
+(define txt-scale 1)
 (define C (scale (pat pat_1) txt-scale))
 (define e (scale (pat pat_2) txt-scale))
 

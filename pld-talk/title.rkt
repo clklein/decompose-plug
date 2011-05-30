@@ -229,17 +229,15 @@
                              white
                              gray ; red
                              black 
-                             'solid
-                             #:pen-size 10))
+                             'solid))
 
 (define wb-title-background 
   (make-plt-title-background black
                              black
                              black
-                             dark-red
+                             gray
                              gray 
-                             'solid
-                             #:pen-size 10))
+                             'solid))
 
 (define (paleize p)
   (refocus (cc-superimpose 
@@ -274,5 +272,5 @@
      
      title-info))
     (slide (cc-superimpose 
-            bw-title-background
+            plt-title-background
             (clip (refocus p title-info)))))

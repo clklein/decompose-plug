@@ -3,8 +3,9 @@
          redex
          "context.rkt"
          "title.rkt"
+         "examples.rkt"
          "util.rkt"
-         "../2-models/model.rkt")
+         "../2-models/models.rkt")
 
 (title)
 
@@ -13,7 +14,7 @@
          (apply
           append
           (map (λ (arg)
-                 (list (scale (car arg) 2)
+                 (list (scale (car arg) 1.5)
                        (apply para #:width 300 (cdr arg))))
                args))
          rc-superimpose ctl-superimpose 
@@ -36,7 +37,7 @@
    (blank 40 0)
    (vl-append
     10
-    (scale (language->pict arith #:nts '(a)) 2)
+    (language->pict arith #:nts '(a))
     (blank 0 2)
     (para #:fill? #f
           (pat (+ a_1 a_2))
@@ -49,9 +50,51 @@
 
 (context-picture)
 
+(example 
+ arith ()
+ (in-hole C a)
+ (+ 1 2))
+
 (lesson "Contexts introduce ambiguity")
+
+(example
+ Λ/red (x y)
+ (in-hole E (e_1 e_2))
+ ((f x) (g y)))
+
 (lesson "Contexts must support multiple ways to decompose each expression form (app in this case)")
+
+(example
+ Λneed/red (A v)
+ (in-hole E (|+1| number))
+ ((λ (x) (|+1| 2)) (|+1| 3)))
+
 (lesson "Finding a decomposition may require other, unrelated decompositions")
-(lesson "Finding a decomposition may require other, unrelated decompositions")
+
+(example
+ Λneed/red (A v)
+ (in-hole E (|+1| number))
+ ((λ (x) (|+1| x)) (|+1| 3)))
+
+(example
+ Λk/red ()
+ (in-hole E (call/cc v))
+ (|+1| (call/cc (λ (k) (|+1| (k 2))))))
+
+(example
+ Λk/red ()
+ (in-hole E_1 ((cont E_2) v))
+ ((|+1| ((cont (|+1| hole)) 2))))
+
 (lesson "Contexts may be involved in no decompositions during a match")
+
+(example
+ Λdk/red ()
+ (in-hole M (|#| (in-hole E (call/comp v))))
+ (|+1| (|#| (|+1| (call/comp (λ (k) (k 2))))))
+ #:out-of-memory? #t)
+
+ ;wacky
+ ;wacky-inside-out
+
 (lesson "The algorithm must deal with cycles well")
