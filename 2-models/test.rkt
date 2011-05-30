@@ -1,5 +1,5 @@
 #lang racket
-(require "model.rkt"
+(require "models.rkt"
          "double.rkt"
          redex/reduction-semantics)
 

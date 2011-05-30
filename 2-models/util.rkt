@@ -1,7 +1,7 @@
 #lang racket/base
 (require redex/pict
          redex/reduction-semantics
-         "model.rkt")
+         "models.rkt")
 
 (provide rr with-rewriters)
 
