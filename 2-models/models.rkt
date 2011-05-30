@@ -1,12 +1,13 @@
 #lang racket/base
 (require redex/reduction-semantics
+         (for-syntax racket/base)
          "double.rkt")
 
 (provide arith :arith 
          Λ/red :Λ/red 
          Λneed/red :Λneed/red
          Λk/red :Λk/red
-         Λdk/red :Λdk/red
+         Λdk/red :Λdk/red Λk/red/no-hide-hole
          wacky :wacky
          wacky-inside-out :wacky-inside-out
          
@@ -75,7 +76,17 @@
         (fresh y_2)
         "assoc")))
 
-(define-double-extended-language Λk/red Λ/red :Λk/red :Λ/red
+(define-syntax-rule 
+  (define-double-extended-language/hide-hole a b c d e 
+    prods ...)
+  (begin
+    (define-double-extended-language a b c d
+      prods ...)
+    (remove-hide-hole
+     (define-extended-language e b
+       prods ...))))
+
+(define-double-extended-language/hide-hole Λk/red Λ/red :Λk/red :Λ/red Λk/red/no-hide-hole
   (e .... call/cc (cont (hide-hole E)))
   (v .... call/cc (cont (hide-hole E))))
 

@@ -5,6 +5,8 @@ This file does the translation from
 Redex-looking notation to the notation
 for the sem-sem/ directory models
 
+Also has hide-hole removing capabilities
+
 |#
 
 (require racket/match
@@ -30,7 +32,8 @@ for the sem-sem/ directory models
          ;;    if this example should not matchs
          test-double-match
          
-         sem-sem-match)
+         sem-sem-match
+         remove-hide-hole)
 
 ;; nts : (listof symbol)
 ;; lang : `([,nt ,pat ...] ...)   -- matches the language setup
@@ -319,12 +322,18 @@ for the sem-sem/ directory models
   (define trm (rt->t (lang-nts lang) (lang-kwds lang) r-term))
   (matches (lang-lang lang) pat trm))
 
-#|
-(lang-lang b)
-'([C (:hole 
-      (:cons + (:cons (:nt C) (:cons (:nt a) empty)))
-      (:cons + (:cons (:nt a) (:cons (:nt C) empty))))]
-  [a ((:cons + (:cons (:nt a) (:cons (:nt a) empty)))
-      1 
-      2)])
-|#
+
+(define-syntax (remove-hide-hole stx)
+  (syntax-case stx ()
+    [(_ arg)
+     (let loop ([arg #'arg])
+       (syntax-case arg (hide-hole)
+         [(hide-hole exp) (loop #'exp)]
+         [_
+          (cond
+            [(syntax? arg)
+             (datum->syntax arg (loop (syntax-e arg)) arg)]
+            [(pair? arg)
+             (cons (loop (car arg))
+                   (loop (cdr arg)))]
+            [else arg])]))]))
