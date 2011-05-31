@@ -51,45 +51,45 @@
 (context-picture)
 
 (example 
- arith ()
+ arith :arith ()
  (in-hole C a)
  (+ 1 2))
 
 (lesson "Contexts introduce ambiguity")
 
 (example
- Λ/red (x y)
+ Λ/red :Λ/red (x y)
  (in-hole E (e_1 e_2))
  ((f x) (g y)))
 
 (lesson "Contexts must support multiple ways to decompose each expression form (app in this case)")
 
 (example
- Λneed/red (A v)
+ Λneed/red :Λneed/red (A v)
  (in-hole E (|+1| number))
  ((λ (x) (|+1| 2)) (|+1| 3)))
 
 (lesson "Finding a decomposition may require other, unrelated decompositions")
 
 (example
- Λneed/red (A v)
+ Λneed/red :Λneed/red (A v)
  (in-hole E (|+1| number))
  ((λ (x) (|+1| x)) (|+1| 3)))
 
 (example
- Λk/red/no-hide-hole ()
+ Λk/red/no-hide-hole :Λk/red ()
  (in-hole E (call/cc v))
- (|+1| (call/cc (λ (k) (|+1| (k 2))))))
+ (|+1| (call/cc (λ (k) (|+1| (k (|+1| 2)))))))
 
 (example
- Λk/red/no-hide-hole ()
- (in-hole E_1 ((cont E_2) v))
- ((|+1| ((cont (|+1| hole)) 2))))
+ Λk/red/no-hide-hole :Λk/red ()
+ (in-hole E (|+1| number))
+ (|+1| ((cont (|+1| hole)) (|+1| 2))))
 
 (lesson "Contexts may be involved in no decompositions during a match")
 
 (example
- Λdk/red ()
+ Λdk/red :Λdk/red ()
  (in-hole M (|#| (in-hole E (call/comp v))))
  (|+1| (|#| (|+1| (call/comp (λ (k) (k 2))))))
  #:out-of-memory? #t)

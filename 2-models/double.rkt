@@ -306,7 +306,7 @@ Also has hide-hole removing capabilities
                                     (normalize-bindings (term bindings)))))
                 (list))
          #,(syntax/loc #':lang
-             (test-equal (b->rb (sem-sem-match :lang 'pat 'trm))
+             (test-equal (sem-sem-match :lang 'pat 'trm)
                          (normalize-bindings (term bindings)))))]))
 
 (define (normalize-bindings bindings)
@@ -320,7 +320,7 @@ Also has hide-hole removing capabilities
 (define (sem-sem-match lang r-pat r-term)
   (define pat (rp->p (lang-nts lang) (lang-kwds lang) r-pat))
   (define trm (rt->t (lang-nts lang) (lang-kwds lang) r-term))
-  (matches (lang-lang lang) pat trm))
+  (b->rb (matches (lang-lang lang) pat trm)))
 
 
 (define-syntax (remove-hide-hole stx)
