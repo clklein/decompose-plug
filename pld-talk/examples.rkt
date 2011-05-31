@@ -61,18 +61,14 @@
         (apply para
                (add-between
                 (for/list ([bind (in-list table)])
-                  (hbl-append (with-pat-fonts
-                               (t (format "~s" (list-ref bind 0))))
-                              (t "=")
-                              (with-pat-fonts
-                               (t (regexp-replace*
-                                   (regexp-quote (format "~s" (term hole)))
-                                   (format "~s" (list-ref bind 1))
-                                   "[]")))))
-                (blank 10 0)))))]
+                  (hbl-append (render-sexp (list-ref bind 0))
+                              (t " = ")
+                              (render-sexp (list-ref bind 1))))
+                (t ", ")))))]
     [else
      (with-pat-fonts 
       (t (format "~s" sem-sem-answer)))]))
+
   
 (define (mk-button thunk)
   (define button-label (inset (t "Run in Redex") 20 10))

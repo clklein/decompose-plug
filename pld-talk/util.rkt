@@ -2,7 +2,7 @@
 (require slideshow
          redex
          "../2-models/util.rkt")
-(provide pat lesson)
+(provide pat lesson render-sexp)
 
 (literal-style "Inconsolata")
 (non-terminal-style (literal-style))
@@ -29,3 +29,13 @@
               "black")
     p)))
 
+(define (render-sexp sexp)
+  (define fixed-hole
+    (let loop ([sexp sexp])
+      (cond
+        [(equal? sexp (term hole)) 'hole]
+        [(pair? sexp) (cons (loop (car sexp)) (loop (cdr sexp)))]
+        [else sexp])))
+  (define p (open-input-string (format "~s" fixed-hole)))
+  (port-count-lines! p)
+  (lw->pict typesetting-lang (to-lw/stx (read-syntax #f p))))
