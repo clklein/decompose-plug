@@ -100,6 +100,19 @@
                      (v 2))))
 
 (test-double-match Λk/red :Λk/red
+                   (in-hole E (|+1| v))
+                   (|+1| ((cont (|+1| hole)) (|+1| 2)))
+                   (((E (|+1| ((cont (|+1| hole)) hole)))
+                     (v 2))))
+
+(test-double-match Λk/red :Λk/red
+                   (f number number_2)
+                   (f 1 2)
+                   (((number 1)
+                     (number_2 2))))
+
+
+(test-double-match Λk/red :Λk/red
                    (in-hole E_1 ((cont E_2) v))
                    (|+1| (|+1| ((cont (|+1| (|+1| (|+1| hole)))) 2)))
                    (((E_1 (|+1| (|+1| hole)))

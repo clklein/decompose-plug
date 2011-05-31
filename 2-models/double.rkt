@@ -163,21 +163,30 @@ Also has hide-hole removing capabilities
     (match pat
       ['hole ':hole]
       [(? number?) (number->p-number pat)]
-      ['number `(:nt num)]
-      ['variable-not-otherwise-mentioned `(:nt var)]
+      ['variable-not-otherwise-mentioned
+       ;; this one is simpler than the 'number' case because
+       ;; we assume that no examples do things like variable-not-otherwise-mentioned_1
+       ;; and non of the examples actually expect variable-not-otherwise-mentioned
+       ;; to be in the result binding table of a match
+       `(:nt var)]
       [(? symbol?)
        (define-values (prefix has-suffix?)
-         (let ([m (regexp-match #rx"^([^_])_(.*)" (symbol->string pat))])
+         (let ([m (regexp-match #rx"^([^_]+)_(.*)" (symbol->string pat))])
            (if m
                (values (string->symbol (list-ref m 1)) #t)
                (values pat #f))))
        (cond
+         [(eq? prefix 'number)
+          (if name-nts?
+              `(:name ,pat (:nt num))
+              `(:nt num))]
          [(memq prefix nts)
           (if name-nts?
               `(:name ,pat (:nt ,prefix))
               `(:nt ,prefix))]
          [(member pat kwds) pat]
          [else (symbol->p-symbol pat)])]
+      [`(hide-hole ,p) (loop p)]
       [`(in-hole ,p1 ,p2) `(:in-hole ,(loop p1) ,(loop p2))]
       [(? pair?) `(:cons ,(loop (car pat)) ,(loop (cdr pat)))]
       [(? null?) `empty])))
