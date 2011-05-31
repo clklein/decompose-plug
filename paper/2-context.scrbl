@@ -95,13 +95,14 @@ but it is also possible to give a direct explanation, expoiting contexts to cont
 @(render-language Λneed/red #:nts '(E))
 }
 @Figure-ref["fig:cbn"] shows the contexts from @citet[cbn-calculus]'s model of call-by-need.
-The first two productions of @rr[E] are standard, allowing evaluation wherever @rr[E]
-may be, as well as in the function position of an application, regardless of what
-appears in the argument position. The third case allows evaluation in the body of
+The first three productions of @rr[E] are standard, allowing evaluation wherever @rr[E]
+may be, in the argument of the @rr[|1+|] primitive, 
+as well as in the function position of an application, regardless of what
+appears in the argument position. The fourth case allows evaluation in the body of
 a lambda expression that is in the function position of an application. Intuitively,
 this case says that once we have determined that the function to be applied, then
 we can begin to evaluate its body. Of course, the function is eventually going to
-need its argument and this is where the fourth production comes in. This production
+need its argument and this is where the final production comes in. This production
 is the most interesting. It says that when a function in the function position
 of some application needs its argument, then you may evaluate its argument.
 

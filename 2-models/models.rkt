@@ -48,11 +48,9 @@
         "+1")))
 
 (define-double-extended-language Λneed/red Λ/red :Λneed/red :Λ/red
-  (E hole 
-     (E e)
+  (E hole (|+1| E) (E e)
      ((λ (x) E) e)
-     ((λ (x) (in-hole E x)) E)
-     (|+1| E))
+     ((λ (x) (in-hole E x)) E))
   (A v ((λ (x) A) e))
   (v number (λ (x) e) |+1|))
 
