@@ -18,11 +18,10 @@
    (pat _term)
    (sem-sem-match :lang '_pat '_term)
    (λ ()
-     (render-output 
-      (redex-match 
-       lang
-       _pat
-       (term _term))))
+     (redex-match 
+      lang
+      _pat
+      (term _term)))
    stuff ...))
 
 (define examples-cache '())
@@ -45,7 +44,7 @@
                                      (render-sem-sem-answer sem-sem-answer))))))
   (let ([t (if out-of-memory?
                (λ ()
-                 (error 'sandbox "ran out of memory"))
+                 (error "ran out of memory"))
                thunk)])
   (set! example-thunks (append example-thunks (list t t)))))
 
@@ -105,7 +104,7 @@
                               (rounded-rectangle (pict-width button-label) 
                                                  (pict-height button-label)))
                    button-label)
-   thunk))
+   (λ () (render-output thunk))))
 
 (define (pair-em a b)
   (vl-append a (hc-append (blank 20 0) b)))
@@ -133,7 +132,7 @@
             (make-evaluator 'racket
                             '(require redex))))
 
-(define (render-output/proc thnk)
+(define (render-output thnk)
   (define res (with-handlers ((exn:fail? values))
                 (call-in-sandbox-context e thnk)))
   (define-values (w h) (get-display-size))
@@ -168,7 +167,3 @@
 
 (define red-italic (make-object style-delta% 'change-italic))
 (void (send red-italic set-delta-foreground "red"))
-
-(define-syntax-rule 
-  (render-output e)
-  (render-output/proc (λ () e)))

@@ -1,51 +1,32 @@
 #lang racket
 (require slideshow
-         redex
          "context.rkt"
          "title.rkt"
          "examples.rkt"
          "util.rkt"
+         "timeline.rkt"
+         "simple-pattern.rkt"
+         "desiderata.rkt"
+         "redex-code-example.rkt"
          "../2-models/models.rkt")
 
 (title)
 
-(define (combine . args)
-  (table 2 
-         (apply
-          append
-          (map (λ (arg)
-                 (list (scale (car arg) 1.5)
-                       (apply para #:width 300 (cdr arg))))
-               args))
-         rc-superimpose ctl-superimpose 
-         20 10))
+(desiderata)
 
-(slide
- (para "To match:")
- (combine
-  (list (pat literal) "match literal occurrence e.g.,"
-        (pat λ) "," (pat 17) "," (pat +))
-  (list (pat (pat ...)) "match an interior node in a tree; one child per"
-        (pat pat) "in the sequence")
-  (list (pat nt) "try all of the productions of" (pat nt))))
+(timeline)
 
-(slide
- (vl-append
-  40
-  (para #:fill? #f "Example:")
-  (ht-append
-   (blank 40 0)
-   (vl-append
-    60
-    (language->pict arith #:nts '(a))
-    (para #:fill? #f
-          (pat (+ a_1 a_2))
-          "matches"
-          (pat (+ (+ 1 2) 3)))
-    (para #:fill? #f
-          "with" (pat a_1) "=" (pat (+ 1 2))
-          "and"
-          (pat a_2) "=" (pat 3))))))
+(a-redex-example)
+
+(simple-pattern-overview)
+
+(slide 
+ (table 2
+        (list (t "the hole:") (scale (pat hole) 1.5)
+              (t "decomposition:") (scale (pat (in-hole pat pat)) 1.5))
+        (cons rc-superimpose lc-superimpose)
+        cbl-superimpose
+        40 40))
 
 (context-picture)
 
@@ -97,7 +78,15 @@
  (|+1| (|#| (|+1| (call/comp (λ (k) (k 2))))))
  #:out-of-memory? #t)
 
- ;wacky
- ;wacky-inside-out
 (flush-examples)
+
+(example
+ wacky :wacky ()
+ C
+ (f (f hole))
+ #:out-of-memory? #t)
+
+(flush-examples)
+
 (lesson "The algorithm must deal with cycles well")
+
