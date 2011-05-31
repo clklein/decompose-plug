@@ -11,9 +11,8 @@
       (2:image-width i)
       (2:image-height i)))
 
-(define txt-scale 1)
-(define C (scale (pat pat_1) txt-scale))
-(define e (scale (pat pat_2) txt-scale))
+(define C (pat pat_1))
+(define e (pat pat_2))
 
 (define (label p1 p2)
   (refocus (vc-append 10  p2 p1)
@@ -24,11 +23,11 @@
    (label (i->p (2:triangle 300 'outline (2:pen "black" 20 "solid" "round" "round")))
           C)
    ((if e? values ghost)
-    (label (i->p (2:triangle 100 'outline (2:pen "red" 20 "solid" "round" "round")))
+    (label (i->p (2:triangle 100 'outline (2:pen "black" 20 "solid" "round" "round")))
            e))))
 
 (define decomp
-  (scale (pat (in-hole pat_1 pat_2)) txt-scale))
+  (scale (pat (in-hole pat_1 pat_2)) 1.5))
 
 (define (stage-context-picture tri2)
   (slide 
@@ -37,21 +36,21 @@
                           decomp
                           (t ","))
               (ht-append
-               40
+               60
                (vc-append 10
                           (triangle-context #f) 
                           (vc-append
                            (hbl-append (t "first match ")
                                        C
                                        (t ", treating"))
-                           (t "the hole as a wildcard")))
+                           (t "the hole as a wildcard,")))
                (tri2 (vc-append 10
                                 (triangle-context #t) 
                                 (vc-append
                                  (hbl-append (t "then match ")
                                              e
-                                             (t " against the"))
-                                 (t "spot where the hole went"))))))))
+                                             (t " against"))
+                                 (t "the spot where the hole went"))))))))
 (define (context-picture)
   (stage-context-picture ghost)
   (stage-context-picture values))

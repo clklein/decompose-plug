@@ -7,11 +7,11 @@
          "util.rkt"
          "../2-models/double.rkt"
          "../2-models/models.rkt")
-(provide example)
+(provide example flush-examples)
 
 (define-syntax-rule
   (example lang :lang nts-to-drop _pat _term stuff ...)
-  (mk-slide
+  (save-slides
    lang
    'nts-to-drop
    (pat _pat)
@@ -25,25 +25,53 @@
        (term _term))))
    stuff ...))
 
-(define (mk-slide lang nts-to-drop _pat _term sem-sem-answer thunk #:out-of-memory? [out-of-memory? #f])
-  (define main
-    (vl-append
-     20
-     (pair-em (t "Language:")
-              (render-language lang #:nts (remove* nts-to-drop (language-nts lang))))
-     (pair-em (t "Pattern:")
-              _pat)
-     (pair-em (t "Term:")
-              _term)
-     (pair-em (t (if (and (list? sem-sem-answer) (= (length sem-sem-answer) 1)) "Answer:" "Answers:"))
-              (render-sem-sem-answer sem-sem-answer))))
-  (slide
-   (vl-append (rc-superimpose (blank (pict-width main) 0)
-                              (mk-button (if out-of-memory?
-                                             (λ ()
-                                               (error "ran out of memory"))
-                                             thunk)))
-              main)))
+(define examples-cache '())
+(define example-thunks '())
+
+(define (save-slides lang nts-to-drop _pat _term sem-sem-answer thunk #:out-of-memory? [out-of-memory? #f])
+  (define l-p (pair-em (t "Language:")
+                     (render-language lang #:nts (remove* nts-to-drop (language-nts lang)))))
+  (define p-p (pair-em (t "Pattern:")
+                     _pat))
+  (define t-p (pair-em (t "Term:")
+                     _term))
+  (set! examples-cache
+        (append examples-cache 
+                (list (list l-p p-p t-p (blank))
+                      (list l-p p-p t-p
+                            (pair-em (t (if (or (not (list? sem-sem-answer)) (= (length sem-sem-answer) 1))
+                                            "Answer:"
+                                            "Answers:"))
+                                     (render-sem-sem-answer sem-sem-answer))))))
+  (let ([t (if out-of-memory?
+               (λ ()
+                 (error 'sandbox "ran out of memory"))
+               thunk)])
+  (set! example-thunks (append example-thunks (list t t)))))
+
+(define (flush-examples)
+  (when (null? examples-cache)
+    (error 'flush-examples "not examples saved"))
+  (define backgrounds (map (λ (l) (launder (ghost (apply cc-superimpose l)))) (transpose examples-cache)))
+  (for ([example (in-list examples-cache)]
+        [thunk (in-list example-thunks)])
+    (define (combine i) (lt-superimpose (list-ref example i) (list-ref backgrounds i)))
+    (define main
+      (vl-append
+       20
+       (combine 0)
+       (combine 1)
+       (combine 2)
+       (combine 3)))
+    (slide
+     (vl-append (rc-superimpose (blank (pict-width main) 0)
+                                (inset (mk-button thunk)
+                                       0 0 0 (- (pict-height (t "something")))))
+                main)))
+  (set! examples-cache '())
+  (set! example-thunks '()))
+
+(define (transpose m) (apply map list m))
 
 (define-syntax-rule 
   (with-pat-fonts exp)
@@ -140,7 +168,6 @@
 
 (define red-italic (make-object style-delta% 'change-italic))
 (void (send red-italic set-delta-foreground "red"))
-
 
 (define-syntax-rule 
   (render-output e)

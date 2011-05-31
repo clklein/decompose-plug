@@ -23,7 +23,7 @@
 (slide
  (para "To match:")
  (combine
-  (list (pat atom) "match literal occurrence of" (pat atom) "e.g.,"
+  (list (pat literal) "match literal occurrence e.g.,"
         (pat λ) "," (pat 17) "," (pat +))
   (list (pat (pat ...)) "match an interior node in a tree; one child per"
         (pat pat) "in the sequence")
@@ -36,9 +36,8 @@
   (ht-append
    (blank 40 0)
    (vl-append
-    10
+    60
     (language->pict arith #:nts '(a))
-    (blank 0 2)
     (para #:fill? #f
           (pat (+ a_1 a_2))
           "matches"
@@ -54,13 +53,15 @@
  arith :arith ()
  (in-hole C a)
  (+ 1 2))
+(flush-examples)
 
-(lesson "Contexts introduce ambiguity")
+(lesson "Contexts are a source of ambiguity")
 
 (example
  Λ/red :Λ/red (x y)
  (in-hole E (e_1 e_2))
  ((f x) (g y)))
+(flush-examples)
 
 (lesson "Contexts must support multiple ways to decompose each expression form (app in this case)")
 
@@ -69,12 +70,13 @@
  (in-hole E (|+1| number))
  ((λ (x) (|+1| 2)) (|+1| 3)))
 
-(lesson "Finding a decomposition may require other, unrelated decompositions")
-
 (example
  Λneed/red :Λneed/red (A v)
  (in-hole E (|+1| number))
  ((λ (x) (|+1| x)) (|+1| 3)))
+
+(flush-examples)
+(lesson "Finding a decomposition may require other, unrelated decompositions")
 
 (example
  Λk/red/no-hide-hole :Λk/red ()
@@ -85,6 +87,7 @@
  Λk/red/no-hide-hole :Λk/red ()
  (in-hole E (|+1| number))
  (|+1| ((cont (|+1| hole)) (|+1| 2))))
+(flush-examples)
 
 (lesson "Contexts may be involved in no decompositions during a match")
 
@@ -96,5 +99,5 @@
 
  ;wacky
  ;wacky-inside-out
-
+(flush-examples)
 (lesson "The algorithm must deal with cycles well")

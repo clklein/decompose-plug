@@ -3,7 +3,7 @@
          redex/reduction-semantics
          "models.rkt")
 
-(provide rr with-rewriters)
+(provide rr with-rewriters typesetting-lang)
 
 ;; use this dummy language to get the right
 ;; fonts for the various non-terminals used 
