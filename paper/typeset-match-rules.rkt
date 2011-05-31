@@ -1,9 +1,14 @@
 #lang racket
 (require redex/pict
          slideshow/pict
+         "../sem-sem/patterns.rkt"
+         "../sem-sem/non-syntax-directed-match-define-relation.rkt"
          "common-rewriters.rkt")
-(provide with-rewriters
-         rule-schema)
+(provide combined-matching-rules
+         matches-schema
+         matches-rules
+         decomposes-schema
+         decomposes-rules)
 
 (define-syntax-rule 
   (with-rewriters arg)
@@ -81,3 +86,25 @@
         (list 'lub-not-top rewrite-lub-not-top)
         (list 'pair rewrite-pair)
         (list 'set rewrite-set)))
+
+(define matches-schema
+  (with-rewriters (rule-schema patterns (matches L t p b))))
+(define matches-rules
+  (with-rewriters (render-relation matches)))
+
+(define decomposes-schema
+  (with-rewriters (rule-schema patterns (decomposes L t C t p b))))
+(define decomposes-rules 
+  (with-rewriters (with-rewriters (render-relation decomposes))))
+
+(define combined-matching-rules
+  (let ([vertical-space 10])
+    (pin-over
+     (pin-over
+      (vc-append vertical-space
+                 matches-rules 
+                 decomposes-rules)
+      0 0 
+      matches-schema)
+     0 (+ (pict-height matches-rules) vertical-space) 
+     decomposes-schema)))
