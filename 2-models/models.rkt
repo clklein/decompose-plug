@@ -85,7 +85,6 @@
        prods ...))))
 
 (define-double-extended-language/hide-hole Λk/red Λ/red :Λk/red :Λ/red Λk/red/no-hide-hole
-  (e .... call/cc (cont (hide-hole E)))
   (v .... call/cc (cont (hide-hole E))))
 
 

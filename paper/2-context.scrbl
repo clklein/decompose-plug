@@ -147,7 +147,7 @@ for this expression
 is to grab a continuation. In this model that continuation is represented as
 @rr[(cont (|+1| hole))], 
 which is then applied to @rr[call/cc]'s argument
-in the original context, yielding 
+in the original context, yielding the expression 
 @rr[(|+1| ((λ (k) (k 2)) (cont (|+1| hole))))].
 The next step is to substitute for @rr[k], 
 which yields this expression
