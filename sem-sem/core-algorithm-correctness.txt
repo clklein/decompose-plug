@@ -1,6 +1,14 @@
+Definition (Cycles)
+1. ->_L ⊆ p x p is the least relation such that
+  a. (nt n) ->_L p if p in L(n),
+  b. (in-hole p p') ->_L p,
+  c. (in-hole p p') ->_L p' if L ⊢ hole : p | b, and
+  d. (name x p) ->L p.
+2. L has a cycle if there exist patterns p and p' such that p ->_L^* p' and
+p' ->_L^* p, where ->_L^*p is the transitive closure of ->_L.
+
 Theorem (Core Algorithm Correctness):
-For all L, p, and t,
-if L has no cycles that consume no input,
+For all L, p, and t, if L has no cycles,
 then b ∈ matches[| L, p, t |] iff L ⊢ t : p | b.
 Proof:
 If b ∈ matches[| L, p, t |], then (•, b) ∈ M[| L, p, t |],
@@ -9,8 +17,93 @@ If L ⊢ t : p | b, then (•, b) ∈ M[| L, p, t |] by completeness,
 and so b ∈ matches[| L, p, t |].
 
 Lemma (Termination): 
-For all L, p, and t, M[| L, p, t |] is defined if L has no bad cycles
-Proof: TODO
+For all L, p, and t, M[| L, p, t |] terminates if L has no bad cycles
+Proof:
+Patterns and terms can be assigned sizes such that each recursive call
+supplies smaller arguments than the ones it received. In particular,
+we interpret the size |t| of a term t as:
+
+|a| = 1
+|(cons t t')| = 1 + |t| + |t'|
+
+and the size |p| of a pattern p as:
+
+|a| = 0
+|(name x p)| = 1 + |p|
+|(nt n)| = 1 + max({|p| | p in L(n)|})|
+|(in-hole p p')| = 1 + max({|p|, |p'|})|
+|(cons p p')| = 0
+
+This assignment of pattern sizes is possible because L has no cycles.
+(It can be constructed bottom-up, by beginning with non-terminals n_0
+for which n_0 -/>_L^* n for any non-terminal n, proceeding with the
+non-terminals n_1 for which n_1 ->_L^* n_0 -/>_L^*n, and so on.)
+
+We interpret the overall size of the combined arguments
+lexicographically, treating the term argument as more significant than
+the pattern argument.
+
+Each recursive call supplies either a smaller term or a term of the
+same size and a smaller pattern.
+
+Case: within `name' clause
+The call supplies the same term and strips the `name' from the
+pattern.
+
+Case: within `nt' clause
+Each call supplies the same term and a pattern whose size is at most
+|(nt n)| - 1.
+
+Case: within `in-hole' clause
+The first call supplies the same term and a pattern whose size is at most
+|(in-hole p_c p_h)| - 1.
+
+The second call supplies a term that's no larger than the input term
+(by the non-increasing subterms lemma) and a strictly smaller pattern.
+
+Case: within `cons' clause
+Each call supplies a strictly smaller term.
+
+Lemma (Non-increasing subterms)
+If ((C, t'), b) ∈ M[| L, p, t |], then |t'| <= |t|.
+Proof: By induction on the M derivation.
+
+Case: M-hole-hole
+The input and output terms are the same.
+
+Case: M-hole-non-hole
+The input and output terms are the same.
+
+Case: M-non-hole-atom
+Impossible, since the result is not a decomposition.
+
+Case: M-name
+Suppose ((C, t'), b) ∈ M[| L, p, t |].
+By induction, |t'| <= |t|.
+
+Case: M-nt
+Similar to M-name.
+
+Case: M-in-hole
+Suppose ((C_h, t_h), b_h) ∈ M[| L, p_h, t_c |].
+combine[| C, (C_h, t_h) |] = (C ++ C_h, t_h).
+|t_h| <= |t_c| and |t_c| <= |t|, both by induction.
+
+Case: M-cons
+By the definition of `select', there are two possibilities:
+  Subcase:
+    Suppose ((C_l, t_l'), b_l) ∈ M[| L, p_l, t_l |] and
+    (•, b_r) ∈ M[| L, p_r, t_r |].
+
+    select[| t_l, (C_l, t_l'), t_r, • |] = {((left t_r):C_l, t_l')}
+    |t_l'| <= |t_l| by induction
+           < |(cons t_l t_r)|
+
+  Subcase:
+    Suppose (•, b_l) ∈ M[| L, p_l, t_l |] and
+    ((C_r, t_r'), b_r) ∈ M[| L, p_r, t_r |].
+
+    Similar.
 
 Lemma (Soundness):
 For all L, p, t, b, C, and t',

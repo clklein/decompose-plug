@@ -69,6 +69,7 @@
     [(#\⊔) "\\ensuremath{\\sqcup}"]
     [(#\⊤) "\\ensuremath{\\top}"]
     [(#\•) "\\ensuremath{\\bullet}"]
+    [(#\⊆) "\\ensuremath{\\subseteq}"]
     [else
      (unless (<= (char->integer x) 127)
        (eprintf "WARNING: cannot translate ~a\n" x))
