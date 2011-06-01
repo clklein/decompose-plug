@@ -94,8 +94,9 @@
 )
 
 (require redex "../sem-sem/patterns.rkt")
-(slide (parameterize ([render-language-nts '(p a t)])
-         (render-language patterns))
+(slide (scale (parameterize ([render-language-nts '(p a t C F)])
+                (render-language patterns))
+              1/2)
        (scale (hc-append 40
                          matches-schema
                          decomposes-schema)
