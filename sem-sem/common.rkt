@@ -7,19 +7,21 @@
 
 (define-metafunction patterns
   uncontext : C -> t
-  [(uncontext :no-context)
+  [(uncontext :no-ctxt)
    :hole]
-  [(uncontext ((:left t) C))
+  [(uncontext (:left t C))
    (:cons (uncontext C) t)]
-  [(uncontext ((:right t) C))
+  [(uncontext (:right t C))
    (:cons t (uncontext C))])
 
 (define-metafunction patterns
   append-contexts : C C -> C
-  [(append-contexts :no-context C)
+  [(append-contexts :no-ctxt C)
    C]
-  [(append-contexts (F C_1) C_2)
-   (F (append-contexts C_1 C_2))])
+  [(append-contexts (:left t C_1) C_2)
+   (:left t (append-contexts C_1 C_2))]
+  [(append-contexts (:right t C_1) C_2)
+   (:right t (append-contexts C_1 C_2))])
 
 (define encode-term
   (match-lambda

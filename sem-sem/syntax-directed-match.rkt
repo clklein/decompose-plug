@@ -21,9 +21,9 @@
 (define-metafunction directed-matching
   M : L p t -> (m ...)
   [(M L :hole :hole)
-   (set (pair (pair :no-context :hole) (no-bindings)) (pair • (no-bindings)))]
+   (set (pair (pair :no-ctxt :hole) (no-bindings)) (pair • (no-bindings)))]
   [(M L :hole t) ; t ≠ :hole
-   (set (pair (pair :no-context t) (no-bindings)))]
+   (set (pair (pair :no-ctxt t) (no-bindings)))]
   [(M L a a) ; a ≠ :hole
    (set (pair • (no-bindings)))]
   [(M L (:name x p) t)
@@ -57,9 +57,9 @@
   [(select t • u •)
    (set •)]
   [(select t (pair C t_^’) u •)
-   (set (pair (: (:left u) C) t_^’))]
+   (set (pair (:left u C) t_^’))]
   [(select t • u (pair C u_^’))
-   (set (pair (: (:right t) C) u_^’))]
+   (set (pair (:right t C) u_^’))]
   [(select t (pair C t_^’) u (pair C_^’ u_^’))
    (set)])
 

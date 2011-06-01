@@ -244,9 +244,9 @@ Also has hide-hole removing capabilities
       [`(:name ,x (:nt ,b)) x]
       [`(:name ,x ,p) `(name ,x ,(loop p))]
       [`(:nt ,x) x]
-      [`((:right ,x) . ,stuff) (c->rt p)]
-      [`((:left ,x) . ,stuff) (c->rt p)]
-      [`:no-context (c->rt p)]
+      [`(:right ,x . ,stuff) (c->rt p)]
+      [`(:left ,x . ,stuff) (c->rt p)]
+      [`:no-ctxt (c->rt p)]
       [else p])))
 
 (define/contract (p-digits->number stuff)
@@ -278,11 +278,11 @@ Also has hide-hole removing capabilities
 
 (define (c->rt p)
   (match p
-    [`((:right ,x) ,rest)
+    [`(:right ,x ,rest)
      (cons (p->rt x) (c->rt rest))]
-    [`((:left ,x) ,rest)
+    [`(:left ,x ,rest)
      (cons (c->rt rest) (p->rt x))]
-    [`:no-context
+    [`:no-ctxt
      (term hole)]))
 
 (define (b->rb b)

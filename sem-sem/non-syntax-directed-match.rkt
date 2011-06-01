@@ -42,19 +42,19 @@
 (define decomposes ; (L t C t p b)
   (relation
    [(L t) ; hole
-    (L t ':no-context t ':hole empty)]
+    (L t ':no-ctxt t ':hole empty)]
    [(L t1 C t2 x p t b b+) ; name
     (L t1 C t2 `(:name ,x ,p) b+)
     (decomposes L t1 C t2 p b)
     (%is/nonvar (C) t (uncontext/proc C))
     (merges (list `(pair ,x ,t)) b b+)]
    [(L t1 t2 C t p1 p2 b1 b2 b) ; cons-left
-    (L `(:cons ,t1 ,t2) `((:left ,t2) ,C) t `(:cons ,p1 ,p2) b)
+    (L `(:cons ,t1 ,t2) `(:left ,t2 ,C) t `(:cons ,p1 ,p2) b)
     (decomposes L t1 C t p1 b1)
     (matches L t2 p2 b2)
     (merges b1 b2 b)]
    [(L t1 t2 C t p1 p2 b1 b2 b) ; cons-right
-    (L `(:cons ,t1 ,t2) `((:right ,t1) ,C) t `(:cons ,p1 ,p2) b)
+    (L `(:cons ,t1 ,t2) `(:right ,t1 ,C) t `(:cons ,p1 ,p2) b)
     (matches L t1 p1 b1)
     (decomposes L t2 C t p2 b2)
     (merges b1 b2 b)]

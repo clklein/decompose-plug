@@ -27,10 +27,9 @@
   (L (D ...))
   (D [x (p ...)])
   
-  (F (:left t)
-     (:right t))
-  (C :no-context
-     (F C))
+  (C :no-ctxt
+     (:left t C)
+     (:right t C))
   
   (otherwise-mentioned ⊤))
 
