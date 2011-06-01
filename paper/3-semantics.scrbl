@@ -47,3 +47,7 @@ pairs. For example, the left-hand side of the @pt[[cont]] rule in
 @figure["matching" "Matching and Decomposition"]{
   @(centered combined-matching-rules)
 }
+
+@figure["binding-consistency" "Binding Consistency"]{
+  @(centered binding-consistency)
+}

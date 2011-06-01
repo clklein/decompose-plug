@@ -2,9 +2,11 @@
 (require redex/pict
          slideshow/pict
          "../sem-sem/patterns.rkt"
+         "../sem-sem/common.rkt"
          "../sem-sem/non-syntax-directed-match-define-relation.rkt"
          "common-rewriters.rkt")
 (provide combined-matching-rules
+         binding-consistency
          matches-schema
          matches-rules
          decomposes-schema
@@ -84,6 +86,7 @@
         (list 'no-bindings rewrite-no-bindings)
         (list 'nt-has-prod rewrite-nt-has-prod)
         (list 'lub-not-top rewrite-lub-not-top)
+        (list '⊔ rewrite-lub)
         (list 'pair rewrite-pair)
         (list 'set rewrite-set)))
 
@@ -108,3 +111,7 @@
       matches-schema)
      0 (+ (pict-height matches-rules) vertical-space) 
      decomposes-schema)))
+
+(define binding-consistency
+  (with-rewriters 
+   (render-metafunctions ⊔ merge-binding merge-value)))
