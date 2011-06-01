@@ -8,7 +8,8 @@
          "simple-pattern.rkt"
          "desiderata.rkt"
          "redex-code-example.rkt"
-         "../2-models/models.rkt")
+         "../2-models/models.rkt"
+         "../paper/typeset-match-rules.rkt")
 
 (title)
 
@@ -89,4 +90,10 @@
 (flush-examples)
 
 (lesson "The algorithm must deal with cycles well")
+
+(slide (scale-up (vr-append matches-schema
+                            matches-rules)))
+
+(slide (scale-up (vr-append decomposes-schema
+                            decomposes-rules)))
 

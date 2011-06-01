@@ -2,7 +2,7 @@
 (require slideshow
          redex
          "../2-models/util.rkt")
-(provide pat lesson render-sexp)
+(provide pat lesson render-sexp scale-up)
 
 (literal-style "Inconsolata")
 (non-terminal-style (literal-style))
@@ -39,3 +39,7 @@
   (define p (open-input-string (format "~s" fixed-hole)))
   (port-count-lines! p)
   (lw->pict typesetting-lang (to-lw/stx (read-syntax #f p))))
+
+(define (scale-up p)
+  (scale p (min (/ client-w (pict-width p))
+                (/ client-h (pict-height p)))))
