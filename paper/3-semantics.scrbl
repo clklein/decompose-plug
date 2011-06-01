@@ -22,8 +22,7 @@ a richer language of patterns, but the present forms suffice to illustrate
 the essential concepts.
 
 @figure["fig:pat-term" "Patterns and Terms"]{
-@(parameterize ([render-language-nts '(p a t)])
-    (render-language patterns))
+@patterns-and-terms
 }
 
 Terms @pt[t] are binary trees with atoms as leaves. Atoms @pt[a] include 

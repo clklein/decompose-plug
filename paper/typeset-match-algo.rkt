@@ -1,6 +1,7 @@
 #lang racket
 
 (require redex/pict
+         slideshow/pict
          "common-rewriters.rkt"
          "../sem-sem/syntax-directed-match.rkt")
 (provide render-algorithm)
@@ -46,11 +47,27 @@
                [e (rewrite (lw-e unquoted))]
                [unq? false]))
 
+(define gap-size 10)
+
 (define (render-algorithm)
   (let loop ([rws compound-rewriters])
     (match rws
       ['() 
-       (with-unquote-rewriter unquote-rewriter
-                              (render-metafunction M))]
+       (with-unquote-rewriter 
+        unquote-rewriter
+        (vl-append
+         (text "matches : L p t → 2^b")
+         (render-metafunction matches)
+         (blank gap-size)
+         
+         (text "M : L p t → 2^m")
+         (parameterize ([render-language-nts '(m d)])
+           (render-language directed-matching))
+         (render-metafunction M)
+         (blank gap-size)
+         
+         (render-metafunction named)
+         (render-metafunction select)
+         (render-metafunction combine)))]
       [(cons (list name rewriter) rs)
        (with-compound-rewriter name rewriter (loop rs))])))

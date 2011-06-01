@@ -7,6 +7,8 @@
          "common-rewriters.rkt")
 (provide combined-matching-rules
          binding-consistency
+         patterns-and-terms
+         matching-data-defs
          matches-schema
          matches-rules
          decomposes-schema
@@ -90,6 +92,8 @@
         (list 'pair rewrite-pair)
         (list 'set rewrite-set)))
 
+(define gap-size 10)
+
 (define matches-schema
   (with-rewriters (rule-schema patterns (matches L t p b))))
 (define matches-rules
@@ -100,18 +104,42 @@
 (define decomposes-rules 
   (with-rewriters (with-rewriters (render-relation decomposes))))
 
+(define matching-data-defs
+  (ht-append
+   gap-size
+   (vl-append
+    (text "L ∈ Non-Terminals -o> 2^p")
+    (text "b ∈ Variable -o> v")
+    (parameterize ([render-language-nts '(v)])
+      (render-language patterns)))
+   (parameterize ([render-language-nts '(C)])
+     (render-language patterns))))
+
 (define combined-matching-rules
-  (let ([vertical-space 10])
+  (vl-append
+   gap-size
+   matching-data-defs
+   (pin-over
     (pin-over
-     (pin-over
-      (vc-append vertical-space
-                 matches-rules 
-                 decomposes-rules)
-      0 0 
-      matches-schema)
-     0 (+ (pict-height matches-rules) vertical-space) 
-     decomposes-schema)))
+     (vc-append gap-size
+                matches-rules 
+                decomposes-rules)
+     0 0 
+     matches-schema)
+    0 (+ (pict-height matches-rules) gap-size) 
+    decomposes-schema)))
 
 (define binding-consistency
   (with-rewriters 
    (render-metafunctions ⊔ merge-binding merge-value)))
+
+(define patterns-and-terms
+  (ht-append
+   gap-size
+   (parameterize ([render-language-nts '(p)])
+     (render-language patterns))
+   (vl-append
+    (parameterize ([render-language-nts '(a t)])
+      (render-language patterns))
+    (text "x ∈ Variables")
+    (text "n ∈ Non-Terminals"))))

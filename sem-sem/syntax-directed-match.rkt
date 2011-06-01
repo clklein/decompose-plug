@@ -9,8 +9,7 @@
 (provide (all-defined-out))
 
 (define-extended-language directed-matching patterns
-  (d (pair C t)
-     •)
+  (d (pair C t) •)
   (m (pair d b)))
 
 (define-metafunction directed-matching
