@@ -318,7 +318,50 @@
                (((x ((:right a) ((:right b) :no-context))))))
   
    ;;;; other tests ;;;;
-   (build-test test:no-match () (:name x (:cons (:name x a) b)) (:cons a b))))
+   (build-test test:no-match () (:name x (:cons (:name x a) b)) (:cons a b))
+   
+   (let ([shift-reset ; like http://arxiv.org/pdf/cs/0508048v4 (Section 4.4)
+          `([t ((:nt v) 
+                (:nt x)
+                (:cons (:nt t) (:cons (:nt t) mt)) ; app
+                (:cons succ (:cons (:nt t) mt))
+                (:cons reset (:cons (:nt t) mt))
+                (:cons shift (:cons (:nt x) (:cons (:nt t) mt))))]
+            [v ((:nt m)
+                (:cons λ (:cons (:nt x) (:cons (:nt t) mt)))
+                (:cons cont (:cons (:nt C) mt)))]
+            [C (:hole
+                (:cons (:nt C) (:cons (:nt t) mt))
+                (:cons (:nt v) (:cons (:nt C) mt))
+                (:cons succ (:cons (:nt C) mt)))]
+            [M (:hole
+                (:in-hole (:nt C) (:cons reset (:cons (:nt M) mt))))]
+            [x ,(build-list 
+                 26
+                 (λ (i) 
+                   (string->symbol
+                    (list->string
+                     (list (integer->char (+ i (char->integer #\a))))))))]
+            [m ,(build-list 10 values)])])
+     (build-test test:bind
+                 ,shift-reset
+                 (:in-hole (:in-hole (:name M (:nt M)) (:name C (:nt C))) r)
+                 ,(encode-term '((λ x x) (reset (succ (reset ((λ x x) (r 2)))))))
+                 (((C
+                    ((:right ,(encode-term '(λ x x)))
+                     ((:left mt)
+                      ((:left ,(encode-term '(2)))
+                       :no-context))))
+                   (M
+                    ((:right ,(encode-term '(λ x x)))
+                     ((:left mt)
+                      ((:right reset)
+                       ((:left mt)
+                        ((:right succ)
+                         ((:left mt)
+                          ((:right reset)
+                           ((:left mt)
+                            :no-context)))))))))))))))
 
 (define flattened-tests
   (foldr (λ (test/list tests)
