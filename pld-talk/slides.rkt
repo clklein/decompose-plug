@@ -11,6 +11,7 @@
          "../2-models/models.rkt"
          "../paper/typeset-match-rules.rkt")
 
+#;(
 (title)
 
 (desiderata)
@@ -90,10 +91,25 @@
 (flush-examples)
 
 (lesson "The algorithm must deal with cycles well")
+)
 
-(slide (scale-up (vr-append matches-schema
-                            matches-rules)))
+(require redex "../sem-sem/patterns.rkt")
+(slide (parameterize ([render-language-nts '(p a t)])
+         (render-language patterns))
+       (scale (hc-append 40
+                         matches-schema
+                         decomposes-schema)
+              3))
 
-(slide (scale-up (vr-append decomposes-schema
-                            decomposes-rules)))
+(define rules1
+  (vr-append matches-schema
+             matches-rules))
+
+(define rules2
+  (vr-append decomposes-schema
+             decomposes-rules))
+
+(slide (scale-up (cc-superimpose (ghost rules2) rules1)))
+
+(slide (scale-up (cc-superimpose (ghost rules1) rules2)))
 
