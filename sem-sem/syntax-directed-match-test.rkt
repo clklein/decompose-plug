@@ -3,7 +3,7 @@
 (require "syntax-directed-match.rkt"
          "shared-test-cases.rkt"
          "common.rkt"
-         redex)
+         redex/reduction-semantics)
 
 (define test-syntax-directed
   (match-lambda

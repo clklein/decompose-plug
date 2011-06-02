@@ -1,7 +1,7 @@
 #lang racket
 
 (require racklog
-         redex
+         redex/reduction-semantics
          unstable/dict
          unstable/debug
          "common.rkt"

@@ -1,6 +1,6 @@
 #lang racket
 
-(require redex
+(require redex/reduction-semantics
          "set-comp.rkt")
 
 (define-language L

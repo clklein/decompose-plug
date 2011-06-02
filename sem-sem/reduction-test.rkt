@@ -1,7 +1,7 @@
 #lang racket
 
 (require "reduction.rkt"
-         redex)
+         redex/reduction-semantics)
 
 (define-syntax (test-reductions stx)
   (syntax-case stx ()

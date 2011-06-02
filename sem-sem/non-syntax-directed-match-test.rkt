@@ -4,7 +4,7 @@
          "shared-test-cases.rkt"
          "patterns.rkt"
          "common.rkt"
-         redex
+         redex/reduction-semantics
          racklog
          rackunit)
 
