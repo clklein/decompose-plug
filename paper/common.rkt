@@ -3,6 +3,16 @@
 (require redex/pict slideshow/pict)
 (provide (all-defined-out))
 
+(define (rewrite-matches lws)
+  (list ""
+        (list-ref lws 2)
+        " ⊢ "
+        (list-ref lws 3)
+        " : "
+        (list-ref lws 4)
+        " | "
+        (list-ref lws 5)))
+
 (define rewrite-productions
   (match-lambda
     [(list _ _ lang non-term _)
@@ -49,8 +59,11 @@
    (text "∈")
    (pict/nt dom)))
 
-(define (finite-function-domain dom codom)
-  (hbl-append word-gap (pict/nt dom) (text "→") (pict/nt codom)))
+(define (function-domain arrow dom codom)
+  (hbl-append word-gap (pict/nt dom) arrow (pict/nt codom)))
+(define (arbitrary-function-domain dom codom)
+  (function-domain (text "→") dom codom))
+(define finite-function-domain arbitrary-function-domain)
 
 (define (non-terminal-text t)
   (text t (non-terminal-style) (default-font-size)))

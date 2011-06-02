@@ -36,16 +36,6 @@
         (list-ref lws 3)
         ""))
 
-(define (rewrite-matches lws)
-  (list ""
-        (list-ref lws 2)
-        " ⊢ "
-        (list-ref lws 3)
-        " : "
-        (list-ref lws 4)
-        " | "
-        (list-ref lws 5)))
-
 (define (rewrite-decomposes lws)
   (list ""
         (list-ref lws 2)
