@@ -12,7 +12,7 @@
     [(test:no-match _ L p t)
      (empty? (matches L p t))]
     [(test:bind _ L p t bs)
-     (equal-bindings? (map unpaired-bindings (matches L p t)) bs)]))
+     (equal-bindings? (map raw-bindings (matches L p t)) bs)]))
 
 (run-tests test-syntax-directed-total)
 

@@ -7,7 +7,7 @@
 (provide render-algorithm)
 
 (define compound-rewriters
-  (list (list 'set rewrite-set)
+  (list (list 'set/id rewrite-set)
         (list 'pair rewrite-pair)
         (list 'no-bindings rewrite-no-bindings)
         (list '⊔ rewrite-lub)

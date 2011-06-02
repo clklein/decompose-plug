@@ -289,9 +289,11 @@ Also has hide-hole removing capabilities
   (normalize-bindings
    (and (not (null? b))
         (for/list ([b (in-list b)])
-          (for/list ([pr (in-list b)])
-            (match pr
-              [`(pair ,x ,p) `(,x ,(p->rt p))]))))))
+          (match b
+            [`(set ,prs ...)
+             (for/list ([pr (in-list prs)])
+               (match pr
+                 [`(pair ,x ,p) `(,x ,(p->rt p))]))])))))
 
 (define-double-language a b
   (C hole (+ C a) (+ a C))

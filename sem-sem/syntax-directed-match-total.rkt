@@ -19,7 +19,7 @@
 (define-struct decomp (context contractum) #:transparent)
 (define-struct no-decomp () #:transparent)
 
-(define empty-bindings '())
+(define empty-bindings '(set))
 
 ; matches : language pattern term -> (set/c mtch)
 ; language ≡ (dict symbol (listof pattern))
@@ -48,7 +48,7 @@
        (==> (go p term seen)
             (match-lambda
               [(mtch d b)
-               (match (⊔/proc `((pair ,x ,(named d term))) b)
+               (match (⊔/proc `(set (pair ,x ,(named d term))) b)
                  ['⊤ (set)]
                  [b+ (set (mtch d b+))])]))]
       [`(:in-hole ,p1 ,p2)

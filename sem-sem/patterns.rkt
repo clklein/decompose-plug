@@ -21,7 +21,7 @@
   ((t u) a
          (:cons t t))
   
-  (b ((pair x v) ...))
+  (b (set (pair x v) ...))
   (v t C)
   
   (L (D ...))

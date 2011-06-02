@@ -22,7 +22,7 @@
      (empty? (all-matches L p t))]
     [(test:bind _ L p t bs)
      (equal-bindings?
-      (map unpaired-bindings (all-matches L p t)) 
+      (map raw-bindings (all-matches L p t)) 
       (no-contexts-bindings bs))]))
 
 (define no-contexts-bindings

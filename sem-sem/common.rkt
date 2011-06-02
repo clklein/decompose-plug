@@ -57,25 +57,25 @@
 
 (define-metafunction patterns
   ⊔ : b b -> b or ⊤
-  [(⊔ () b)
+  [(⊔ (set) b)
    b]
-  [(⊔ ((pair x_0 v_0) (pair x_1 v_1) ...) b)
-   (⊔ ((pair x_1 v_1) ...) b_1)
+  [(⊔ (set (pair x_0 v_0) (pair x_1 v_1) ...) b)
+   (⊔ (set (pair x_1 v_1) ...) b_1)
    (where b_1 (merge-binding x_0 v_0 b))]
   [(⊔ b_1 b_2) ; else
    ⊤])
 
 (define-metafunction patterns
   merge-binding : x v b -> b or ⊤
-  [(merge-binding x v ())
-   ((pair x v))]
-  [(merge-binding x v ((pair x v_0) (pair x_1 v_1) ...))
-   ((pair x v_m) (pair x_1 v_1) ...)
+  [(merge-binding x v (set))
+   (set (pair x v))]
+  [(merge-binding x v (set (pair x v_0) (pair x_1 v_1) ...))
+   (set (pair x v_m) (pair x_1 v_1) ...)
    (where v_m (merge-value v v_0))]
-  [(merge-binding x v ((pair x_0 v_0) (pair x_1 v_1) ...))
-   ((pair x_0 v_0) (pair x_1’ v_1’) ...)
+  [(merge-binding x v (set (pair x_0 v_0) (pair x_1 v_1) ...))
+   (set (pair x_0 v_0) (pair x_1’ v_1’) ...)
    (side-condition (not (equal? (term x) (term x_0))))
-   (where ((pair x_1’ v_1’) ...) (merge-binding x v ((pair x_1 v_1) ...)))]
+   (where (set (pair x_1’ v_1’) ...) (merge-binding x v (set (pair x_1 v_1) ...)))]
   [(merge-binding x v b) ; else
    ⊤])
 
@@ -91,15 +91,17 @@
   [(merge-value v_1 v_2) ; else
    ⊤])
 
-(define (unpaired-bindings bs)
-  (map (match-lambda [`(pair ,x ,v) `(,x ,v)]) bs))
+(define raw-bindings
+  (match-lambda
+    [`(set (pair ,xs ,vs) ...)
+     (map list xs vs)]))
 
 ;; metafunctions to facilitate typesetting
 (define-metafunction patterns
   [(neq any_1 any_1) #f]
   [(neq any_!_1 any_!_1) #t])
 (define-metafunction patterns
-  [(no-bindings) ()])
+  [(no-bindings) (set)])
 (define-metafunction patterns
   [(productions (D_0 ... [n_i (p ...)] D_i+1 ...) n_i)
    (p ...)])
