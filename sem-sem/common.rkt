@@ -73,9 +73,9 @@
    (set (pair x v_m) (pair x_1 v_1) ...)
    (where v_m (merge-value v v_0))]
   [(merge-binding x v (set (pair x_0 v_0) (pair x_1 v_1) ...))
-   (set (pair x_0 v_0) (pair x_1’ v_1’) ...)
-   (side-condition (not (equal? (term x) (term x_0))))
-   (where (set (pair x_1’ v_1’) ...) (merge-binding x v (set (pair x_1 v_1) ...)))]
+   (set-adjoin (pair x_0 v_0) b)
+   (side-condition (term (neq x x_0)))
+   (where b (merge-binding x v (set (pair x_1 v_1) ...)))]
   [(merge-binding x v b) ; else
    ⊤])
 
@@ -107,3 +107,6 @@
    (p ...)])
 (define-metafunction patterns
   [(: F C) (F C)])
+(define-metafunction patterns
+  [(set-adjoin any_0 (set any_1 ...))
+   (set any_0 any_1 ...)])

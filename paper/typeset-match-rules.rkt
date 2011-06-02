@@ -80,6 +80,9 @@
         " ≠ "
         "⊤"))
 
+(define (rewrite-set-adjoin lws)
+  (list "{" (list-ref lws 2) "} ∪ " (list-ref lws 3)))
+
 (define compound-rewriters
   (list (list 'append-contexts rewrite-append-contexts)
         (list '~ rewrite-~)
@@ -89,7 +92,9 @@
         (list 'nt-has-prod rewrite-nt-has-prod)
         (list 'lub-not-top rewrite-lub-not-top)
         (list '⊔ rewrite-lub)
+        (list 'neq rewrite-neq)
         (list 'pair rewrite-pair)
+        (list 'set-adjoin rewrite-set-adjoin)
         (list 'set rewrite-set)))
 
 (define gap-size 10)
@@ -131,7 +136,7 @@
 
 (define binding-consistency
   (with-rewriters 
-   (render-metafunctions ⊔ merge-binding merge-value)))
+   (render-metafunctions ⊔ merge-binding merge-value uncontext)))
 
 (define patterns-and-terms
   (ht-append
