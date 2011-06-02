@@ -2,12 +2,16 @@
 
 (require redex/pict
          slideshow/pict
-         "common-rewriters.rkt"
+         "common.rkt"
          "../sem-sem/syntax-directed-match.rkt")
 (provide render-algorithm)
 
+(define (rewrite-append-contexts lws)
+  (list "" (list-ref lws 2) " ++ " (list-ref lws 3) ""))
+
 (define compound-rewriters
-  (list (list 'set/id rewrite-set)
+  (list (list 'append-contexts rewrite-append-contexts)
+        (list 'set/id rewrite-set)
         (list 'pair rewrite-pair)
         (list 'no-bindings rewrite-no-bindings)
         (list '⊔ rewrite-lub)
@@ -47,8 +51,6 @@
                [e (rewrite (lw-e unquoted))]
                [unq? false]))
 
-(define gap-size 10)
-
 (define (render-algorithm)
   (let loop ([rws compound-rewriters])
     (match rws
@@ -56,18 +58,20 @@
        (with-unquote-rewriter 
         unquote-rewriter
         (vl-append
-         (text "matches : L p t → 2^b")
+         (metafunction-signature "matches" "L" "p" "t" (powerset "b"))
          (render-metafunction matches)
-         (blank gap-size)
+         (blank vertical-gap-size)
          
-         (text "M : L p t → 2^m")
-         (parameterize ([render-language-nts '(m d)])
-           (render-language directed-matching))
+         (hbl-append
+          horizontal-gap-size
+          (metafunction-signature "M" "L" "p" "t" (powerset "m"))
+          (parameterize ([render-language-nts '(m)])
+            (render-language directed-matching))
+          (parameterize ([render-language-nts '(d)])
+            (render-language directed-matching)))
          (render-metafunction M)
-         (blank gap-size)
+         (blank vertical-gap-size)
          
-         (render-metafunction named)
-         (render-metafunction select)
-         (render-metafunction combine)))]
+         (render-metafunctions named select combine)))]
       [(cons (list name rewriter) rs)
        (with-compound-rewriter name rewriter (loop rs))])))

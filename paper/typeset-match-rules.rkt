@@ -4,7 +4,7 @@
          "../sem-sem/patterns.rkt"
          "../sem-sem/common.rkt"
          "../sem-sem/non-syntax-directed-match-define-relation.rkt"
-         "common-rewriters.rkt")
+         "common.rkt")
 (provide combined-matching-rules
          binding-consistency
          patterns-and-terms
@@ -83,8 +83,17 @@
 (define (rewrite-set-adjoin lws)
   (list "{" (list-ref lws 2) "} ∪ " (list-ref lws 3)))
 
+(define (rewrite-concatenation-of lws)
+  (list ""
+        (list-ref lws 2)
+        " ++ "
+        (list-ref lws 3)
+        " = "
+        (list-ref lws 4)
+        ""))
+
 (define compound-rewriters
-  (list (list 'append-contexts rewrite-append-contexts)
+  (list (list 'concatenation-of rewrite-concatenation-of)
         (list '~ rewrite-~)
         (list 'matches rewrite-matches)
         (list 'decomposes rewrite-decomposes)
@@ -96,8 +105,6 @@
         (list 'pair rewrite-pair)
         (list 'set-adjoin rewrite-set-adjoin)
         (list 'set rewrite-set)))
-
-(define gap-size 10)
 
 (define matches-schema
   (with-rewriters (rule-schema patterns (matches L t p b))))
@@ -111,10 +118,10 @@
 
 (define matching-data-defs
   (ht-append
-   gap-size
+   horizontal-gap-size
    (vl-append
-    (text "L ∈ Non-Terminals -o> 2^p")
-    (text "b ∈ Variable -o> v")
+    (non-bnf-def "L" (finite-function-domain "Non-Terminals" (powerset "p")))
+    (non-bnf-def "b" (finite-function-domain "Variables" "v"))
     (parameterize ([render-language-nts '(v)])
       (render-language patterns)))
    (parameterize ([render-language-nts '(C)])
@@ -122,16 +129,16 @@
 
 (define combined-matching-rules
   (vl-append
-   gap-size
+   vertical-gap-size
    matching-data-defs
    (pin-over
     (pin-over
-     (vc-append gap-size
+     (vc-append vertical-gap-size
                 matches-rules 
                 decomposes-rules)
      0 0 
      matches-schema)
-    0 (+ (pict-height matches-rules) gap-size) 
+    0 (+ (pict-height matches-rules) vertical-gap-size) 
     decomposes-schema)))
 
 (define binding-consistency
@@ -140,11 +147,11 @@
 
 (define patterns-and-terms
   (ht-append
-   gap-size
+   horizontal-gap-size
    (parameterize ([render-language-nts '(p)])
      (render-language patterns))
    (vl-append
     (parameterize ([render-language-nts '(a t)])
       (render-language patterns))
-    (text "x ∈ Variables")
-    (text "n ∈ Non-Terminals"))))
+    (non-bnf-def "x" "Variables")
+    (non-bnf-def "n" "Non-Terminals"))))
