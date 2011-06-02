@@ -227,9 +227,9 @@
   (make-plt-title-background light-gray
                              light-gray
                              white
-                             gray ; red
+                             white ; gray ; red
                              black 
-                             'solid))
+                             'transparent))
 
 (define wb-title-background 
   (make-plt-title-background black
@@ -251,18 +251,21 @@
            p))
 
 (define (title)
+  (define names 
+    (hbl-append
+     30
+     (t "Casey Klein")
+     (t "Jay McCarthy")
+     (t "Steven Jaconette")
+     (t "Robby Findler")))
+  (define title (bt "Matching Contexts"))
   (define title-info
     (colorize (inset 
                (vc-append 20 
-                          (scale/improve-new-text
-                           (bt "Matching Contexts")
-                           2.5)
-                          (hbl-append
-                           30
-                           (t "Casey Klein")
-                           (t "Jay McCarthy")
-                           (t "Steven Jaconette")
-                           (t "Robby Findler")))
+                          (scale title
+                                 (/ (pict-width names)
+                                    (pict-width title)))
+                          names)
                40
                40)
               "white"))
@@ -272,5 +275,5 @@
      
      title-info))
     (slide (cc-superimpose 
-            plt-title-background
+            bw-title-background
             (clip (refocus p title-info)))))

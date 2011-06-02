@@ -1,9 +1,11 @@
 #lang racket/base
 (require slideshow
          redex
+         (only-in redex/private/reduction-semantics make-match)
          racket/sandbox
          framework
          racket/gui/base
+         slideshow/code
          "util.rkt"
          "../2-models/double.rkt"
          "../2-models/models.rkt")
@@ -17,6 +19,9 @@
    (pat _pat)
    (pat _term)
    (sem-sem-match :lang '_pat '_term)
+   (list 'lang
+         '_pat
+         '_term)
    (λ ()
      (redex-match 
       lang
@@ -27,13 +32,13 @@
 (define examples-cache '())
 (define example-thunks '())
 
-(define (save-slides lang nts-to-drop _pat _term sem-sem-answer thunk #:out-of-memory? [out-of-memory? #f])
+(define (save-slides lang nts-to-drop _pat _term sem-sem-answer input-pict thunk #:out-of-memory? [out-of-memory? #f])
   (define l-p (pair-em (t "Language:")
-                     (render-language lang #:nts (remove* nts-to-drop (language-nts lang)))))
+                       (render-language lang #:nts (remove* nts-to-drop (language-nts lang)))))
   (define p-p (pair-em (t "Pattern:")
-                     _pat))
+                       _pat))
   (define t-p (pair-em (t "Term:")
-                     _term))
+                       _term))
   (set! examples-cache
         (append examples-cache 
                 (list (list l-p p-p t-p (blank))
@@ -42,18 +47,18 @@
                                             "Answer:"
                                             "Answers:"))
                                      (render-sem-sem-answer sem-sem-answer))))))
-  (let ([t (if out-of-memory?
+  (let ([t (if (and #f out-of-memory?)
                (λ ()
                  (error "ran out of memory"))
                thunk)])
-  (set! example-thunks (append example-thunks (list t t)))))
+    (set! example-thunks (append example-thunks (list (list t input-pict) (list t input-pict))))))
 
 (define (flush-examples)
   (when (null? examples-cache)
     (error 'flush-examples "not examples saved"))
   (define backgrounds (map (λ (l) (launder (ghost (apply cc-superimpose l)))) (transpose examples-cache)))
   (for ([example (in-list examples-cache)]
-        [thunk (in-list example-thunks)])
+        [thunk-pair (in-list example-thunks)])
     (define (combine i) (lt-superimpose (list-ref example i) (list-ref backgrounds i)))
     (define main
       (vl-append
@@ -64,7 +69,7 @@
        (combine 3)))
     (slide
      (vl-append (rc-superimpose (blank (pict-width main) 0)
-                                (inset (mk-button thunk)
+                                (inset (mk-button thunk-pair)
                                        0 0 0 (- (pict-height (t "something")))))
                 main)))
   (set! examples-cache '())
@@ -97,14 +102,17 @@
       (t (format "~s" sem-sem-answer)))]))
 
   
-(define (mk-button thunk)
+(define (mk-button thunk-pair)
+  (define thunk (list-ref thunk-pair 0))
+  (define input-pict (list-ref thunk-pair 1))
   (define button-label (inset (t "Run in Redex") 20 10))
   (clickback
    (cc-superimpose (linewidth 10
                               (rounded-rectangle (pict-width button-label) 
                                                  (pict-height button-label)))
                    button-label)
-   (λ () (render-output thunk))))
+   (λ () (render-output thunk input-pict))))
+
 
 (define (pair-em a b)
   (vl-append a (hc-append (blank 20 0) b)))
@@ -132,7 +140,7 @@
             (make-evaluator 'racket
                             '(require redex))))
 
-(define (render-output thnk)
+(define (render-output thnk input-details)
   (define res (with-handlers ((exn:fail? values))
                 (call-in-sandbox-context e thnk)))
   (define-values (w h) (get-display-size))
@@ -141,29 +149,58 @@
   (define fm (new menu% [label "File"] [parent mb]))
   (define mi (new menu-item% [label "Close"] [parent fm] [shortcut #\w] [callback (λ x (send f show #f))]))
   (send f center 'both)
-  (define t (if (exn:fail? res)
-                (new text%)
-                (new scheme:text%)))
-  (define ec (new editor-canvas% [parent f] [editor t]))
-  (define (il str)
-    (send t insert str (send t last-position) (send t last-position)))
+  
+  (define drawer (make-pict-drawer (vl-append (build-input-pict input-details)
+                                              (build-output-pict res))))
+  (define c (new canvas% 
+                 [parent f]
+                 [paint-callback
+                  (λ (c dc)
+                    (drawer dc 0 0))]))
+  (send f show #t))
+
+(define (build-output-pict res)
   (cond
     [(exn:fail? res)
-     (define before (send t last-position))
-     (il (exn-message res))
-     (define after (send t last-position))
-     (send t change-style red-italic before after)]
-    [(and (list? res) (andmap match? res))
-     (for ([match (in-list res)])
-       (for ([bind (in-list (match-bindings match))])
-         (define str (format "~s = " (bind-name bind)))
-         (il str)
-         (pretty-write (bind-exp bind) (open-output-text-editor t)))
-       (il "\n"))]
+     (colorize (it (exn-message res)) "red")]
     [else
-     (pretty-write res (open-output-text-editor t))])
-  (send t hide-caret #t)
-  (send f show #t))
+     
+     (define (rewrite-hole exp)
+       (let loop ([exp exp])
+         (cond
+           [(pair? exp)
+            (cons (loop (car exp))
+                  (loop (cdr exp)))]
+           [(match? exp)
+            (make-match (loop (match-bindings exp)))]
+           [(bind? exp)
+            (make-bind (loop (bind-name exp))
+                       (loop (bind-exp exp)))]
+           [(equal? exp (term hole)) 'hole]
+           [else exp])))
+     
+     (define sp (open-output-string))
+     (parameterize ([pretty-print-columns 40])
+       (pretty-print (rewrite-hole res) sp))
+     (define rp (open-input-string (get-output-string sp)))
+     (apply
+      vl-append
+      (let loop ()
+        (let ([l (read-line rp)])
+          (cond
+            [(eof-object? l) '()]
+            [else (cons (tt l) (loop))]))))]))
+
+(define (build-input-pict input-details)
+  (define lang (list-ref input-details 0))
+  (define pat (list-ref input-details 1))
+  (define term (list-ref input-details 2))
+  (htl-append (tt "> ")
+              (vl-append
+               (tt "(redex-match")
+               (tt (format "  ~s" lang))
+               (tt (format "  ~s" pat))
+               (tt (format "  (term ~s))" term)))))
 
 (define red-italic (make-object style-delta% 'change-italic))
 (void (send red-italic set-delta-foreground "red"))

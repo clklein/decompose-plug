@@ -9,9 +9,9 @@
          "desiderata.rkt"
          "redex-code-example.rkt"
          "../2-models/models.rkt"
-         "../paper/typeset-match-rules.rkt")
+         racket/runtime-path
+         redex)
 
-#;(
 (title)
 
 (desiderata)
@@ -90,17 +90,28 @@
 
 (flush-examples)
 
-(lesson "The algorithm must deal with cycles well")
-)
+(lesson "An algorithm must deal with cycles well")
 
-(require redex "../sem-sem/patterns.rkt")
-(slide (scale (parameterize ([render-language-nts '(p a t C F)])
-                (render-language patterns))
-              1/2)
-       (scale (hc-append 40
+(define-runtime-path patterns.rkt "../sem-sem/patterns.rkt")
+(define-runtime-path typeset-match-rules.rkt "../paper/typeset-match-rules.rkt")
+
+(define-from patterns patterns.rkt)
+(define-from matches-schema typeset-match-rules.rkt)
+(define-from matches-rules typeset-match-rules.rkt)
+(define-from decomposes-schema typeset-match-rules.rkt)
+(define-from decomposes-rules typeset-match-rules.rkt)
+
+(slide
+ (scale-up
+  (inset 
+   (vc-append 20
+              (hc-append 40
                          matches-schema
                          decomposes-schema)
-              3))
+              (over-there
+               (λ () (parameterize ([render-language-nts '(p a t C)])
+                       (render-language patterns)))))
+   20)))
 
 (define rules1
   (vr-append matches-schema
@@ -113,4 +124,3 @@
 (slide (scale-up (cc-superimpose (ghost rules2) rules1)))
 
 (slide (scale-up (cc-superimpose (ghost rules1) rules2)))
-
