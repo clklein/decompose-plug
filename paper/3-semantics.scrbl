@@ -10,7 +10,7 @@
           "../sem-sem/non-syntax-directed-match-define-relation.rkt")
 
 @(define-syntax-rule (pt t) ; "pattern term"
-   (lw->pict patterns (to-lw t)))
+   (with-rewriters (lw->pict patterns (to-lw t))))
 
 @title{A Semantics for Matching}
 This section formalizes the intuition that a term @math{t} decomposes into 

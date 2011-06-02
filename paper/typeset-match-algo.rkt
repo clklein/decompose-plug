@@ -52,26 +52,28 @@
                [unq? false]))
 
 (define (render-algorithm)
-  (let loop ([rws compound-rewriters])
-    (match rws
-      ['() 
-       (with-unquote-rewriter 
-        unquote-rewriter
-        (vl-append
-         (metafunction-signature "matches" "L" "p" "t" (powerset "b"))
-         (render-metafunction matches)
-         (blank vertical-gap-size)
-         
-         (hbl-append
-          horizontal-gap-size
-          (metafunction-signature "M" "L" "p" "t" (powerset "m"))
-          (parameterize ([render-language-nts '(m)])
-            (render-language directed-matching))
-          (parameterize ([render-language-nts '(d)])
-            (render-language directed-matching)))
-         (render-metafunction M)
-         (blank vertical-gap-size)
-         
-         (render-metafunctions named select combine)))]
-      [(cons (list name rewriter) rs)
-       (with-compound-rewriter name rewriter (loop rs))])))
+  (with-keyword-rewriters
+   (λ ()
+     (with-unquote-rewriter 
+      unquote-rewriter
+      (let loop ([rws compound-rewriters])
+        (match rws
+          ['() 
+           (vl-append
+            (metafunction-signature "matches" "L" "p" "t" (powerset "b"))
+            (render-metafunction matches)
+            (blank vertical-gap-size)
+            
+            (hbl-append
+             horizontal-gap-size
+             (metafunction-signature "M" "L" "p" "t" (powerset "m"))
+             (parameterize ([render-language-nts '(m)])
+               (render-language directed-matching))
+             (parameterize ([render-language-nts '(d)])
+               (render-language directed-matching)))
+            (render-metafunction M)
+            (blank vertical-gap-size)
+            
+            (render-metafunctions named select combine))]
+          [(cons (list name rewriter) rs)
+           (with-compound-rewriter name rewriter (loop rs))]))))))

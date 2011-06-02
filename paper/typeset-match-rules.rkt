@@ -5,7 +5,8 @@
          "../sem-sem/common.rkt"
          "../sem-sem/non-syntax-directed-match-define-relation.rkt"
          "common.rkt")
-(provide combined-matching-rules
+(provide with-rewriters
+         combined-matching-rules
          binding-consistency
          patterns-and-terms
          matching-data-defs
@@ -25,7 +26,7 @@
 (define (with-rewriters/proc thunk)
   (let loop ([rs compound-rewriters])
     (match rs
-      ['() (thunk)]
+      ['() (with-keyword-rewriters (λ () (thunk)))]
       [(cons (list name rewriter) rs*)
        (with-compound-rewriter name rewriter (loop rs*))])))
 
@@ -107,15 +108,16 @@
   (with-rewriters (with-rewriters (render-relation decomposes))))
 
 (define matching-data-defs
-  (ht-append
-   horizontal-gap-size
-   (vl-append
-    (non-bnf-def "L" (finite-function-domain "Non-Terminals" (powerset "p")))
-    (non-bnf-def "b" (finite-function-domain "Variables" "v"))
-    (parameterize ([render-language-nts '(v)])
-      (render-language patterns)))
-   (parameterize ([render-language-nts '(C)])
-     (render-language patterns))))
+  (with-rewriters
+   (ht-append
+    horizontal-gap-size
+    (vl-append
+     (non-bnf-def "L" (finite-function-domain "Non-Terminals" (powerset "p")))
+     (non-bnf-def "b" (finite-function-domain "Variables" "v"))
+     (parameterize ([render-language-nts '(v)])
+       (render-language patterns)))
+    (parameterize ([render-language-nts '(C)])
+      (render-language patterns)))))
 
 (define combined-matching-rules
   (vl-append
@@ -136,12 +138,13 @@
    (render-metafunctions ⊔ merge-binding merge-value uncontext)))
 
 (define patterns-and-terms
-  (ht-append
-   horizontal-gap-size
-   (parameterize ([render-language-nts '(p)])
-     (render-language patterns))
-   (vl-append
-    (parameterize ([render-language-nts '(a t)])
+  (with-rewriters
+   (ht-append
+    horizontal-gap-size
+    (parameterize ([render-language-nts '(p)])
       (render-language patterns))
-    (non-bnf-def "x" "Variables")
-    (non-bnf-def "n" "Non-Terminals"))))
+    (vl-append
+     (parameterize ([render-language-nts '(a t)])
+       (render-language patterns))
+     (non-bnf-def "x" "Variables")
+     (non-bnf-def "n" "Non-Terminals")))))

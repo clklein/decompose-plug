@@ -88,3 +88,22 @@
 
 (define vertical-gap-size 10)
 (define horizontal-gap-size 30)
+
+(define atomic-rewriters
+  '((:name "name")
+    (:nt "nt")
+    (:in-hole "in-hole")
+    (:cons "cons")
+    (:no-ctxt "no-ctxt")
+    (:var "var")
+    (:app "app")
+    (:left "left")
+    (:right "right")
+    (:hole "hole")))
+
+(define (with-keyword-rewriters thunk)
+  (let loop ([rs atomic-rewriters])
+    (match rs
+      ['() (thunk)]
+      [(cons (list s r) rs)
+       (with-atomic-rewriter s r (loop rs))])))
