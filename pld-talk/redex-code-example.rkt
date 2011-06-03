@@ -51,6 +51,16 @@
     (--> (in-hole E (+ number_1 number_2))
          (in-hole E (Σ number_1 number_2))))))
 
+(define (with-subst-rewrite thunk)
+  (with-compound-rewriter 'subst
+                          (λ (lws)
+                            (define inner-lws (lw-e (list-ref lws 3)))
+                            (define e (list-ref lws 2))
+                            (define x (list-ref lws 3))
+                            (define v (list-ref lws 4))
+                            (list "" e "{" x ":=" v "}"))
+                          (thunk)))
+
 (define (a-redex-example)
   (slide
    (hc-append
@@ -66,7 +76,10 @@
            .8)))
   
   (slide
-   (scale (render-reduction-relation red #:style 'horizontal) 2/3)
+   (scale (with-subst-rewrite
+           (λ ()
+             (render-reduction-relation red #:style 'horizontal)))
+          2/3)
    
    (blank)
    

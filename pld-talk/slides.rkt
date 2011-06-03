@@ -92,14 +92,16 @@
 
 (lesson "An algorithm must deal with cycles well")
 
-(define-runtime-path patterns.rkt "../sem-sem/patterns.rkt")
-(define-runtime-path typeset-match-rules.rkt "../paper/typeset-match-rules.rkt")
+(define-runtime-path sem-sem/patterns.rkt "../sem-sem/patterns.rkt")
+(define-runtime-path paper/typeset-match-rules.rkt "../paper/typeset-match-rules.rkt")
+(define-runtime-path paper/common.rkt "../paper/common.rkt")
 
-(define-from patterns patterns.rkt)
-(define-from matches-schema typeset-match-rules.rkt)
-(define-from matches-rules typeset-match-rules.rkt)
-(define-from decomposes-schema typeset-match-rules.rkt)
-(define-from decomposes-rules typeset-match-rules.rkt)
+(define-from patterns sem-sem/patterns.rkt)
+(define-from matches-schema paper/typeset-match-rules.rkt)
+(define-from matches-rules paper/typeset-match-rules.rkt)
+(define-from decomposes-schema paper/typeset-match-rules.rkt)
+(define-from decomposes-rules paper/typeset-match-rules.rkt)
+(define-from with-keyword-rewriters paper/common.rkt)
 
 (slide
  (scale-up
@@ -110,7 +112,9 @@
                          decomposes-schema)
               (over-there
                (λ () (parameterize ([render-language-nts '(p a t C)])
-                       (render-language patterns)))))
+                       (with-keyword-rewriters 
+                        (λ () 
+                          (render-language patterns)))))))
    20)))
 
 (define rules1
