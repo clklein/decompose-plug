@@ -16,9 +16,9 @@
 
 (desiderata)
 
-(timeline)
-
 (a-redex-example)
+
+(timeline)
 
 (simple-pattern-overview)
 
