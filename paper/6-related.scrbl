@@ -17,8 +17,6 @@ such rewriting systems, something that is generally of limited interest when stu
 systems that are designed to model programming languages (as programming 
 languages are typically known not to terminate).
 
-(Does Maude@~cite[maude2] support context sensitive rewriting?)
-
 Finally, for some perspective, without our system the careful researcher typically
 supplies both a one-off plugging function and decomposition function, as exemplified
 by @citet[example-of-using-contexts-with-explicit-deompose-and-plug]'s work.

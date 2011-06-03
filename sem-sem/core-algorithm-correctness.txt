@@ -1,0 +1,339 @@
+Definition (Cycles)
+1. ->_L ⊆ p x p is the least relation such that
+  a. (nt n) ->_L p if p in L(n),
+  b. (in-hole p p') ->_L p,
+  c. (in-hole p p') ->_L p' if L ⊢ hole : p | b, and
+  d. (name x p) ->L p.
+2. L has a cycle if there exist patterns p and p' such that p ->_L^* p' and
+p' ->_L^* p, where ->_L^*p is the transitive closure of ->_L.
+
+Theorem (Core Algorithm Correctness):
+For all L, p, and t, if L has no cycles,
+then b ∈ matches[| L, p, t |] iff L ⊢ t : p | b.
+Proof:
+If b ∈ matches[| L, p, t |], then (•, b) ∈ M[| L, p, t |],
+which by soundness implies L ⊢ t : p | b.
+If L ⊢ t : p | b, then (•, b) ∈ M[| L, p, t |] by completeness,
+and so b ∈ matches[| L, p, t |].
+
+Lemma (Termination): 
+For all L, p, and t, M[| L, p, t |] terminates if L has no bad cycles
+Proof:
+Patterns and terms can be assigned sizes such that each recursive call
+supplies smaller arguments than the ones it received. In particular,
+we interpret the size |t| of a term t as:
+
+|a| = 1
+|(cons t t')| = 1 + |t| + |t'|
+
+and the size |p| of a pattern p as:
+
+|a| = 0
+|(name x p)| = 1 + |p|
+|(nt n)| = 1 + max({|p| | p in L(n)|})|
+|(in-hole p p')| = 1 + max({|p|, |p'|})|
+|(cons p p')| = 0
+
+This assignment of pattern sizes is possible because L has no cycles.
+(It can be constructed bottom-up, by beginning with non-terminals n_0
+for which n_0 -/>_L^* n for any non-terminal n, proceeding with the
+non-terminals n_1 for which n_1 ->_L^* n_0 -/>_L^*n, and so on.)
+
+We interpret the overall size of the combined arguments
+lexicographically, treating the term argument as more significant than
+the pattern argument.
+
+Each recursive call supplies either a smaller term or a term of the
+same size and a smaller pattern.
+
+Case: within `name' clause
+The call supplies the same term and strips the `name' from the
+pattern.
+
+Case: within `nt' clause
+Each call supplies the same term and a pattern whose size is at most
+|(nt n)| - 1.
+
+Case: within `in-hole' clause
+The first call supplies the same term and a pattern whose size is at most
+|(in-hole p_c p_h)| - 1.
+
+The second call supplies a term that's no larger than the input term
+(by the non-increasing subterms lemma) and a strictly smaller pattern.
+
+Case: within `cons' clause
+Each call supplies a strictly smaller term.
+
+Lemma (Non-increasing subterms)
+If ((C, t'), b) ∈ M[| L, p, t |], then |t'| <= |t|.
+Proof: By induction on the M derivation.
+
+Case: M-hole-hole
+The input and output terms are the same.
+
+Case: M-hole-non-hole
+The input and output terms are the same.
+
+Case: M-non-hole-atom
+Impossible, since the result is not a decomposition.
+
+Case: M-name
+Suppose ((C, t'), b) ∈ M[| L, p, t |].
+By induction, |t'| <= |t|.
+
+Case: M-nt
+Similar to M-name.
+
+Case: M-in-hole
+Suppose ((C_h, t_h), b_h) ∈ M[| L, p_h, t_c |].
+combine[| C, (C_h, t_h) |] = (C ++ C_h, t_h).
+|t_h| <= |t_c| and |t_c| <= |t|, both by induction.
+
+Case: M-cons
+By the definition of `select', there are two possibilities:
+  Subcase:
+    Suppose ((C_l, t_l'), b_l) ∈ M[| L, p_l, t_l |] and
+    (•, b_r) ∈ M[| L, p_r, t_r |].
+
+    select[| t_l, (C_l, t_l'), t_r, • |] = {((left t_r):C_l, t_l')}
+    |t_l'| <= |t_l| by induction
+           < |(cons t_l t_r)|
+
+  Subcase:
+    Suppose (•, b_l) ∈ M[| L, p_l, t_l |] and
+    ((C_r, t_r'), b_r) ∈ M[| L, p_r, t_r |].
+
+    Similar.
+
+Lemma (Soundness):
+For all L, p, t, b, C, and t',
+1. (•, b) ∈ M[| L, p, t |] implies L ⊢ t : p | b, and
+2. ((C, t'), b) ∈ M[| L, p, t |] implies L ⊢ t = C[t'] : p | b.
+Proof: By induction on the M derivation.
+
+Case: M-hole-hole
+  Given:
+    M[| L, :hole, :hole |] = {((:no-context, :hole), {}), (•, {})}
+  By decomposes-hole,
+    L ⊢ :hole = :no-context[:hole] : :hole | {}
+  By matches-hole,
+    L ⊢ :hole : :hole | {}
+
+Case: M-hole-non-hole
+  Given: 
+    1. M[| L, :hole, t |] = {((:no-context, t), {})}, and
+    2. t ≠ :hole.
+    By decomposes-hole, 
+      L ⊢ t = :no-context[t] : :hole | {}
+
+Case: M-non-hole-atom
+  Given:
+    1. M[| L, a, a |] = {(•, {})}, and
+    2. a ≠ :hole.
+  By matches-hole,
+    L ⊢ a : a | {}
+
+Case: M-name
+  Let (d, b') ∈ M[| L, (:name x p), t |], i.e.,
+    1. (d, b) ∈ M[| L, p, t |],
+    2. {(x, named[| d, t |])} ⊔ b = b' ≠ ⊤.
+
+  Subcase: d = •
+    By matches-name, L ⊢ t : (:name x p) | b' since:
+      1. L ⊢ t p | b, by induction.
+      2. Since {(x, named[| d, t |])} ⊔ b = b' ≠ ⊤
+         and t = named[| •, t |] (first clause),
+         {(x, C)} ⊔ b = b' ≠ ⊤.
+ 
+  Subcase: d = (C, t')
+    By decomposes-name, L ⊢ t = C[t'] : (:name x p) | b' since:
+      1. L ⊢ t = C[t'] : p | b, by induction.
+      2. Since {(x, named[| d, t |])} ⊔ b = b' ≠ ⊤
+         and C = named[| (C, t'), t |] (second clause),
+         {(x, C)} ⊔ b = b' ≠ ⊤.
+        
+Case: M-nt
+  Let (d, {}) ∈ M[| L, (:nt n), t |], i.e.,
+    1. p ∈ L(n), and
+    2. (d, b) ∈ M[| L, p, t |].
+
+  Subcase: d = •
+    By matches-nt, L ⊢ t : (:nt n) | {} since:
+      1. p ∈ L(n) by hypotheis, and
+      2. L ⊢ t : p | b by induction.
+
+  Subcase: d = (C, t')
+    Similarly by decomposes-nt (TODO: check).
+
+Case: M-in-hole
+  Let (d, b) ∈ M[| L, (:in-hole p_1 p_2), t |], i.e.,
+    1. ((C_1, t_1), b_1) ∈ M[| L, p_1, t |],
+    2. (d_2, b_2) ∈ M[| L, p_2, t_1 |],
+    3. b_1 ⊔ b_2 = b ≠ ⊤, and
+    4. d = combine[| C_1, d_2 |].
+
+  Subcase: d_2 = •
+    combine[| C_1, • |] = •, 
+    requiring L ⊢ t : (:in-hole p_1 p_2) | b,
+    which holds by matches-in-hole since:
+      1. L ⊢ t = C_1[t_1] : p_1 | b_1 by induction,
+      2. L ⊢ t_1 : p_2 | b_2 by induction,
+      3. b_1 ⊔ b_2 = b ≠ ⊤ by hypothesis.
+
+  Subcase: d_2 = (C_2, t_2)
+    combine[| C_1, (C_2, t_2) |] = (C_1 ++ C_2, t_2), 
+    requiring L ⊢ t = (C_1 ++ C_2)[t_2] : (:in-hole p_1 p_2) b,
+    which holds by decomposes-in-hole since:
+      1. L ⊢ t = C_1[t_1] : p_1 | b_1 by induction,
+      2. L ⊢ t_1 = C_2[t_2] : p_2 | b_2 by induction, and
+      3. b_1 ⊔ b_2 = b ≠ ⊤ by hypothesis.
+
+Case: M-cons
+  Let (d, b) ∈ M[| L, (:cons p_1 p_2), (:cons t_1 t_2) |], i.e.,
+    1. (d_1, b_1) ∈ M[| L, p_1, t_1 |],
+    2. (d_2, b_2) ∈ M[| L, p_2, t_2 |],
+    3. b_1 ⊔ b_2 = b ≠ ⊤, and
+    4. d ∈ select[| t_1, d_1, t_2, d_2 |].
+
+  Subcase: d_1 = d_2 = •
+    Then d = • by the first select clause, requiring
+    L ⊢ (:cons t_1 t_2) : (:cons p_1 p_2) : b,
+    which holds by matches-cons since:
+      1. L ⊢ t_1 : p_1 | b_1 by induction,
+      2. L ⊢ t_2 : p_2 | b_2 by induction, and
+      3. b_1 ⊔ b_2 = b ≠ ⊤ by hypothesis.
+
+  Subcase: d_1 = • and d_2 = (C, t_2')
+    Then d = ((right t_1), C) by the third select clause, requiring
+    L ⊢ (:cons t_1 t_2) = ((right t_1), C)[t_2'] : (:cons p_1 p_2) : b,
+    which holds by decomposes-cons-right since:
+      1. L ⊢ t_1 : p_1 | b_1 by induction,
+      2. L ⊢ t_2 = C[t_2'] : p_2 | b_2 by induction,
+      3. b_1 ⊔ b_2 = b ≠ ⊤ by hypothesis.
+
+  Subcase: d_1 = (C, t_1') and d_2 = •
+    Similarly using decomposes-cons-left (TODO: check)
+
+  Subcase: d_1 = (C_1, t_1') and d_2 = (C_2, t_2')
+    Impossible since select[| t_1, (C_1, t_1'), t_2, (C_2, t_2') |] = {}
+
+Case: M-else
+  Impossible since M[| L, p, t |] = {}
+
+Lemma (Completeness): 
+For all L, p, t, b, C, and t' such that L has no bad cycles,
+1. L ⊢ t : p | b implies (•, b) ∈ M[| L, p, t |], and
+2. L ⊢ t = C[t'] : p | b implies ((C, t'), b) ∈ M[| L, p, t |].
+Proof: By mutual induction on the matching/decomposition derivation.
+
+Case: matches-atom
+  Given: L ⊢ a : a | {}
+  Subcase: a = :hole
+    (•, {}) ∈ M[| L, :hole, :hole |] by the first M clause
+  Subcase: a ≠ :hole
+    (•, {}) ∈ M[| L, a, a |] by the third M clause
+
+Case: matches-name
+  Given: 
+    1. L ⊢ t : (:name x p) | b', 
+    2. L ⊢ t : p | b, and 
+    3. b ⊔ {(x, t)} = b' ≠ ⊤
+  By the fourth M clause, (•, b) ∈ M[| L, (:name x p), t |] since:
+    1. (•, b) ∈ M[| L, p, t |] by induction.
+    2. named[| •, t |] = t by definition.
+    3. b ⊔ {(x, t)} = b' ≠ ⊤ by hypothesis.
+
+Case: matches-nt
+  Given:
+    1. L ⊢ t : (:nt n) | {},
+    2. p ∈ L(n), and
+    3. L ⊢ t : p | b. 
+  By the fifth M clause, (•, {}) ∈ M[| L, (:nt n), t |] since:
+    1. p ∈ L(n) by hypothesis.
+    2. (•, b) ∈ M[| L, p, t |] by induction.
+    3. M[| L, p', t |] also terminates for all other p' by termination lemma.
+
+Case: matches-cons
+  Given:
+    1. L ⊢ (:cons t_1 t_2) : (:cons p_1 p_2) | b,
+    2. L ⊢ t_1 : p_1 | b_1,
+    3. L ⊢ t_2 : p_2 | b_2, and
+    4. b_1 ⊔ b_2 = b ≠ ⊤.
+  By the seventh M clause, (•, b) ∈ M[| L, (:cons p_1 p_2), (:cons t_1 t_2) |] 
+  since:
+    1. (•, b_1) ∈ M[| L, p_1, t_1 |] by induction,
+    2. (•, b_2) ∈ M[| L, p_2, t_2 |] by induction,
+    3. b_1 ⊔ b_2 = b ≠ ⊤ by hypothesis, and
+    4. • ∈ select[| t_1, •, t_2, • |] by its first clause
+
+Case: matches-in-hole
+  Given:
+    1. L ⊢ t : (:in-hole p_1 p_2) | b,
+    2. L ⊢ t = C[t'] : p_1 | b_1,
+    3. L ⊢ t' : p_2 | b_2, and
+    4. b_1 ⊔ b_2 = b ≠ ⊤.
+  By the sixth M clause, (•, b) ∈ M[| L, (:in_hole p_1 p_2), t |] since:
+    1. ((C, t'), b_1) ∈ M[| L, p_1, t |] by induction,
+    2. (•, b_2) ∈ M[| L, p_2, t' |] by induction,
+    3. b_1 ⊔ b_2 = b ≠ ⊤ by hypothesis, and
+    4. • ∈ combine[| C, • |] by its first clause.
+
+Case: decomposes-hole 
+  Given: L ⊢ t = :no-context[t] : :hole | {}
+  Subcase: t = :hole
+    By the first M clause, 
+      ((:no-context, :hole), {}) ∈ M[| L, :hole, t |]
+  Subcase: t ≠ :hole
+    By the second M clause,
+      ((:no-context, t), {}) ∈ M[| L, :hole, t |]
+
+Case: decomposes-name
+  Given:
+    1. L ⊢ t = C[t'] : (:name x p) | b',
+    2. L ⊢ t = C[t'] : p | b, and
+    3. b ⊔ {(x, C)} = b' ≠ ⊤.
+  By the fourth M clause, ((C, t'), b') ∈ M[| L, (:name x p), t |] since:
+    1. ((C, t'), b) ∈ M[| L, p, t |] by induction,
+    2. named[| (C, t'), t |] = C by its second clause,
+    3. b ⊔ {(x, C)} = b' ≠ ⊤ by hypothesis.
+
+Case: decomposes-cons-left
+  Given:
+    1. L ⊢ (:cons t_1 t_2) = ((:left t_2) C)[t_1'] : (:cons p_1 p_2) | b,
+    2. L ⊢ t_1 = C[t_1'] : p_1 | b_1,
+    3. L ⊢ t_2 : p_2 | b_2, and
+    4. b_1 ⊔ b_2 = b' ≠ ⊤.
+  By the sixth M clause,
+  ((((:left t_2) C), t_1'), b) ∈ M[| L, (:cons p_1 p_2), (:cons t_1 t_2) |] 
+  since:
+    1. ((C, t_1'), b_1) ∈ M[| L, p_1, t_1 |] by induction,
+    2. (•, b_2) ∈ M[| L, p_2, t_2 |] by induction,
+    3. b_1 ⊔ b_2 = b' ≠ ⊤ by hypothesis, and
+    4. (((:left t_2) C), t_1') ∈ select[| t_1, (C, t_1'), t_2, • |]
+       by its second clause.
+
+Case: decomposes-cons-right
+  Similar to decomposes-cons-left (TODO: check)
+
+Case: decomposes-in-hole
+  Given:
+    1. L ⊢ t = C[t_2] : (:in-hole p_1 p_2) | b,
+    2. L ⊢ t = C_1[t_1] : p_1 | b_1,
+    3. L ⊢ t_1 = C_2[t_2] : p_2 | b_2,
+    4. C_1 ++ C_2 = C,
+    5. b_1 ⊔ b_2 = b' ≠ ⊤.
+  By the fifth M clause, ((C, t_2), b) ∈ M[| L, (:in-hole p_1 p_2), t |] since:
+    1. ((C_1, t_1), b_1) ∈ M[| L, p_1, t |] by induction,
+    2. ((C_2, t_2), b_2) ∈ M[| L, p_2, t_1 |] by induction,
+    3. b_1 ⊔ b_2 = b' ≠ ⊤ by hypothesis, and
+    4. C = combine[| C_1, (C_2, t_2) |] by its second clause.
+
+Case: decomposes-nt
+  Given:
+    1. L ⊢ t = C[t'] : (:nt n) | {},
+    2. p ∈ L(n), and
+    3. L ⊢ t = C[t'] : p | b.
+  By the fourth M clause, ((C, t'), {}) ∈ M[| L, (:nt n), t |] since:
+    1. p ∈ L(n) by hypothesis, 
+    2. ((C, t'), b) ∈ M[| L, p, t |] by induction, and
+    3. M[| L, p', t |] also terminates for all other p' by termination lemma.

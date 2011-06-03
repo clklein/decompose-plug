@@ -1,5 +1,7 @@
 #lang scribble/base
-@(require scribble/manual)
+@(require scribble/manual
+          scriblib/figure
+          "typeset-reduction.rkt")
 
 @title[#:tag "sec:reduction"]{A Semantics for Reduction}
 @itemlist[
@@ -16,3 +18,7 @@
 @item{Doesn't handle some right-hand sides that the rejectes semantics one
       (e.g., (in-hole (cons E E) 7)), but the alternative seems sufficient
       for the rules people tend to write in practice.}]
+
+@figure["fig:reduction" "Semantics of Reduction"]{
+@(render-reduction)
+}

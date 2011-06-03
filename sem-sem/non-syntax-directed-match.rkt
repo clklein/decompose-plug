@@ -1,7 +1,7 @@
 #lang racket
 
 (require racklog
-         redex
+         redex/reduction-semantics
          unstable/dict
          unstable/debug
          "common.rkt"
@@ -17,14 +17,14 @@
 (define matches ; (L t p b)
   (relation
    [(L a) ; atom
-    (L a a empty)
+    (L a a '(set))
     (is-atom a)]
    [(L t x p b b+) ; name
     (L t `(:name ,x ,p) b+)
     (matches L t p b)
-    (merges (list (list x t)) b b+)]
+    (merges `(set (pair ,x ,t)) b b+)]
    [(L t x ps p b) ; non-terminal
-    (L t `(:nt ,x) empty)
+    (L t `(:nt ,x) '(set))
     (%is/nonvar (L x) ps (productions/proc L x))
     (%member p ps)
     (matches L t p b)]
@@ -42,19 +42,19 @@
 (define decomposes ; (L t C t p b)
   (relation
    [(L t) ; hole
-    (L t ':no-context t ':hole empty)]
+    (L t ':no-ctxt t ':hole '(set))]
    [(L t1 C t2 x p t b b+) ; name
     (L t1 C t2 `(:name ,x ,p) b+)
     (decomposes L t1 C t2 p b)
     (%is/nonvar (C) t (uncontext/proc C))
-    (merges (list (list x t)) b b+)]
+    (merges `(set (pair ,x ,t)) b b+)]
    [(L t1 t2 C t p1 p2 b1 b2 b) ; cons-left
-    (L `(:cons ,t1 ,t2) `((:left ,t2) ,C) t `(:cons ,p1 ,p2) b)
+    (L `(:cons ,t1 ,t2) `(:left ,t2 ,C) t `(:cons ,p1 ,p2) b)
     (decomposes L t1 C t p1 b1)
     (matches L t2 p2 b2)
     (merges b1 b2 b)]
    [(L t1 t2 C t p1 p2 b1 b2 b) ; cons-right
-    (L `(:cons ,t1 ,t2) `((:right ,t1) ,C) t `(:cons ,p1 ,p2) b)
+    (L `(:cons ,t1 ,t2) `(:right ,t1 ,C) t `(:cons ,p1 ,p2) b)
     (matches L t1 p1 b1)
     (decomposes L t2 C t p2 b2)
     (merges b1 b2 b)]
@@ -65,7 +65,7 @@
     (%is/nonvar (C1 C2) C (append-contexts/proc C1 C2))
     (merges b1 b2 b)]
    [(L t C u x b ps p) ; non-terminal
-    (L t C u `(:nt ,x) empty)
+    (L t C u `(:nt ,x) '(set))
     (%is/nonvar (L x) ps (productions/proc L x))
     (%member p ps)
     (decomposes L t C u p b)]))
@@ -77,8 +77,8 @@
   (relation
    [(b1 b2 b)
     (b1 b2 b)
-    (%is/nonvar (b1 b2) b (⊓/proc b1 b2))
-    (%/= b false)]))
+    (%is/nonvar (b1 b2) b (⊔/proc b1 b2))
+    (%/= b '⊤)]))
 
 (define (uncontext/proc C)
   (term (uncontext ,C)))

@@ -21,16 +21,17 @@
   ((t u) a
          (:cons t t))
   
-  (b ([x v] ...))
+  (b (set (pair x v) ...))
   (v t C)
   
   (L (D ...))
   (D [x (p ...)])
   
-  (F (:left t)
-     (:right t))
-  (C :no-context
-     (F C)))
+  (C :no-ctxt
+     (:left t C)
+     (:right t C))
+  
+  (otherwise-mentioned ⊤))
 
 (define pattern? (redex-match patterns p))
 (define value? (redex-match patterns v))

@@ -27,6 +27,7 @@
       [(equal? size 2) "T"]
       [(equal? size 2.5) "TF"]
       [(equal? size 2.2) "TT"]
+      [(equal? size 3) "TH"]
       [else (error 'wfigure "unknown size: ~s" size)]))
   (define f (decode-flow args))
   (nested-flow

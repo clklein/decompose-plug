@@ -10,7 +10,7 @@
           "../sem-sem/non-syntax-directed-match-define-relation.rkt")
 
 @(define-syntax-rule (pt t) ; "pattern term"
-   (lw->pict patterns (to-lw t)))
+   (with-rewriters (lw->pict patterns (to-lw t))))
 
 @title{A Semantics for Matching}
 This section formalizes the intuition that a term @math{t} decomposes into 
@@ -22,8 +22,7 @@ a richer language of patterns, but the present forms suffice to illustrate
 the essential concepts.
 
 @figure["fig:pat-term" "Patterns and Terms"]{
-@(parameterize ([render-language-nts '(p a t)])
-    (render-language patterns))
+@patterns-and-terms
 }
 
 Terms @pt[t] are binary trees with atoms as leaves. Atoms @pt[a] include 
@@ -45,20 +44,9 @@ pairs. For example, the left-hand side of the @pt[[cont]] rule in
                                (:nt v)))]}
 
 @figure["matching" "Matching and Decomposition"]{
-  @(centered
-    (with-rewriters
-     (let ([matches-schema (rule-schema patterns (matches L t p b))]
-           [matches-rules (render-relation matches)]
-           [decomposes-schema (rule-schema patterns (decomposes L t C t p b))]
-           [decomposes-rules (render-relation decomposes)]
-           [vertical-space 10])
-       (pin-over
-        (pin-over
-         (vc-append (+ (pict-height decomposes-schema) (* 2 vertical-space))
-                    matches-rules 
-                    decomposes-rules)
-         0 0 
-         matches-schema)
-        0 (+ (pict-height matches-rules) vertical-space) 
-        decomposes-schema))))
+  @(centered combined-matching-rules)
+}
+
+@figure["binding-consistency" "Binding Consistency"]{
+  @(centered binding-consistency)
 }

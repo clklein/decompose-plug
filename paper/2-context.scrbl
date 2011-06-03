@@ -4,7 +4,7 @@
           redex/reduction-semantics
           (only-in scribble/core table paragraph style element)
           (only-in slideshow/pict vl-append)
-          "../2-models/model.rkt"
+          "../2-models/models.rkt"
           "../2-models/util.rkt"
           "wfigure.rkt"
           "citations.rkt")
@@ -89,20 +89,20 @@ Unlike call-by-name, however, each
 function argument is evaluated at most once. 
 A typical implementation of
 a language with call-by-need uses state to track if an argument has been evaluated,
-but it is also possible to give a direct explanation, expoiting the expressive
-nature of contexts to control where evaluation occurs.
+but it is also possible to give a direct explanation, expoiting contexts to control where evaluation occurs.
 
 @wfigure[#:size 2 "fig:cbn" "Call-by-need Contexts"]{
 @(render-language Λneed/red #:nts '(E))
 }
 @Figure-ref["fig:cbn"] shows the contexts from @citet[cbn-calculus]'s model of call-by-need.
-The first two productions of @rr[E] are standard, allowing evaluation wherever @rr[E]
-may be, as well as in the function position of an application, regardless of what
-appears in the argument position. The third case allows evaluation in the body of
+The first three productions of @rr[E] are standard, allowing evaluation wherever @rr[E]
+may be, in the argument of the @rr[|1+|] primitive, 
+as well as in the function position of an application, regardless of what
+appears in the argument position. The fourth case allows evaluation in the body of
 a lambda expression that is in the function position of an application. Intuitively,
 this case says that once we have determined that the function to be applied, then
 we can begin to evaluate its body. Of course, the function is eventually going to
-need its argument and this is where the fourth production comes in. This production
+need its argument and this is where the final production comes in. This production
 is the most interesting. It says that when a function in the function position
 of some application needs its argument, then you may evaluate its argument.
 
@@ -128,11 +128,11 @@ able to support a sophisticated form of nesting, namely that
 a decomposition must occur in one part of a term in order
 for a decomposition to occur in another.
 
-
-@wfigure["fig:cont" "Continuations"]{
+@wfigure[#:size 2.5 "fig:cont" "Continuations"]{
 @(render-language Λk/red)
 
-@(render-reduction-relation cont-red)
+@(parameterize ([rule-pict-style 'horizontal])
+   (render-reduction-relation cont-red))
 }
 When building a model for continuations, there is an easy connection to make, namely that
 an evaluation context is itself a natural representation for a continuation. That is,
@@ -147,9 +147,9 @@ for this expression
 is to grab a continuation. In this model that continuation is represented as
 @rr[(cont (|+1| hole))], 
 which is then applied to @rr[call/cc]'s argument
-in the original context, yielding this expression
+in the original context, yielding the expression 
 @rr[(|+1| ((λ (k) (k 2)) (cont (|+1| hole))))].
-The next step is to substitute the continuation for @rr[k], 
+The next step is to substitute for @rr[k], 
 which yields this expression
 @rr[(|+1| ((cont (|+1| hole)) 2))].
 This expression has a continuation value in the function
@@ -192,13 +192,11 @@ match what appeared at the hole against @rr[e]. With @rr[M], however,
 this leads to an infinite loop because @rr[M] expands to a
 decomposition that includes @rr[M] in the first position.
 
-@(define-language ex2
-   (C (in-hole C (f hole)) hole))
-@(define-language ex3
-   (C (f C) hole))
 @wfigure["fig:wacky" "Wacky Context"]{
-@(render-language ex2)
-@(render-language ex3)
+@(vl-append 
+  4
+  (render-language wacky)
+  (render-language wacky-inside-out))
 }
 
 A simple fix that works for the delimited continuations 

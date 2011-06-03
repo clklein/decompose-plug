@@ -1,0 +1,16 @@
+Matching Contexts
+
+Redex is a domain-specific language for writing, testing, and
+typesetting operational semantics (and related tasks). Linguistically,
+however, the most interesting part of Redex is its pattern
+matcher. More interesting, in fact, that we realized when we started
+working on it. Specifically, Redex's pattern language has a notion of
+context-sensitive matching, inspired by Felleisen/Hieb-style
+semantics. As it turns out, the precise semantics of context
+decomposition has not been nailed down anywhere and is pretty subtle.
+
+This talk explores the design space for the semantics of the pattern
+matching and tries to bring across how rich it is, how to best make
+sense of decomposition as it is currently bring practiced, and how
+to design a programming language around it.
+

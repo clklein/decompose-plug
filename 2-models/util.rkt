@@ -1,9 +1,9 @@
 #lang racket/base
 (require redex/pict
          redex/reduction-semantics
-         "model.rkt")
+         "models.rkt")
 
-(provide rr with-rewriters)
+(provide rr with-rewriters typesetting-lang)
 
 ;; use this dummy language to get the right
 ;; fonts for the various non-terminals used 
@@ -31,3 +31,4 @@
                             (define e (list-ref lws 2))
                             (list "" e "{" x ":=" v ", ...}"))
                           (thunk)))
+

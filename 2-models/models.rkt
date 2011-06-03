@@ -1,9 +1,16 @@
-#lang racket
+#lang racket/base
 (require redex/reduction-semantics
+         (for-syntax racket/base)
          "double.rkt")
 
 (provide arith :arith 
-         Λ/red Λk/red Λneed/red Λdk/red
+         Λ/red :Λ/red 
+         Λneed/red :Λneed/red
+         Λk/red :Λk/red
+         Λdk/red :Λdk/red Λk/red/no-hide-hole
+         wacky :wacky
+         wacky-inside-out :wacky-inside-out
+         
          arith-red
          cbv-red 
          cont-red
@@ -23,9 +30,10 @@
    (--> (in-hole C (+ number_1 number_2))
         (in-hole C (Σ number_1 number_2)))))
  
-(define-language Λ/red
+(define-double-language Λ/red :Λ/red
   (e (e e) x v)
-  ((x y) variable-not-otherwise-mentioned)
+  (x variable-not-otherwise-mentioned)
+  (y x)
   (v (λ (x) e) |+1| number)
   (E (E e) (v E) hole))
 
@@ -39,31 +47,10 @@
         (in-hole E (Σ number 1))
         "+1")))
 
-(define-extended-language Λk/red Λ/red
-  (e .... call/cc (cont (hide-hole E)))
-  (v .... call/cc (cont (hide-hole E))))
-
-
-(define cont-partial-red
-  (reduction-relation 
-   Λk/red
-   (--> (in-hole E (call/cc v))
-        (in-hole E (v (cont E)))
-        "call/cc")
-   (--> (in-hole E_1 ((cont E_2) v))
-        (in-hole E_2 v)
-        "cont")))
-
-(define cont-red
-  (union-reduction-relations cont-partial-red
-                             (extend-reduction-relation cbv-red Λk/red)))
-
-(define-extended-language Λneed/red Λ/red
-  (E hole 
-     (E e)
+(define-double-extended-language Λneed/red Λ/red :Λneed/red :Λ/red
+  (E hole (|+1| E) (E e)
      ((λ (x) E) e)
-     ((λ (x) (in-hole E x)) E)
-     (|+1| E))
+     ((λ (x) (in-hole E x)) E))
   (A v ((λ (x) A) e))
   (v number (λ (x) e) |+1|))
 
@@ -87,17 +74,50 @@
         (fresh y_2)
         "assoc")))
 
-(define-extended-language Λdk/red Λk/red
+(define-syntax-rule 
+  (define-double-extended-language/hide-hole a b c d e 
+    prods ...)
+  (begin
+    (define-double-extended-language a b c d
+      prods ...)
+    (remove-hide-hole
+     (define-extended-language e b
+       prods ...))))
+
+(define-double-extended-language/hide-hole Λk/red Λ/red :Λk/red :Λ/red Λk/red/no-hide-hole
+  (v .... call/cc (cont (hide-hole E))))
+
+
+(define cont-partial-red
+  (reduction-relation 
+   Λk/red
+   ;; no labels on these rules so the figure fits in the paper
+   (--> (in-hole E (call/cc v))
+        (in-hole E (v (cont E))))
+   (--> (in-hole E_1 ((cont E_2) v))
+        (in-hole E_2 v))))
+
+(define cont-red
+  (union-reduction-relations cont-partial-red
+                             (extend-reduction-relation cbv-red Λk/red)))
+
+(define-double-extended-language Λdk/red Λk/red :Λdk/red :Λk/red
   (e .... (|#| e) call/comp)
   (v .... call/comp)
-  (E (E e) (v E) (|+1| E) hole)
-  (M hole (in-hole M (|#| E))))
+  (E (E e) (v E) hole)
+  (M E (in-hole M (|#| E))))
 
 (define delim-red
   (reduction-relation
    Λdk/red
    (--> (in-hole M (|#| (in-hole E (call/comp v))))
         (in-hole M (|#| (in-hole E (v (cont E))))))))
+
+
+(define-double-language wacky :wacky
+  (C (in-hole C (f hole)) hole))
+(define-double-language wacky-inside-out :wacky-inside-out
+  (C (f C) hole))
 
 
 (define-metafunction Λneed/red

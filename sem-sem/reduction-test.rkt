@@ -1,12 +1,12 @@
 #lang racket
 
 (require "reduction.rkt"
-         redex)
+         (except-in redex/reduction-semantics plug))
 
 (define-syntax (test-reductions stx)
   (syntax-case stx ()
     [(_ language relation to-reduce expected)
-     #`(let ([actual (reductions `language `relation `to-reduce)])
+     #`(let ([actual (reductions/func `language `relation `to-reduce)])
          #,(syntax/loc stx
              (test-equal (alphabetical actual) (alphabetical `expected))))]))
 (define (alphabetical xs)
