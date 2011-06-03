@@ -1,0 +1,4 @@
+- Section 3: mechanize the construction of the example pattern used to
+  explain how Redex patterns translate into core patterns.
+- Section 3: consider explaining the matches judgment form with an
+  example, perhaps the matches in Figure 2 (arithmetic language).

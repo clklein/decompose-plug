@@ -6,9 +6,6 @@
          "../sem-sem/syntax-directed-match.rkt")
 (provide render-algorithm)
 
-(define (rewrite-append-contexts lws)
-  (list "" (list-ref lws 2) " ++ " (list-ref lws 3) ""))
-
 (define compound-rewriters
   (list (list 'append-contexts rewrite-append-contexts)
         (list 'set/id rewrite-set)
