@@ -23,7 +23,7 @@
     [(list s _ l r e)
      (list (struct-copy lw s [e ""] [column-span (- (lw-column l) (lw-column s))])
            l 
-           (just-after (format " ~a " op) l)
+           (just-after (format " ~a" op) l)
            r
            (struct-copy lw e [e ""]))]))
 
