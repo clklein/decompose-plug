@@ -91,14 +91,14 @@
         (list 'set rewrite-set)))
 
 (define matches-schema/unframed
-  (with-rewriters (rule-schema patterns (matches L t p b))))
+  (with-rewriters (rule-schema patterns (matches G t p b))))
 (define matches-schema
   (frame-rule-schema matches-schema/unframed))
 (define matches-rules
   (with-rewriters (render-relation matches)))
 
 (define decomposes-schema/unframed
-  (with-rewriters (rule-schema patterns (decomposes L t C t_^’ p b))))
+  (with-rewriters (rule-schema patterns (decomposes G t C t_^’ p b))))
 (define decomposes-schema
   (frame-rule-schema decomposes-schema/unframed))
 (define decomposes-rules 
@@ -109,7 +109,7 @@
    (ht-append
     horizontal-gap-size
     (vl-append
-     (non-bnf-def "L" (finite-function-domain "Non-Terminals" (powerset "p")))
+     (non-bnf-def "G" (finite-function-domain "Non-Terminals" (powerset "p")))
      (non-bnf-def "b" (finite-function-domain "Variables" "v"))
      (parameterize ([render-language-nts '(v)])
        (render-language patterns)))

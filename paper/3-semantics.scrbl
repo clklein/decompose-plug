@@ -51,7 +51,7 @@ For example, the left-hand side of the reduction rule in
 
 @Figure-ref{fig:matching} gives a semantics for patterns via the judgment form
 @matches-schema/unframed, which defines when the pattern @pt[p] matches the term
-@pt[t]. The grammar @pt[L] provides a meaning for non-terminals by mapping them
+@pt[t]. The grammar @pt[G] provides a meaning for non-terminals by mapping them
 to their productions. The finite map @pt[b] shows how the pattern variables of
 @pt[p] can be instantiated to yield @pt[t]. A binding map's range may include
 not only terms but also encoded contexts @pt[C]. In addition to the tree 

@@ -58,13 +58,13 @@
         (match rws
           ['() 
            (vl-append
-            (metafunction-signature "matches" "L" "p" "t" (powerset "b"))
+            (metafunction-signature "matches" "G" "p" "t" (powerset "b"))
             (render-metafunction matches)
             (blank vertical-gap-size)
             
             (hbl-append
              horizontal-gap-size
-             (metafunction-signature "M" "L" "p" "t" (powerset "m"))
+             (metafunction-signature "M" "G" "p" "t" (powerset "m"))
              (parameterize ([render-language-nts '(m)])
                (render-language directed-matching))
              (parameterize ([render-language-nts '(d)])

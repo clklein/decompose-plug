@@ -69,6 +69,6 @@
     rules)))
 
 (define-relation reduction
-  [(reduces L t p t_^′ r)
-   (matches L t p b)
+  [(reduces G t p t_^′ r)
+   (matches G t p b)
    (eq (non-context (inst r b)) t_^’)])

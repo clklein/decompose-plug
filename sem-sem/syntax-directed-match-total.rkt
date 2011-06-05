@@ -10,7 +10,7 @@
          racket/set
          racket/match)
 (provide/contract
- [matches (-> language? pattern? term? (listof bindings?))])
+ [matches (-> grammar? pattern? term? (listof bindings?))])
 
 ; decomposition : (or/c decomp no-decomp)
 ; binding : bindings?
@@ -21,8 +21,8 @@
 
 (define empty-bindings '(set))
 
-; matches : language pattern term -> (set/c mtch)
-; language ≡ (dict symbol (listof pattern))
+; matches : grammar pattern term -> (set/c mtch)
+; grammar ≡ (dict symbol (listof pattern))
 (define (matches lang pat term)
   (define memo-table (make-hash))
   (define continue? #false)
