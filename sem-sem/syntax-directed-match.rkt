@@ -26,8 +26,8 @@
   [(M G a a) ; a ≠ :hole
    (set/id (pair • (no-bindings)))]
   [(M G (:name x p) t)
-   ,(set-comp* (term ((pair d b_^’) (guard (neq b_^’ ⊤)) 
-                                    (eq b_^’ (⊔ (set (pair x (named d t))) b))
+   ,(set-comp* (term ((pair d b_^′) (guard (neq b_^′ ⊤)) 
+                                    (eq b_^′ (⊔ (set (pair x (named d t))) b))
                                     (in (pair d b) (M G p t)))))]
   [(M G (:nt n) t)
    ,(set-comp* (term ((pair d (no-bindings)) (in (pair d b) (M G p t)) (in p (productions G n)))))]
@@ -55,11 +55,11 @@
   select : t d t d -> (d) or ()
   [(select t • u •)
    (set/id •)]
-  [(select t (pair C t_^’) u •)
-   (set/id (pair (:left u C) t_^’))]
-  [(select t • u (pair C u_^’))
-   (set/id (pair (:right t C) u_^’))]
-  [(select t (pair C t_^’) u (pair C_^’ u_^’))
+  [(select t (pair C t_^′) u •)
+   (set/id (pair (:left u C) t_^′))]
+  [(select t • u (pair C u_^′))
+   (set/id (pair (:right t C) u_^′))]
+  [(select t (pair C t_^′) u (pair C_^′ u_^′))
    (set/id)])
 
 (define-metafunction directed-matching
