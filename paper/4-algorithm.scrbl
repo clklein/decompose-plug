@@ -3,7 +3,9 @@
           scribble/core
           scriblib/figure
           redex/pict
+          scriblib/footnote
           "../2-models/models.rkt"
+          "citations.rkt"
           "typeset-match-rules.rkt"
           "typeset-match-algo.rkt")
 
@@ -79,4 +81,10 @@ Definition (Left Recursion)
 
 Theorem (Correctness for Grammars without Left Recursion)
 
-The restriction on @mt[G] can be lifted by ...
+Parsing algorithms that support left recursive context-free grammars go back 
+nearly fifty years @citet[kuno-cacm65]. We refer the reader to 
+@citet[frost-iwpt07-sec3] for a summary. Some of these algorithms appear 
+adaptable to our setting,@note{We discovered this line of work only recently; if
+PC knows of other papers we should read, we would love to hear them.} though we 
+have investigated only one, an extension of the packrat parsing algorithm 
+@citet[warth-pepm08]. This extension ...

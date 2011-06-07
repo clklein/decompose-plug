@@ -62,6 +62,8 @@
 (define acl2 (string-append International Workshop "ACL2 Theorem Prover and its Applications"))
 (define itp (string-append International Conference "Interactive Theorem Proving"))
 
+(define pepm (string-append ACM SIGPLAN Workshop "Partial Evaluation and Program Manipulation"))
+(define iwpt "International Conference on Parsing Technology")
 (define sofsem "Seminar on Current Trends in Theory and Practice of Informatics")
 
 (define ibm-sys "IBM Systems Journal")
@@ -524,3 +526,32 @@
                                 #:volume 1)
    
    #:date 2005))
+
+(define kuno-cacm65
+  (make-bib
+   #:title "The Predictive Analyzer and a Path Elimination Technique"
+   #:author "Susumu Kuno"
+   #:location (journal-location cacm
+                                #:volume 8
+                                #:number "7"
+                                #:pages '(453 462))
+   #:date 1965))
+
+(define frost-iwpt07
+  (make-bib
+   #:title "Modular and Efficient Top-Down Parsing for Ambiguous Left-Recursive Grammars"
+   #:author (authors "Richard A. Frost"
+                     "Rahmatullah Hafiz"
+                     "Paul C. Callaghan")
+   #:location (proceedings-location iwpt #:pages '(109 120))
+   #:date 2007))
+(define frost-iwpt07-sec3 (in-bib frost-iwpt07 ", section 3"))
+
+(define warth-pepm08
+  (make-bib
+   #:title "Packrat Parsers Can Support Left Recursion"
+   #:author (authors "Alessandro Warth"
+                     "James R. Douglass"
+                     "Todd Millstein")
+   #:location (proceedings-location pepm #:pages '(103 110))
+   #:date 2008))
