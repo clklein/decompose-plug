@@ -10,9 +10,6 @@
           "../sem-sem/patterns.rkt"
           "../sem-sem/non-syntax-directed-match-define-relation.rkt")
 
-@(define-syntax-rule (pt t) ; "pattern term"
-   (with-rewriters (lw->pict patterns (to-lw t))))
-
 @title{A Semantics for Matching}
 This section formalizes the intuition that a term @math{t} decomposes into 
 @math{C[e]} when @math{t} can be partitioned into two smaller terms @math{t'} 
@@ -108,6 +105,6 @@ prefers contexts (see @pt[merge-value]), since they the path to the hole.
 @Secref{sec:reduction} considers an alternative definition of reduction that
 avoids this necessity.
 
-@figure["fig:binding-consistency" "Binding Consistency"]{
+@figure["fig:binding-consistency" "The least upper bound of bindings. Cases apply in order."]{
   @(centered binding-consistency)
 }

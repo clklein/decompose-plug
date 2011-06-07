@@ -5,7 +5,8 @@
          "../sem-sem/common.rkt"
          "../sem-sem/non-syntax-directed-match-define-relation.rkt"
          "common.rkt")
-(provide with-rewriters
+(provide pt
+         with-rewriters
          combined-matching-rules
          binding-consistency
          patterns-and-terms
@@ -31,6 +32,9 @@
       ['() (with-keyword-rewriters (λ () (thunk)))]
       [(cons (list name rewriter) rs*)
        (with-compound-rewriter name rewriter (loop rs*))])))
+
+(define-syntax-rule (pt t) ; "pattern term"
+  (with-rewriters (lw->pict patterns (to-lw t))))
 
 (define (rewrite-~ lws)
   (list ""
@@ -98,7 +102,7 @@
   (with-rewriters (render-relation matches)))
 
 (define decomposes-schema/unframed
-  (with-rewriters (rule-schema patterns (decomposes G t C t_^’ p b))))
+  (with-rewriters (rule-schema patterns (decomposes G t C t_^′ p b))))
 (define decomposes-schema
   (frame-rule-schema decomposes-schema/unframed))
 (define decomposes-rules 

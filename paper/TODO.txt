@@ -2,3 +2,4 @@
   explain how Redex patterns translate into core patterns.
 - Section 3: consider explaining the matches judgment form with an
   example, perhaps the matches in Figure 2 (arithmetic language).
+- Section 4: address the algorithm's complexity?

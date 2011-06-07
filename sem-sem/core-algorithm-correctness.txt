@@ -1,14 +1,14 @@
-Definition (Cycles)
+Definition (Left Recursion)
 1. ->_G ⊆ p x p is the least relation such that
   a. (nt n) ->_G p if p in G(n),
   b. (in-hole p p') ->_G p,
   c. (in-hole p p') ->_G p' if G ⊢ hole : p | b, and
   d. (name x p) ->G p.
-2. G has a cycle if there exist patterns p and p' such that p ->_G^* p' and
-p' ->_G^* p, where ->_G^*p is the transitive closure of ->_G.
+2. G has is left recursive if p ->_G^* p' and p' ->_G^* p for some p
+and p', where ->_G^*p is the transitive closure of ->_G.
 
 Theorem (Core Algorithm Correctness):
-For all G, p, and t, if G has no cycles,
+For all G, p, and t, if G is not left recursive,
 then b ∈ matches[| G, p, t |] iff G ⊢ t : p | b.
 Proof:
 If b ∈ matches[| G, p, t |], then (•, b) ∈ M[| G, p, t |],
@@ -17,7 +17,7 @@ If G ⊢ t : p | b, then (•, b) ∈ M[| G, p, t |] by completeness,
 and so b ∈ matches[| G, p, t |].
 
 Lemma (Termination): 
-For all G, p, and t, M[| G, p, t |] terminates if G has no bad cycles
+For all G, p, and t, M[| G, p, t |] terminates if G is not left recursive.
 Proof:
 Patterns and terms can be assigned sizes such that each recursive call
 supplies smaller arguments than the ones it received. In particular,
@@ -34,7 +34,7 @@ and the size |p| of a pattern p as:
 |(in-hole p p')| = 1 + max({|p|, |p'|})|
 |(cons p p')| = 0
 
-This assignment of pattern sizes is possible because G has no cycles.
+This assignment of pattern sizes is possible because ->_G has no cycles.
 (It can be constructed bottom-up, by beginning with non-terminals n_0
 for which n_0 -/>_G^* n for any non-terminal n, proceeding with the
 non-terminals n_1 for which n_1 ->_G^* n_0 -/>_G^*n, and so on.)
@@ -221,7 +221,7 @@ Case: M-else
   Impossible since M[| G, p, t |] = {}
 
 Lemma (Completeness): 
-For all G, p, t, b, C, and t' such that G has no bad cycles,
+For all G, p, t, b, C, and t' such that G is not left recursive:
 1. G ⊢ t : p | b implies (•, b) ∈ M[| G, p, t |], and
 2. G ⊢ t = C[t'] : p | b implies ((C, t'), b) ∈ M[| G, p, t |].
 Proof: By mutual induction on the matching/decomposition derivation.
