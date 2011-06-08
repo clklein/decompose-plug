@@ -7,12 +7,12 @@
 
 (define test-syntax-directed-total
   (match-lambda
-    [(test:match _ L p t)
-     (not (empty? (matches L p t)))]
-    [(test:no-match _ L p t)
-     (empty? (matches L p t))]
-    [(test:bind _ L p t bs)
-     (equal-bindings? (map raw-bindings (matches L p t)) bs)]))
+    [(test:match _ G p t)
+     (not (empty? (matches G p t)))]
+    [(test:no-match _ G p t)
+     (empty? (matches G p t))]
+    [(test:bind _ G p t bs)
+     (equal-bindings? (map raw-bindings (matches G p t)) bs)]))
 
 (run-tests test-syntax-directed-total)
 

@@ -24,7 +24,7 @@
   (b (set (pair x v) ...))
   (v t C)
   
-  (L (D ...))
+  (G (D ...))
   (D [x (p ...)])
   
   (C :no-ctxt
@@ -37,4 +37,4 @@
 (define value? (redex-match patterns v))
 (define term? (redex-match patterns t))
 (define bindings? (redex-match patterns b))
-(define language? (redex-match patterns L))
+(define grammar? (redex-match patterns G))

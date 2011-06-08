@@ -3,6 +3,9 @@
 (require redex/pict slideshow/pict)
 (provide (all-defined-out))
 
+(define (rewrite-append-contexts lws)
+  (list "" (list-ref lws 2) " ++ " (list-ref lws 3) ""))
+
 (define (rewrite-matches lws)
   (list ""
         (list-ref lws 2)
@@ -23,7 +26,7 @@
     [(list s _ l r e)
      (list (struct-copy lw s [e ""] [column-span (- (lw-column l) (lw-column s))])
            l 
-           (just-after (format " ~a " op) l)
+           (just-after (format " ~a" op) l)
            r
            (struct-copy lw e [e ""]))]))
 
