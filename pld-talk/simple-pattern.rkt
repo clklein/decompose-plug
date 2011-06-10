@@ -23,7 +23,7 @@
      (scale (vl-append 
              (hbl-append m (t "  Grammar  Pat  Term"))
              (hbl-append (rbl-superimpose (ghost m) (t "→"))
-                         (t "  Substitution  or  Failure")))
+                         (t "  Substitution*  or  Failure")))
             1.5))
    
    (blank)
