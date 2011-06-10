@@ -1,0 +1,16 @@
+A Semantics for Context-Sensitive Reduction Semantics
+Casey Klein, Jay McCarthy, Steven Jaconette, Robert Bruce Findler
+
+This paper explores Felleisen-Hieb-style operational semantics from a
+term rewriting perspective. More precisely, it contains a formalism
+system that gives a meaning for evaluation-context based semantics,
+specifically showing how to interpret decomposition and plugging
+formally. The semantics is not naturally algorithmic, so the paper
+also gives an algorithm for matching and proves that the algorithm
+matches the semantics.
+
+The work is inspired by PLT Redex, a domain-specific programming
+language for operational semantics and it draws heavily on our
+experience building operational semantics and struggling to nail down
+how a semantics behaves.
+
