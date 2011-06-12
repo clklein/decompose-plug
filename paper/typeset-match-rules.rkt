@@ -43,20 +43,12 @@
         (list-ref lws 3)
         ""))
 
-(define (rewrite-decomposes lws)
-  (list ""
-        (list-ref lws 2)
-        " ⊢ "
-        (list-ref lws 3)
-        " = "
-        (list-ref lws 4)
-        "["
-        (list-ref lws 5)
-        "]"
-        " : "
-        (list-ref lws 6)
-        " | "
-        (list-ref lws 7)))
+(define rewrite-decomposes
+  (match-lambda
+    [(list lp d G t C t′ p b rb)
+     (list "" G " ⊢ " t " = " C "[" t′ "]" " : " p " | " b)]
+    [(list lp d t C t′ p rb)
+     (list "" t " = " C "[" t′ "]" " : " p)]))
 
 (define (rewrite-nt-has-prod lws)
   (list ""

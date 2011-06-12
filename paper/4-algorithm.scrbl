@@ -5,6 +5,7 @@
           redex/pict
           scriblib/footnote
           "../2-models/models.rkt"
+          "../sem-sem/syntax-directed-match.rkt"
           "citations.rkt"
           "typeset-match-rules.rkt"
           "typeset-match-algo.rkt")
@@ -12,12 +13,12 @@
 @title{An Algorithm for Matching}
 
 The rules in @figure-ref{fig:matching} provide a declarative definition of
-context-sensitive matching, but they do not lead directly to an efficient
+context-sensitive matching, but they do not lead directly to a tractable
 matching algorithm. There are two problems. First, as reflected in the two 
 @pt[:cons] decomposition rules, an algorithm cannot know a priori whether 
 to match on the left and decompose on the right or to decompose on the left and
 match on the right. An implementation that tries both possibilities scales 
-exponentially in the number of nested @pt[:cons] patterns (counting indirect 
+exponentially in the number of nested @pt[:cons] patterns matched (counting indirect 
 nesting through non-terminals). Second, the rules provide no answer to the 
 question of whether to proceed in expanding a non-terminal if none of the input 
 term has been consumed since last encountering that non-terminal. This question
@@ -75,16 +76,64 @@ Putting aside the second problem described above, the call @mt[(M G p t)]
 computes the set of @mt[b] such that @matches-schema/unframed or 
 @decomposes-schema/unframed for some @mt[C] and @mt[t_^′], and the top-level 
 wrapper function @mt[matches] restricts this set to the bindings associated with
-match derivations. More precisely, the following result holds.
+match derivations. More precisely, the following result holds (see 
+@secref{sec:proof}).
 
 Definition (Left Recursion)
 
 Theorem (Correctness for Grammars without Left Recursion)
 
 Parsing algorithms that support left recursive context-free grammars go back 
-nearly fifty years @citet[kuno-cacm65]. We refer the reader to 
+nearly fifty years @~cite[kuno-cacm65]. We refer the reader to 
 @citet[frost-iwpt07-sec3] for a summary. Some of these algorithms appear 
 adaptable to our setting,@note{We discovered this line of work only recently; if
-PC knows of other papers we should read, we would love to hear them.} though we 
+the PC knows of other papers we should read, we would love pointers.} though we 
 have investigated only one, an extension of the packrat parsing algorithm 
-@citet[warth-pepm08]. This extension ...
+@~cite[warth-pepm08]. This extension dynamically detects left recursion and 
+treats the choice leading to it as a failure. If the other choices for the same 
+portion of the input make any progress at all, the algorithm repeats the parse
+attempt, in hopes that the entries added to the memo table during the failed
+attempt will cause a second attempt to succeed. This process continues as long
+as repeated attempts make additional progress.
+
+@(define-syntax-rule (wt t) ; "wacky term"
+   (render-lw wacky-inside-out (to-lw t)))
+
+Extending the algorithm in @figure-ref{fig:core-algo} with a similar iterative 
+phase allows matching of terms from left recursive grammars, such 
+@render-language[wacky-inside-out]. To illustrate, we trace the calls to the
+function @mt[M] in the extended algorithm for the term @wt[(f (f hole))] and
+the pattern @wt[C]. For readability, we use conventional notation for terms,
+contexts, and patterns and omit @mt[M]'s unchanging first argument. 
+
+The extended algorithm repeats the call @mt[(M (f (f hole)) C)] three times,
+assuming it tries @wt[C]'s productions from left to right:
+
+@itemlist[#:style 'ordered
+@item{The @mt[:in-hole] production immediately leads to another call 
+@mt[(M (f (f hole)) C)], which the extended algorithm considers a failure, since 
+the same call is already in progress. Next, @mt[M] tries @wt[C]'s @wt[hole] 
+production, which produces one result: the trivial decomposition 
+@pt[(decomposes (f (f hole)) hole (f (f hole)) C)].
+Since the first call made some progress---it computed one possible 
+decomposition---the extended algorithm repeats the process.}
+@item{The second call begins with the same curtailed left recursive call, now
+taken to return the decomposition computed in the first attempt. The 
+@mt[M] function's @mt[:in-hole] case continues with the call 
+@mt[(M (f (f hole)) (f hole))], which computes the decomposition
+@pt[(decomposes (f (f hole)) (f hole) (f hole) (f hole))].
+The call to @mt[combine] composes this decomposition with the previous to
+conclude that @pt[(decomposes (f (f hole)) (f hole) (f hole) C)]. Because
+the second call discovered an additional @wt[C] decomposition, the extended 
+algorithm repeats the process again.}
+@item{In the third call, the result of the curtailed left recursive call 
+includes the additional decomposition
+@pt[(decomposes (f (f hole)) (f hole) (f hole) C)]. This result induces the call
+@mt[(M (f hole) (f hole))], which computes the match 
+@pt[(matches (f hole) (f hole))] (as well as the decomposition
+@pt[(decomposes (f hole) (f hole) hole (f hole))]). This match leads @mt[M] to
+conclude via @mt[combine] that @pt[(matches (f (f hole)) (in-hole C (f hole)))], 
+and consequently that @pt[(matches (f (f hole)) C)]. The extended algorithm
+repeats to process once more to conclude that no more matches or decompositions
+by @wt[C] are possible.}
+]

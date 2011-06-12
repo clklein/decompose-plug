@@ -28,5 +28,5 @@ understanding of evaluation context semantics.
 Thanks also to Matthias Felleisen and Matthew Flatt for
 helpful discussions on the work.
 
-@section{Appendix}
+@section[#:tag "sec:proof"]{Appendix}
 @element[(style "input" '(exact-chars)) '("core-algorithm-correctness-txt.tex")]
