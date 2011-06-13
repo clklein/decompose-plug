@@ -1,15 +1,6 @@
-Definition (Left Recursion)
-1. ->_G ⊆ p x p is the least relation such that
-  a. (nt n) ->_G p if p in G(n),
-  b. (in-hole p p') ->_G p,
-  c. (in-hole p p') ->_G p' if G ⊢ hole : p | b, and
-  d. (name x p) ->G p.
-2. G has is left recursive if p ->_G^* p' and p' ->_G^* p for some p
-and p', where ->_G^*p is the transitive closure of ->_G.
-
-Theorem (Core Algorithm Correctness):
-For all G, p, and t, if G is not left recursive,
-then b ∈ matches[| G, p, t |] iff G ⊢ t : p | b.
+BEGIN-INLINE-LATEX
+\correctnessthm{}
+END-INLINE-LATEX
 Proof:
 If b ∈ matches[| G, p, t |], then (•, b) ∈ M[| G, p, t |],
 which by soundness implies G ⊢ t : p | b.

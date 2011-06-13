@@ -79,17 +79,16 @@ wrapper function @mt[matches] restricts this set to the bindings associated with
 match derivations. More precisely, the following result holds (see 
 @secref{sec:proof}).
 
-Definition (Left Recursion)
-
-Theorem (Correctness for Grammars without Left Recursion)
+@(element (style "leftrecurdef" '()) "")
+@(element (style "correctnessthm" '()) "")
 
 Parsing algorithms that support left recursive context-free grammars go back 
-nearly fifty years @~cite[kuno-cacm65]. We refer the reader to 
+nearly fifty years@~cite[kuno-cacm65]. We refer the reader to
 @citet[frost-iwpt07-sec3] for a summary. Some of these algorithms appear 
 adaptable to our setting,@note{We discovered this line of work only recently; if
 the PC knows of other papers we should read, we would love pointers.} though we 
-have investigated only one, an extension of the packrat parsing algorithm 
-@~cite[warth-pepm08]. This extension dynamically detects left recursion and 
+have investigated only one, an extension of the packrat parsing
+algorithm@~cite[warth-pepm08]. This extension dynamically detects left recursion and 
 treats the choice leading to it as a failure. If the other choices for the same 
 portion of the input make any progress at all, the algorithm repeats the parse
 attempt, in hopes that the entries added to the memo table during the failed

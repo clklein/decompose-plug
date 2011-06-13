@@ -30,6 +30,14 @@
                             line))
                  
                  (cond
+                   [(equal? "BEGIN-INLINE-LATEX" line)
+                    (let loop ()
+                      (define next-line (read-line in-port))
+                      (when (eof-object? next-line)
+                        (error 'txt-to-tex "undelimited inline Latex"))
+                      (unless (equal? "END-INLINE-LATEX" next-line)
+                        (displayln next-line out-port)
+                        (loop)))]
                    [(regexp-match #rx"-*- Mode" line)
                     (void)]
                    [(regexp-match #rx"^ *$" line)
