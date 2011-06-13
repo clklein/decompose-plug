@@ -1,16 +1,18 @@
 A Semantics for Context-Sensitive Reduction Semantics
 Casey Klein, Jay McCarthy, Steven Jaconette, Robert Bruce Findler
 
-This paper explores Felleisen-Hieb-style operational semantics from a
-term rewriting perspective. More precisely, it contains a formalism
-system that gives a meaning for evaluation-context based semantics,
-specifically showing how to interpret decomposition and plugging
-formally. The semantics is not naturally algorithmic, so the paper
-also gives an algorithm for matching and proves that the algorithm
-matches the semantics.
+This paper explores the semantics of the meta-notation used in the
+style of operational semantics introduced by Felleisen and Hieb.
+Specifically, it defines a formal system that gives precise meanings
+to the notions of contexts, decomposition, and plugging (or
+recomposition) left implicit in most expositions. This semantics is
+not naturally algorithmic, so the paper also provides an algorithm and
+proves a correspondence with the declarative definition.
 
-The work is inspired by PLT Redex, a domain-specific programming
-language for operational semantics and it draws heavily on our
-experience building operational semantics and struggling to nail down
-how a semantics behaves.
-
+The motivation for this investigation is PLT Redex, a domain-specific
+programming language designed to support Felleisen-Hieb-style
+definitions with minimal changes from the conventional
+pencil-and-paper notation. Since Redex's first release, its semantics
+for contexts as changed several times, as we repeatedly encountered
+reduction systems that did not behave according to their authors'
+intent. The work describes the result of that experience.
