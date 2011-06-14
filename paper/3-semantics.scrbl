@@ -10,7 +10,7 @@
           "../sem-sem/patterns.rkt"
           "../sem-sem/non-syntax-directed-match-define-relation.rkt")
 
-@title{A Semantics for Matching}
+@title[#:tag "sec:match-rules"]{A Semantics for Matching}
 This section formalizes the intuition that a term @math{t} decomposes into 
 @math{C[e]} when @math{t} can be partitioned into two smaller terms @math{t'} 
 and @math{t''} such that @math{t'} matches the pattern @math{C} and @math{t''} 
