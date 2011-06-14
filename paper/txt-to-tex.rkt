@@ -78,10 +78,17 @@
     [(#\⊤) "\\ensuremath{\\top}"]
     [(#\•) "\\ensuremath{\\bullet}"]
     [(#\⊆) "\\ensuremath{\\subseteq}"]
+    [(#\≤) "\\ensuremath{\\leq}"]
     [else
      (unless (<= (char->integer x) 127)
-       (eprintf "WARNING: cannot translate ~a\n" x))
+       (show-warning x))
      (string x)]))
+
+(define warning-shown '())
+(define (show-warning x)
+  (unless (member x warning-shown)
+    (set! warning-shown (cons x warning-shown))
+    (eprintf "WARNING: cannot translate ~a\n" x)))
 
 ;; txt-to-tex-name : string -> string
 ;; converts the name of a file from its .txt to its latex name
