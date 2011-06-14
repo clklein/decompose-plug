@@ -9,3 +9,5 @@
 - Section 4: address the algorithm's complexity?
 - Section 4: backtracking parsers typically use memoization to avoid
   exponential complexity. Mention that we can do the same.
+- Appendix: fix "[|", "|]", "->_G", and "-/>_G^*"
+- Appendix: update for reordered cases and flattened context data def

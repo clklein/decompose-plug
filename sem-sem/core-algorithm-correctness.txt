@@ -56,7 +56,7 @@ Case: within `cons' clause
 Each call supplies a strictly smaller term.
 
 Lemma (Non-increasing subterms)
-If ((C, t'), b) ∈ M[| G, p, t |], then |t'| <= |t|.
+If ((C, t'), b) ∈ M[| G, p, t |], then |t'| ≤ |t|.
 Proof: By induction on the M derivation.
 
 Case: M-hole-hole
@@ -70,7 +70,7 @@ Impossible, since the result is not a decomposition.
 
 Case: M-name
 Suppose ((C, t'), b) ∈ M[| G, p, t |].
-By induction, |t'| <= |t|.
+By induction, |t'| ≤ |t|.
 
 Case: M-nt
 Similar to M-name.
@@ -78,7 +78,7 @@ Similar to M-name.
 Case: M-in-hole
 Suppose ((C_h, t_h), b_h) ∈ M[| G, p_h, t_c |].
 combine[| C, (C_h, t_h) |] = (C ++ C_h, t_h).
-|t_h| <= |t_c| and |t_c| <= |t|, both by induction.
+|t_h| ≤ |t_c| and |t_c| ≤ |t|, both by induction.
 
 Case: M-cons
 By the definition of `select', there are two possibilities:
@@ -87,7 +87,7 @@ By the definition of `select', there are two possibilities:
     (•, b_r) ∈ M[| G, p_r, t_r |].
 
     select[| t_l, (C_l, t_l'), t_r, • |] = {((left t_r):C_l, t_l')}
-    |t_l'| <= |t_l| by induction
+    |t_l'| ≤ |t_l| by induction
            < |(cons t_l t_r)|
 
   Subcase:
