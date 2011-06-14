@@ -61,8 +61,9 @@
 (define oopsla (string-append ACM Conference "Object-Oriented Programming, Systems, Languages, and Applications"))
 (define acl2 (string-append International Workshop "ACL2 Theorem Prover and its Applications"))
 (define itp (string-append International Conference "Interactive Theorem Proving"))
-
+(define ifl (string-append Symposium "Implementation and Application of Functional Languages"))
 (define pepm (string-append ACM SIGPLAN Workshop "Partial Evaluation and Program Manipulation"))
+(define hosc "Higher-Order and Symbolic Computation")
 (define iwpt "International Conference on Parsing Technology")
 (define sofsem "Seminar on Current Trends in Theory and Practice of Informatics")
 
@@ -278,13 +279,13 @@
                      "Jacob Matthews")
    #:location (book-location #:publisher "Cambridge University Press")))
 
-(define PoplMark
+(define POPLmark
   (make-bib
    #:author (authors "Brian E. Aydemir" "Aaron Bohannon" "Matthew Fairbairn"
                      "J. Nathan Foster" "Benjamin C. Pierce" "Peter Sewell"
                      "Dimitrios Vytiniotis" "Geoffrey Washburn" "Stephanie Weirich"
                      "Steve Zdancewic")
-   #:title "Mechanized Metatheory for the Masses: The PoplMark Challenge"
+   #:title "Mechanized Metatheory for the Masses: The POPLmark Challenge"
    #:location (proceedings-location tphols
                                     #:series lncs
                                     #:volume 3603
@@ -502,7 +503,7 @@
                                 #:pages '(265 301))
    #:date "1997"))
   
-(define berendrecht 
+(define berendregt 
   (make-bib 
     #:author "H. P. Barendregt"
     #:title "The Lambda Calculus: Its Syntax and Semantics"
@@ -555,3 +556,38 @@
                      "Todd Millstein")
    #:location (proceedings-location pepm #:pages '(103 110))
    #:date 2008))
+
+(define xiao-hosc01
+  (make-bib
+   #:title "From Syntactic Theories to Interpreters: Automating the Proof of Unique Decomposition"
+   #:author (authors "Yong Xiao" "Amr Sabry" "Zena M. Ariola")
+   #:location (journal-location hosc
+                                #:volume 14
+                                #:number "4"
+                                #:pages '(387 409))
+   #:date 2001))
+
+(define dubois-tphols00
+  (make-bib
+   #:author "Catherine Dubois"
+   #:title "Proving ML Type Soundness Within Coq"
+   #:location (proceedings-location tphols
+                                    #:series lncs
+                                    #:volume 1869
+                                    #:pages '(126 144))
+   #:date "2000"))
+
+(define refocusing
+  (make-bib
+   #:author (authors "Olivier Danvy" "Lasse R. Nielsen")
+   #:title "Refocusing in Reduction Semantics"
+   #:location (techrpt-location #:institution "Aarhus University" 
+                                #:number "BRICS RS-04-26")
+   #:date "2004"))
+
+(define refocusing-formalized
+  (make-bib
+   #:author (authors "Filip Sieczkowski" "Malgorzata Biernacka" "Dariusz Biernacki")
+   #:title "Automating Derivations of Abstract Machines from Reduction Semantics: A Generic Formalization of Refocusing in Coq"
+   #:location (proceedings-location ifl #:series (format "To appear in ~a" lncs))
+   #:date "2010"))

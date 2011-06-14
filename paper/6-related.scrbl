@@ -1,63 +1,58 @@
 #lang scribble/base
-@(require "citations.rkt")
+@(require scribble/manual
+          scriblib/footnote
+          scriblib/figure
+          "citations.rkt")
 @title{Related Work}
 
-Contexts date back at least to @citet[berendrecht], who used them to define the compatible closure
-of a reduction relation. @citet[felleisen-hieb] exploited the power of a selective
-notion of context to give equational semantics for many aspects of programming languages,
-notably continuations and state. 
+@citet[berendregt] makes frequent use of a notion of contexts specialized to 
+@math{λ}-terms. Like ours, these contexts may contain multiple holes, but
+plug's behavior differs in that it fills all of the context's holes. 
+@citet[felleisen-hieb] exploited the power of a selective notion of context 
+to give equational semantics for many aspects of programming languages, 
+notably continuations and state. The meaning of multi-holed contexts does
+not arise in their work, since the grammar for contexts restricts them
+to exactly one hole.
 
-Later, @citet[context-sensitive-rewriting-fundamentals]
-explored contexts from a rewriting perspective, much like we do in the present work. 
-Lucas's definitions, however, do not even accomodate the first context-sensitive
-rewriting system in @secref["sec:examples"], because his formalism limits each
-function symbol to a single place where rewriting can occur. The followup work in the
-rewriting community seems to have focused on tools for proving termination of
-such rewriting systems, something that is generally of limited interest when studying a rewriting
-systems that are designed to model programming languages (as programming 
-languages are typically known not to terminate).
+@citet[context-sensitive-rewriting-fundamentals] later explored an alternative
+formulation of selective contexts. This formulation defines contexts not by
+grammars but by specifying for each function symbol which sub-term positions
+may be reduced. Because the specification depends only on the function symbol's
+identity (i.e., and not on the sibling sub-terms), this formulation cannot express
+common evaluation strategies, such as call-by-value and call-by-name. Follow-up
+work on this form of context-sensitive rewriting focuses on tools for proving
+termination, generally a topic of limited interest when studying reduction 
+systems designed to model programming languages (which tend to allow 
+non-termination).
 
-Finally, for some perspective, without our system the careful researcher typically
-supplies both a one-off plugging function and decomposition function, as exemplified
-by @citet[example-of-using-contexts-with-explicit-deompose-and-plug]'s work.
+As part of their work on SL, a meta-language similar to Redex, @citet[xiao-hosc01]
+define a semantics for Felleisen-Hieb contexts by translating grammars to finite 
+tree automata. This indirect approach allows SL to prove decomposition lemmas 
+automatically using existing automata algorithms, but it is considerably more
+complicated our approach and does not allow for multi-hole contexts.
 
-Other notes:
-@itemlist[
-@item{Barendregt (1st ed. 1981, 2nd ed. 1984) uses contexts but not to
-restrict where reduction occurs. Contexts can have multiple holes;
-plug fills all of them (p. 29). “Multiple numbered contexts” (p. 375)
-associate names with each hole to allow different holes to be plugged
-with different terms. It's not clear from his definition what plug
-does when multiple holes have the same name. Felleisen (Expressive
-Power of PLs 1990) also defines multiple number contexts (Definition
-3.4); it's clear from his definition that plug fills all
-occurrences of each named hole.}
-@item{Felleisen (dissertation 1987) defines contexts as grammars and uses
-them to restrict reduction. Contexts are restricted to a single hole
-(p. 27). The reduction system reifies continuations into lambdas (p.
-100), avoiding the ambiguity of plug/decompose wrt multi-holed
-contexts. Felleisen and Hieb (Revised Report 1992) and Sitaram and
-Felleisen (Reasoning with Continuations II 1990) also reify
-continuations into lambdas.}
-@item{Lucas (Fundamentals of Context-Sensitive Rewriting 1995) defines a
-more restrictive notion of context-sensitivity which notably cannot
-express call-by-value or call-by-name evaluation contexts.}
-@item{Danvy (Refocusing 2004) says that the meaning of evaluation contexts
-is given by a plug function, defined separately. Decomposition is also
-defined in terms of this plug function. In another paper (An
-Operational Foundation for Delimited Continuations in the CPS
-Hierarchy 2005), he gives an independent definition of decomposition
-(but it still inverts plug).}
-@item{Millikin (blog comment: http://tinyurl.com/44egua8) says that decomposition 
-should be given explicitly.}
-@item{Dubois (http://portal.acm.org/citation.cfm?id=695035) encodes a reduction 
-semantics in Coq, with evaluation contexts as meta-level functions from terms to 
-terms (constrained to coincide with a standard grammar for single-hole contexts), 
-plug as meta-level application, and decompose as the inverse of plug. She claims 
-her encoding to be the first formal treatment of evaluation contexts.}
-@item{The PoplMark Challenge involves a context-sensitive reduction
-semantics. Three of the submitted solutions use Dubois' encoding.
-Another uses a first-order representation of contexts, defines plug
-explicitly, and takes decompose to be plug's inverse. (The rest of the
-solutions use SOS, don't tackle parts of the challenge involving
-dynamic semantics, or are no longer online.)}]
+@citet[dubois-tphols00] develops what may be the first formulation of a 
+Felleisen-Hieb reduction semantics in a proof assistant, as part of a mechanized
+proof of the soundness of ML's type system. Her formulation encodes single-hole 
+contexts as meta-level term-to-term functions (restricted to coincide with the 
+usual grammar defining call-by-value evaluation) and therefore models plug as 
+meta-application. The formulation does not use an explicit notion of 
+decomposition; instead, the contextual closure reduction rule applies to term 
+@math{t} when plugging context @math{C} with term @math{t'} yields @math{t}. 
+Three of the solutions submitted to the POPLmark Challenge@~cite[POPLmark] use 
+this same encoding for the challenge's reduction semantics. A fourth uses a 
+first-order encoding of contexts and therefore provides an explicit definition
+of plugging.@note{The other submitted solutions use structural operational 
+semantics, do not address dynamic semantics at all, or are no longer available 
+online.}
+
+In pursuit of an efficient implementation technique, @citet[refocusing] and 
+@citet[refocusing-formalized] provide an axiomatization of the various 
+components, such as a decomposition relation, that together define a reduction
+semantics. For two reasons, this axiomatization is not an appropriate basis for
+Redex. First, it requires users to specify plugging and decomposition 
+explicitly. Common practice leaves these definitions implicit, and one of our 
+design goals for Redex is to support conventional definitions with few changes. 
+Second, the axiomatization requires decomposition to be a (single-valued) 
+function, ruling out the semantics in @figure-ref{fig:arith}, and more 
+problematically, reduction semantics for multi-threaded programs.

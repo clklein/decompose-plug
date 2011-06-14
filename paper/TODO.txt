@@ -1,3 +1,7 @@
+- Section 1: explain that contexts haven't been formalized in a way
+  that captures their informal use.
+- Section 2: when discussing Figure 5 language, point to papers set up
+  this way (delimited control, CMT, others?)
 - Section 3: mechanize the construction of the example pattern used to
   explain how Redex patterns translate into core patterns.
 - Section 3: consider explaining the matches judgment form with an
