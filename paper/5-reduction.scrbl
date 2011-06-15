@@ -2,6 +2,8 @@
 @(require scribble/manual
           scriblib/figure
           scriblib/footnote
+          scribble/core 
+          scribble/decode
           redex/pict
           redex/reduction-semantics
           (only-in "../2-models/util.rkt" rr)
@@ -9,6 +11,10 @@
           "../sem-sem/patterns.rkt"
           "typeset-match-rules.rkt"
           "typeset-reduction.rkt")
+
+@(define-syntax-rule (big-footnote . args)
+   (nested-flow (style "footnote" '(command never-indents)) 
+                (decode-flow (list . args))))
 
 @title[#:tag "sec:reduction"]{A Semantics for Reduction}
 
@@ -18,6 +24,39 @@ As with patterns, we consider a core specification language that lacks
 many of the conveniences of a language like Redex but nevertheless addresses the
 principal ideas.
 
+
+
+@figure["fig:reduction" "Reduction"]{
+@verbatim{
+      r ::= a
+          | (var x)            G ⊢ t : p | b   inst(G, r, b) = t′
+          | (in-hole r r p)    ----------------------------------
+          | (cons r r)                G ⊢ t / p → t′ / r
+          | (app f r)
+      f ∈ t → t
+
+         -----------------        --------------------------
+         inst(G, a, b) = a        inst(G, (var x), b) = b(x)
+
+inst(G, r_1, b) = t_1   inst(G, r_2, b) = t_2   plug^G_p(t_1, t_2) = t
+----------------------------------------------------------------------
+            inst(G, (in-hole r_1 r_2 p), b) = t
+            
+          inst(G, r_1, b) = t_1   inst(G, r_2, b) = t_2
+          ---------------------------------------------
+          inst(G, (cons r_1 r_2), b) = (cons t_1 t_2)
+
+                      inst(G, r, b) = t
+               --------------------------------
+               inst(G, (app f r), b) = f[| t |]
+
+          G ⊢ t = C[t_2] : p | b   t_1 = uncontext[| C |]               
+          -----------------------------------------------
+                    plug^G_p(t_1, t_2) = t
+}
+}
+
+@Figure-ref{fig:reduction} shows our definition@big-footnote{
 The definition of reduction popular in the term rewriting
 community provides some guidance here. In first-order term rewriting, a
 reduction rule @math{ρ} is a pair @math{(l, r)} of usually non-ground terms.
@@ -60,40 +99,7 @@ rule:
       (render-reduction-relation
        (reduction-relation
         dummy
-        (--> (in-hole E r) (f (in-hole (g r) E))))))))
-
-
-@figure["fig:reduction" "Reduction"]{
-@verbatim{
-      r ::= a
-          | (var x)            G ⊢ t : p | b   inst(G, r, b) = t′
-          | (in-hole r r p)    ----------------------------------
-          | (cons r r)                G ⊢ t / p → t′ / r
-          | (app f r)
-      f ∈ t → t
-
-         -----------------        --------------------------
-         inst(G, a, b) = a        inst(G, (var x), b) = b(x)
-
-inst(G, r_1, b) = t_1   inst(G, r_2, b) = t_2   plug^G_p(t_1, t_2) = t
-----------------------------------------------------------------------
-            inst(G, (in-hole r_1 r_2 p), b) = t
-            
-          inst(G, r_1, b) = t_1   inst(G, r_2, b) = t_2
-          ---------------------------------------------
-          inst(G, (cons r_1 r_2), b) = (cons t_1 t_2)
-
-                      inst(G, r, b) = t
-               --------------------------------
-               inst(G, (app f r), b) = f[| t |]
-
-          G ⊢ t = C[t_2] : p | b   t_1 = uncontext[| C |]               
-          -----------------------------------------------
-                    plug^G_p(t_1, t_2) = t
-}
-}
-
-We therefore prefer the asymmetric definition in @figure-ref{fig:reduction},
+        (--> (in-hole E r) (f (in-hole (g r) E))))))))}
 in which a reduction rule's left-hand side is a pattern but its right-hand
 side is a term template @math{r} drawn from the grammar in the top-left.
 A template is either an atom, a reference to a variable bound by the rule's 
