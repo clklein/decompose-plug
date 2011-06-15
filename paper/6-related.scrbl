@@ -16,43 +16,57 @@ to exactly one hole.
 
 @citet[context-sensitive-rewriting-fundamentals] later explored an alternative
 formulation of selective contexts. This formulation defines contexts not by
-grammars but by specifying for each function symbol which sub-term positions
+grammars but by specifying, for each function symbol, which sub-term positions
 may be reduced. Because the specification depends only on the function symbol's
 identity (i.e., and not on the sibling sub-terms), this formulation cannot express
-common evaluation strategies, such as call-by-value and call-by-name. Follow-up
+common evaluation strategies, such as left-to-right, call-by-value evaluation. Follow-up
 work on this form of context-sensitive rewriting focuses on tools for proving
 termination, generally a topic of limited interest when studying reduction 
-systems designed to model programming languages (which tend to allow 
-non-termination).
+systems designed to model a programming language (as programming languages typically
+are known not to terminate).
 
 As part of their work on SL, a meta-language similar to Redex, @citet[xiao-hosc01]
 define a semantics for Felleisen-Hieb contexts by translating grammars to finite 
 tree automata. This indirect approach allows SL to prove decomposition lemmas 
 automatically using existing automata algorithms, but it is considerably more
-complicated our approach and does not allow for multi-hole contexts.
+complicated than our approach and does not allow for multi-hole contexts.
 
-@citet[dubois-tphols00] develops what may be the first formulation of a 
+@citet[dubois-tphols00] develops the first formulation of a 
 Felleisen-Hieb reduction semantics in a proof assistant, as part of a mechanized
 proof of the soundness of ML's type system. Her formulation encodes single-hole 
 contexts as meta-level term-to-term functions (restricted to coincide with the 
 usual grammar defining call-by-value evaluation) and therefore models plug as 
 meta-application. The formulation does not use an explicit notion of 
-decomposition; instead, the contextual closure reduction rule applies to term 
-@math{t} when plugging context @math{C} with term @math{t'} yields @math{t}. 
-Three of the solutions submitted to the POPLmark Challenge@~cite[POPLmark] use 
-this same encoding for the challenge's reduction semantics. A fourth uses a 
+decomposition; instead, the contextual closure reduction rule applies to terms
+when they are plugged into a given context.
+
+Berghofer's, Leroy's, and Xi's solutions to the POPLmark Challenge@~cite[POPLmark] use 
+Dubois's encoding for the challenge's reduction semantics. Vouillon's solution uses a 
 first-order encoding of contexts and therefore provides an explicit definition
-of plugging.@note{The other submitted solutions use structural operational 
+of plugging. (The other submitted solutions use structural operational 
 semantics, do not address dynamic semantics at all, or are no longer available 
-online.}
+online.)
 
 In pursuit of an efficient implementation technique, @citet[refocusing] and 
 @citet[refocusing-formalized] provide an axiomatization of the various 
-components, such as a decomposition relation, that together define a reduction
-semantics. For two reasons, this axiomatization is not an appropriate basis for
-Redex. First, it requires users to specify plugging and decomposition 
+components of a Felleisen-Hieb reduction semantics, 
+such as a decomposition relation, that together define the
+semantics. This axiomatization is not an appropriate basis for
+Redex for two reasons. First, it requires users to specify plugging and decomposition 
 explicitly. Common practice leaves these definitions implicit, and one of our 
-design goals for Redex is to support conventional definitions with few changes. 
+design goals for Redex is to support conventional definitions. 
 Second, the axiomatization requires decomposition to be a (single-valued) 
-function, ruling out the semantics in @figure-ref{fig:arith}, and more 
-problematically, reduction semantics for multi-threaded programs.
+function, ruling out the semantics in @figure-ref{fig:arith} and, more 
+problematically, reduction semantics for multi-threaded programs or 
+unspecified order of evaluation.
+
+More broadly speaking, there are 
+hundreds@note{There are more than 400 citations to the original Felleisen-Hieb paper;
+              while evaluation-context based semantics are still widely used, the paper
+              is now rarely cited as it has become a standard part of the programming
+              languages landscape.}
+of papers that use evaluation context
+semantics to model programming languages for just as many different
+purposes. Although we have not implemented all of them in Redex, we have sought out
+interesting and non-standard ones to try them out and every one we have tried
+matches the semantics we present here.
