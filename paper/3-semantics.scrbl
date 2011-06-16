@@ -12,33 +12,37 @@
 
 @title[#:tag "sec:match-rules"]{A Semantics for Matching}
 This section formalizes the notion of matching used in the definitions of
-the example reduction systems in @figure-ref{sec:examples}. For ease of 
+the example reduction systems in @secref{sec:examples}. For ease of 
 presentation, we stick to the core language of patterns and terms in
-@figure-ref{fig:pat-term}. Redex supports a richer language of patterns, 
-but these core forms suffice to illustrate the essential concepts.
+@figure-ref{fig:pat-term}. Redex supports a richer language of patterns
+(notably including a notion of Kleene star), 
+but this core captures an essence suitable for explaining the semantics
+of matching.
 
-@figure["fig:pat-term" "Patterns and Terms"]{
+@wfigure[#:size 1.7 "fig:pat-term" "Patterns and Terms"]{
 @patterns-and-terms
 }
-
 Terms @pt[t] are binary trees with atoms as leaves. Atoms @pt[a] include 
 literals such as numbers and symbols, as well as the distinguished atom 
 @pt[:hole], used in decomposition. Patterns @pt[p] take one of five forms. 
-An atomic pattern @pt[a] matches the atom @pt[a]. A pattern 
+An atomic pattern @pt[a] matches itself. A pattern 
 @pt[(:name x p)] binds the pattern variable @pt[x] to the term matched by 
-@pt[p]. Pattern variables are used in reduction rules (@secref{sec:reduction})
-and, when repeated within a pattern, to force the corresponding sub-terms to
+@pt[p]. Repeated pattern variables force the corresponding sub-terms to
 be identical. A pattern @pt[(:nt n)] matches terms that match any of the 
-productions of the non-terminal @pt[n] (defined outside the pattern). A pattern 
-@pt[(:in-hole p_1 p_2)], more conventionally written @math{p_1[p_2]}, 
-performs a decomposition. Finally, a pattern @pt[(:cons p_1 p_2)] matches 
-pairs. 
+productions of the non-terminal @pt[n] (defined outside the pattern). 
+We write decomposition patterns @math{p_1[p_2]} using a separate keyword
+for clarity: @pt[(:in-hole p_1 p_2)]. Finally, a pattern @pt[(:cons p_1 p_2)] matches 
+an interior node, with @pt[p_1] and @pt[p_2] matching the corresponding
+subterms.
 
 For example, the left-hand side of the reduction rule in 
-@figure-ref{fig:arith} could be encoded as the following pattern: 
+@figure-ref{fig:arith} corresponds to the following pattern, 
+where the literal @pt[empty] empty is used for the empty sequence:
 @centered{@pt[(:in-hole (:name C (:nt C))
-                        (:cons + (:cons (:name number_1 (:nt number))
-                                        (:name number_2 (:nt number)))))]}
+                        (:cons + 
+                               (:cons (:name number_1 (:nt number))
+                                      (:cons (:name number_2 (:nt number))
+                                             empty))))]}
 
 @figure["fig:matching" "Matching and Decomposition"]{
   @(centered combined-matching-rules)

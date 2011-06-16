@@ -130,12 +130,8 @@
 
 (define patterns-and-terms
   (with-rewriters
-   (ht-append
-    horizontal-gap-size
-    (parameterize ([render-language-nts '(p)])
+   (vl-append
+    (parameterize ([render-language-nts '(t a p)])
       (render-language patterns))
-    (vl-append
-     (parameterize ([render-language-nts '(a t)])
-       (render-language patterns))
-     (non-bnf-def "x" "Variables")
-     (non-bnf-def "n" "Non-Terminals")))))
+    (non-bnf-def "x" "Variables")
+    (non-bnf-def "n" "Non-Terminals"))))

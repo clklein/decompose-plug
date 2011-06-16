@@ -52,11 +52,11 @@
 
 (define word-gap (pict-width (text " ")))
 
-(define (non-bnf-def var dom)
+(define (non-bnf-def var dom #:wide-nt [wide-nt "e"])
   (hbl-append
    word-gap
-   (non-terminal-text var)
-   (text "∈")
+   (rbl-superimpose (non-terminal-text var) (ghost (text wide-nt)))
+   (cbl-superimpose (text "∈") (ghost (text "::=")))
    (pict/nt dom)))
 
 (define (function-domain arrow dom codom)

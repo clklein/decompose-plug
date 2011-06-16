@@ -6,20 +6,20 @@
 (provide (all-defined-out))
 
 (define-language patterns
+  ((t u) (:cons t t)
+         a)
+  (a :hole
+     literal)
   (p a
      (:name x p)
      (:nt n)
      (:in-hole p p)
      (:cons p p))
-  (a :hole
-     literal)
   (literal variable-not-otherwise-mentioned
            number)
   (x variable-not-otherwise-mentioned)
   (n variable-not-otherwise-mentioned)
   
-  ((t u) a
-         (:cons t t))
   
   (b (set (pair x v) ...))
   (v t C)

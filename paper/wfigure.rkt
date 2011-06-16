@@ -24,6 +24,8 @@
 (define (wfigure/proc tag caption size args)
   (define rendered-size
     (cond
+      [(equal? size 1.7) "OS"]
+      [(equal? size 1.8) "OE"]
       [(equal? size 2) "T"]
       [(equal? size 2.5) "TF"]
       [(equal? size 2.2) "TT"]

@@ -182,6 +182,12 @@ the rule for grabbing a continuation exploits this factoring
 to record only the portion of the context between
 @rr[call/comp] and the nearest enclosing prompt in a continuation.
 
+@wfigure["fig:wacky" "Wacky Context"]{
+@(vl-append 
+  4
+  (render-language wacky)
+  (render-language wacky-inside-out))
+}
 The interesting aspect of this system is how @rr[M] refers to @rr[E] 
 and how that makes it difficult to support an algorithm
 that matches @rr[M]. For all of the example systems so far in
@@ -191,13 +197,6 @@ the entire term and, once a match has been found, attempting to
 match what appeared at the hole against @rr[e]. With @rr[M], however,
 this leads to an infinite loop because @rr[M] expands to a
 decomposition that includes @rr[M] in the first position.
-
-@wfigure["fig:wacky" "Wacky Context"]{
-@(vl-append 
-  4
-  (render-language wacky)
-  (render-language wacky-inside-out))
-}
 
 A simple fix that works for the delimited continuations 
 example is to treat such
