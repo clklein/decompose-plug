@@ -6,15 +6,12 @@
 (define (rewrite-append-contexts lws)
   (list "" (list-ref lws 2) " ++ " (list-ref lws 3) ""))
 
-(define (rewrite-matches lws)
-  (list ""
-        (list-ref lws 2)
-        " ⊢ "
-        (list-ref lws 3)
-        " : "
-        (list-ref lws 4)
-        " | "
-        (list-ref lws 5)))
+(define rewrite-matches
+  (match-lambda
+    [(list lp m G t p b rb)
+     (list "" G " ⊢ " t " : " p " | " b)]
+    [(list lp m t p rb)
+     (list "" t " : " p)]))
 
 (define rewrite-productions
   (match-lambda

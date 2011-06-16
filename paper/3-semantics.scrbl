@@ -10,14 +10,12 @@
           "../sem-sem/patterns.rkt"
           "../sem-sem/non-syntax-directed-match-define-relation.rkt")
 
-@title{A Semantics for Matching}
-This section formalizes the intuition that a term @math{t} decomposes into 
-@math{C[e]} when @math{t} can be partitioned into two smaller terms @math{t'} 
-and @math{t''} such that @math{t'} matches the pattern @math{C} and @math{t''} 
-matches the pattern @math{e}. For ease of presentation, we stick to the core 
-language of patterns and terms in @figure-ref{fig:pat-term}. Redex supports 
-a richer language of patterns, but the present forms suffice to illustrate 
-the essential concepts.
+@title[#:tag "sec:match-rules"]{A Semantics for Matching}
+This section formalizes the notion of matching used in the definitions of
+the example reduction systems in @figure-ref{sec:examples}. For ease of 
+presentation, we stick to the core language of patterns and terms in
+@figure-ref{fig:pat-term}. Redex supports a richer language of patterns, 
+but these core forms suffice to illustrate the essential concepts.
 
 @figure["fig:pat-term" "Patterns and Terms"]{
 @patterns-and-terms

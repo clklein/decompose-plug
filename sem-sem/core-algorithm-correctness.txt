@@ -1,15 +1,6 @@
-Definition (Left Recursion)
-1. ->_G ⊆ p x p is the least relation such that
-  a. (nt n) ->_G p if p in G(n),
-  b. (in-hole p p') ->_G p,
-  c. (in-hole p p') ->_G p' if G ⊢ hole : p | b, and
-  d. (name x p) ->G p.
-2. G has is left recursive if p ->_G^* p' and p' ->_G^* p for some p
-and p', where ->_G^*p is the transitive closure of ->_G.
-
-Theorem (Core Algorithm Correctness):
-For all G, p, and t, if G is not left recursive,
-then b ∈ matches[| G, p, t |] iff G ⊢ t : p | b.
+BEGIN-INLINE-LATEX
+\correctnessthm{}
+END-INLINE-LATEX
 Proof:
 If b ∈ matches[| G, p, t |], then (•, b) ∈ M[| G, p, t |],
 which by soundness implies G ⊢ t : p | b.
@@ -65,7 +56,7 @@ Case: within `cons' clause
 Each call supplies a strictly smaller term.
 
 Lemma (Non-increasing subterms)
-If ((C, t'), b) ∈ M[| G, p, t |], then |t'| <= |t|.
+If ((C, t'), b) ∈ M[| G, p, t |], then |t'| ≤ |t|.
 Proof: By induction on the M derivation.
 
 Case: M-hole-hole
@@ -79,7 +70,7 @@ Impossible, since the result is not a decomposition.
 
 Case: M-name
 Suppose ((C, t'), b) ∈ M[| G, p, t |].
-By induction, |t'| <= |t|.
+By induction, |t'| ≤ |t|.
 
 Case: M-nt
 Similar to M-name.
@@ -87,7 +78,7 @@ Similar to M-name.
 Case: M-in-hole
 Suppose ((C_h, t_h), b_h) ∈ M[| G, p_h, t_c |].
 combine[| C, (C_h, t_h) |] = (C ++ C_h, t_h).
-|t_h| <= |t_c| and |t_c| <= |t|, both by induction.
+|t_h| ≤ |t_c| and |t_c| ≤ |t|, both by induction.
 
 Case: M-cons
 By the definition of `select', there are two possibilities:
@@ -96,7 +87,7 @@ By the definition of `select', there are two possibilities:
     (•, b_r) ∈ M[| G, p_r, t_r |].
 
     select[| t_l, (C_l, t_l'), t_r, • |] = {((left t_r):C_l, t_l')}
-    |t_l'| <= |t_l| by induction
+    |t_l'| ≤ |t_l| by induction
            < |(cons t_l t_r)|
 
   Subcase:

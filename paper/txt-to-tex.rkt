@@ -30,6 +30,14 @@
                             line))
                  
                  (cond
+                   [(equal? "BEGIN-INLINE-LATEX" line)
+                    (let loop ()
+                      (define next-line (read-line in-port))
+                      (when (eof-object? next-line)
+                        (error 'txt-to-tex "undelimited inline Latex"))
+                      (unless (equal? "END-INLINE-LATEX" next-line)
+                        (displayln next-line out-port)
+                        (loop)))]
                    [(regexp-match #rx"-*- Mode" line)
                     (void)]
                    [(regexp-match #rx"^ *$" line)
@@ -70,10 +78,17 @@
     [(#\⊤) "\\ensuremath{\\top}"]
     [(#\•) "\\ensuremath{\\bullet}"]
     [(#\⊆) "\\ensuremath{\\subseteq}"]
+    [(#\≤) "\\ensuremath{\\leq}"]
     [else
      (unless (<= (char->integer x) 127)
-       (eprintf "WARNING: cannot translate ~a\n" x))
+       (show-warning x))
      (string x)]))
+
+(define warning-shown '())
+(define (show-warning x)
+  (unless (member x warning-shown)
+    (set! warning-shown (cons x warning-shown))
+    (eprintf "WARNING: cannot translate ~a\n" x)))
 
 ;; txt-to-tex-name : string -> string
 ;; converts the name of a file from its .txt to its latex name
