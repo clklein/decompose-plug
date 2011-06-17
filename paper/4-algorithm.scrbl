@@ -52,7 +52,7 @@ term is identical to the atom.
 The (meta) context in which a call to @mt[M] appears may eventually discard some 
 or all of the results it receives. For example, consider the fourth clause,
 which handles @mt[:cons] patterns. If the term is also a pair, the case makes
-two recursive and examines the cross product of the results. For each result
+two recursive calls and examines the cross product of the results. For each result
 pair, the case merges their bindings and checks that the results are not both 
 decompositions. If neither is a decomposition, the case combines the pair into
 a match result; if exactly one is a decomposition, it extends the decomposition
@@ -76,8 +76,8 @@ Putting aside the second problem described above, the call @mt[(M G p t)]
 computes the set of @mt[b] such that @matches-schema/unframed or 
 @decomposes-schema/unframed for some @mt[C] and @mt[t_^′], and the top-level 
 wrapper function @mt[matches] restricts this set to the bindings associated with
-match derivations. More precisely, the following result holds (see 
-@secref{sec:proof}).
+match derivations. More precisely, the following result holds (the complete proof
+is given in @secref{sec:proof}).
 
 @(element (style "leftrecurdef" '()) "")
 @(element (style "correctnessthm" '()) "")
@@ -94,15 +94,17 @@ portion of the input make any progress at all, the algorithm repeats the parse
 attempt, in hopes that the entries added to the memo table during the failed
 attempt will cause a second attempt to succeed. This process continues as long
 as repeated attempts make additional progress.
-
-@(define-syntax-rule (wt t) ; "wacky term"
-   (render-lw wacky-inside-out (to-lw t)))
-
 Extending the algorithm in @figure-ref{fig:core-algo} with a similar iterative 
 phase allows matching of terms from left recursive grammars, such 
-@render-language[wacky-inside-out]. To illustrate, we trace the calls to the
-function @mt[M] in the extended algorithm for the term @wt[(f (f hole))] and
-the pattern @wt[C]. For readability, we use conventional notation for terms,
+@render-language[wacky]. 
+
+@;{|
+@(define-syntax-rule (wt t) ; "wacky term"
+   (render-lw wacky (to-lw t)))
+
+The remainder of this section works through an example derivation, showing
+how the algorithm can derive that @mt[C] matches the term @wt[(f (f hole))].
+For readability, we use conventional notation for terms,
 contexts, and patterns and omit @mt[M]'s unchanging first argument. 
 
 The extended algorithm repeats the call @mt[(M (f (f hole)) C)] three times,
@@ -136,3 +138,4 @@ and consequently that @pt[(matches (f (f hole)) C)]. The extended algorithm
 repeats to process once more to conclude that no more matches or decompositions
 by @wt[C] are possible.}
 ]
+|}
