@@ -50,9 +50,10 @@ where the literal @pt[empty] empty is used for the empty sequence:
 
 @Figure-ref{fig:matching} gives a semantics for patterns via the judgment form
 @matches-schema/unframed, which defines when the pattern @pt[p] matches the term
-@pt[t]. The grammar @pt[G] provides a meaning for non-terminals by mapping them
-to their productions. The finite map @pt[b] shows how the pattern variables of
-@pt[p] can be instantiated to yield @pt[t]. A binding map's range may include
+@pt[t]. The grammar @pt[G] is a finite map from non-terminals to sets of patterns. 
+The bindings @pt[b] is a finite map from pattern variables to terms shows how the 
+pattern variables of @pt[p] can be instantiated to yield @pt[t]. 
+A binding map's range may include
 not only terms but also encoded contexts @pt[C]. In addition to the tree 
 structure represented by a term, an encoded context also defines a path from the
 tree's root to one of its possibly many holes---specifically the one exposed by 
@@ -61,8 +62,8 @@ instantiate the right-hand sides of reduction rules (@secref{sec:reduction}).
 
 The atom rule produces an empty binding map because a pattern @pt[a] contains no
 pattern varibles. The @pt[:name] rule checks that the binding @pt[(pair x t)] is
-consistent with the bindings produced by matching @pt[p] against @pt[t].
-@note{Alternatively, one could omit the check and consider patterns 
+consistent with the bindings produced by matching @pt[p] against 
+@pt[t].@note{Alternatively, one could omit the check and consider patterns 
 @pt[(:name x p)] ill-formed when @pt[p] binds @pt[x], since such patterns are 
 not useful with finite terms.} With one small exception (explained below), 
 @pt[⊔] is the usual least upper bound of finite maps. The @pt[nt] rule applies 
