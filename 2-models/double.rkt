@@ -246,7 +246,7 @@ Also has hide-hole removing capabilities
       [`(:nt ,x) x]
       [`(:right ,x . ,stuff) (c->rt p)]
       [`(:left ,x . ,stuff) (c->rt p)]
-      [`: (c->rt p)]
+      [`:hole (c->rt p)]
       [else p])))
 
 (define/contract (p-digits->number stuff)
