@@ -109,5 +109,5 @@ prefers contexts (see @pt[merge-value]), since they the path to the hole.
 avoids this necessity.
 
 @figure["fig:binding-consistency" "The least upper bound of bindings. Cases apply in order."]{
-  @(centered binding-consistency)
+  Remove!
 }

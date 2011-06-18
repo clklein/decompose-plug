@@ -20,11 +20,24 @@
         (list-ref lws 6)
         ""))
 
+(define (rewrite-lookup lws)
+  (list "" (list-ref lws 2) "(" (list-ref lws 3) ")"))
+
 (define (rewrite-meta-app lws)
   (list "δ(" (list-ref lws 2) ", " (list-ref lws 3) ")"))
 
+(define (rewrite-no-ctxts lws)
+  (list (text
+         (symbol->string (lw-e (list-ref lws 1)))
+         (metafunction-style)
+         (metafunction-font-size)) 
+        " "
+        (list-ref lws 2)))
+
 (define compound-rewriters
   (list (list 'meta-app rewrite-meta-app)
+        (list 'no-ctxts rewrite-no-ctxts)
+        (list 'lookup rewrite-lookup)
         (list 'eq rewrite-eq)
         (list 'set rewrite-set)
         (list 'pair rewrite-pair)
@@ -37,7 +50,7 @@
       ['() 
        (with-keyword-rewriters
         (λ ()
-          (vl-append
+          (vc-append
            vertical-gap-size 
            (hc-append
             horizontal-gap-size
@@ -46,7 +59,7 @@
               (vl-append
                (render-language reduction)
                (non-bnf-def "f" (arbitrary-function-domain "t" "t")))))
-           (render-metafunctions inst plug)
-           (render-metafunction non-context))))]
+           (render-metafunctions inst plug plug-ctxt)
+           (render-relation no-ctxts))))]
       [(cons (list name rewriter) rs)
        (with-compound-rewriter name rewriter (loop rs))])))

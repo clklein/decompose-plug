@@ -1,16 +1,22 @@
 #lang racket
 
 (require "reduction.rkt"
+         "../2-models/double.rkt"
+         "../2-models/models.rkt"
          (except-in redex/reduction-semantics plug))
 
-(define-syntax (test-reductions stx)
-  (syntax-case stx ()
-    [(_ language relation to-reduce expected)
-     #`(let ([actual (reductions/func `language `relation `to-reduce)])
-         #,(syntax/loc stx
-             (test-equal (alphabetical actual) (alphabetical `expected))))]))
+(define-syntax-rule (define-reduction-test-form name reduce)
+  (define-syntax (name stx)
+    (syntax-case stx ()
+      [(_ language relation to-reduce expected)
+       #`(let ([actual (reduce `language `relation `to-reduce)])
+           #,(syntax/loc stx
+               (test-equal (alphabetical actual) (alphabetical `expected))))])))
 (define (alphabetical xs)
   (sort xs string<=? #:key (λ (x) (format "~s" x))))
+
+(define-reduction-test-form test-reductions reductions)
+(define-reduction-test-form test-reductions* reductions*)
 
 (define bool-lang
   '((B (true
@@ -35,6 +41,7 @@
                  ,bool-rr
                  true
                  ())
+
 (test-reductions ,bool-lang
                  ,bool-rr
                  false
@@ -82,12 +89,12 @@
                   ((:name a (:nt a))
                    (:var a)))
                  aa
-                 (aa (:cons :hole aa)))
+                 (aa (:left :hole aa)))
 (test-reductions ((a (aa)))
                  (((:in-hole (:name x :hole) (:name a (:nt a)))
                    (:cons (:var a) (:var x))))
                  aa
-                 ((:cons aa :hole)))
+                 ((:right aa :hole)))
 
 (test-reductions ()
                  ([a (:cons a a)])
@@ -98,12 +105,12 @@
                  ([(:in-hole (:name x (:cons :hole b)) a)
                    (:in-hole (:var x) (:var x))])
                  (:cons a b)
-                 ((:cons (:cons :hole b) b)))
+                 ((:left (:left :hole b) b)))
 (test-reductions ()
                  ([(:in-hole (:name x (:cons a :hole)) b)
                    (:in-hole (:var x) (:var x))])
                  (:cons a b)
-                 ((:cons a (:cons a :hole))))
+                 ((:right a (:right a :hole))))
 
 (test-reductions ([C (:hole (:cons (:nt C) mt))]
                   [n (1 (:cons (:nt n) mt))]) 
@@ -121,5 +128,11 @@
                  ([(:in-hole (:name x (:cons :hole 2)) 1)
                     (:app ,values (:var x))])
                  (:cons 1 2)
-                 ((:cons :hole 2)))
+                 ((:left :hole 2)))
+
+(test-reductions* ()
+                  ([a b] [a e] [b c] [c c] [c d])
+                  a
+                  (d e))
+
 (test-results)

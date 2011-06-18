@@ -8,7 +8,6 @@
 (provide pt
          with-rewriters
          combined-matching-rules
-         binding-consistency
          patterns-and-terms
          matching-data-defs
          matches-schema matches-schema/unframed
@@ -74,7 +73,6 @@
 
 (define compound-rewriters
   (list (list 'append-contexts rewrite-append-contexts)
-        (list '~ rewrite-~)
         (list 'matches rewrite-matches)
         (list 'decomposes rewrite-decomposes)
         (list 'no-bindings rewrite-no-bindings)
@@ -91,7 +89,12 @@
 (define matches-schema
   (frame-rule-schema matches-schema/unframed))
 (define matches-rules
-  (with-rewriters (render-relation matches)))
+  (with-rewriters 
+   (parameterize ([relation-clauses-combine
+                   (match-lambda
+                     [(list-rest atom hole others)
+                      (apply vc-append 20 (hb-append 20 atom hole) others)])])
+     (render-relation matches))))
 
 (define decomposes-schema/unframed
   (with-rewriters (rule-schema patterns (decomposes G t C t_^′ p b))))
@@ -102,31 +105,24 @@
 
 (define matching-data-defs
   (with-rewriters
-   (ht-append
-    horizontal-gap-size
-    (vl-append
-     (non-bnf-def "G" (finite-function-domain "Non-Terminals" (powerset "p")))
-     (non-bnf-def "b" (finite-function-domain "Variables" "v"))
-     (parameterize ([render-language-nts '(v)])
-       (render-language patterns)))
-    (parameterize ([render-language-nts '(C)])
-      (render-language patterns)))))
+   (vl-append
+    (non-bnf-def "G" (finite-function-domain "Non-Terminals" (powerset "p")))
+    (non-bnf-def "b" (finite-function-domain "Variables" "t")))))
 
 (define combined-matching-rules
-  (pin-over
+  (vl-append
+   20
+   matching-data-defs
    (pin-over
-    (vc-append (+ (* 2 vertical-gap-size)
-                  (pict-height decomposes-schema))
-               matches-rules 
-               decomposes-rules)
-    0 (+ vertical-gap-size
-         (pict-height matches-rules))
-    decomposes-schema)
-   0 0 matches-schema))
-
-(define binding-consistency
-  (with-rewriters 
-   (render-metafunctions ⊔ merge-binding merge-value uncontext)))
+    (pin-over
+     (vc-append (+ (* 2 vertical-gap-size)
+                   (pict-height decomposes-schema))
+                matches-rules 
+                decomposes-rules)
+     0 (+ vertical-gap-size
+          (pict-height matches-rules))
+     decomposes-schema)
+    0 0 matches-schema)))
 
 (define patterns-and-terms
   (with-rewriters

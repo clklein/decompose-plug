@@ -91,7 +91,7 @@
                ()
                (:in-hole (:name x (:cons a (:cons :hole c))) b) 
                (:cons a (:cons b c))
-               (((x (:right a (:left c :no-ctxt))))))
+               (((x (:right a (:left :hole c))))))
    
    (build-test test:bind
                ()
@@ -102,8 +102,8 @@
                       mt)
                (((C (:cons (:cons :hole b) mt))
                  (D (:cons :hole b)))))
-   
-   (build-test test:match 
+
+   (build-test test:no-match 
                ()
                (:in-hole
                 (:cons (:name C (:cons :hole b))
@@ -140,17 +140,8 @@
                 :hole)
                (:cons (:cons :hole b)
                       (:cons :hole b))
-               (((C (:left (:cons :hole b) (:left b :no-ctxt))))
-                ((C (:right (:cons :hole b) (:left b :no-ctxt))))))
-   
-   (build-test test:bind
-               ()
-               (:cons (:in-hole (:name x (:cons :hole a))
-                                :hole)
-                      (:name x (:cons :hole a)))
-               (:cons (:cons :hole a)
-                      (:cons :hole a))
-               (((x (:left a :no-ctxt)))))
+               (((C (:left (:left :hole b) (:cons :hole b))))
+                ((C (:right (:cons :hole b) (:left :hole b))))))
    
    (build-test test:bind
                ()
@@ -158,7 +149,7 @@
                                             (:cons :hole c)))
                          b)
                (:cons a (:cons b c))
-               (((x (:right a (:left c :no-ctxt))))))
+               (((x (:right a (:left :hole c))))))
    
    (let ([λv `([e ((:cons (:nt e) (:cons (:nt e) mt))
                    (:nt x)
@@ -183,14 +174,13 @@
                        (:in-hole (:name E (:nt E)) (:name e (:nt e)))
                        ,(encode-term '((λ (x) x) (λ (y) y)))
                        (((e ,(encode-term '((λ (x) x) (λ (y) y))))
-                         (E :no-ctxt))
+                         (E :hole))
                         ((e ,(encode-term '(λ (x) x)))
-                         (E (:left ,(encode-term '((λ (y) y)))
-                             :no-ctxt)))
+                         (E (:left :hole
+                                   ,(encode-term '((λ (y) y))))))
                         ((e ,(encode-term '(λ (y) y)))
                          (E (:right ,(encode-term '(λ (x) x))
-                             (:left mt
-                              :no-ctxt))))))
+                                    (:left :hole mt))))))
            
            (build-test test:bind
                        ,λv 
@@ -202,8 +192,7 @@
                        ,(encode-term '(:hole ((λ (x) x) (λ (y) y))))
                        (((r ,(encode-term '((λ (x) x) (λ (y) y))))
                          (E (:right :hole
-                             (:left mt
-                              :no-ctxt))))))
+                                    (:left :hole mt))))))
            
            (build-test test:match ,λv (:nt v) ,(encode-term '(:hole :hole)))
            
@@ -212,11 +201,11 @@
                        (:in-hole (:name E (:nt E)) (:name e (:nt e)))
                        ,(encode-term '(:hole :hole))
                        (((e (:cons :hole (:cons :hole mt)))
-                         (E :no-ctxt))
+                         (E :hole))
                         ((e :hole)
-                         (E (:left (:cons :hole mt) :no-ctxt)))
+                         (E (:left :hole (:cons :hole mt))))
                         ((e :hole)
-                         (E (:right :hole (:left mt :no-ctxt))))))
+                         (E (:right :hole (:left :hole mt))))))
            
            (build-test test:bind
                        ,λv
@@ -241,22 +230,26 @@
    
    (let ([L '([W (:hole
                   (:cons (:in-hole (:name x (:nt W))
-                                   (:cons (:nt n) (:cons :hole mt)))
-                         (:cons (:name x (:nt W))
-                                mt)))]
+                                   (:cons (:nt n) :hole))
+                         (:name x (:nt W))))]
               [n (1 2 3 4 5)])])
-     (build-test test:match ,L (:nt W) ,(encode-term '((1 :hole) :hole)))
-     (build-test test:match ,L (:nt W)
-                 ,(encode-term '(((1 (2 :hole)) :hole) 
-                                 ((1 :hole) :hole))))
-     (build-test test:match ,L (:nt W) 
-                 ,(encode-term '((((1 (2 (3 :hole))) :hole) ((1 :hole) :hole))
-                                 (((1 (2 :hole)) :hole) ((1 :hole) :hole)))))
-     (build-test test:bind
-                 ,L (:in-hole (:nt W) (:name n (:nt n)))
-                 ,(encode-term '((((1 (2 (3 4))) :hole) ((1 :hole) :hole))
-                                 (((1 (2 :hole)) :hole) ((1 :hole) :hole))))
-                 (((n 4)))))
+     (list
+      (build-test test:match ,L (:nt W) (:cons (:cons 1 :hole) :hole))
+      (build-test test:match ,L (:nt W)
+                  (:cons (:cons (:cons 1 (:cons 2 :hole)) :hole)
+                         (:left (:right 1 :hole) :hole)))
+      (build-test test:match ,L (:nt W)
+                  (:cons (:cons (:cons (:cons 1 (:cons 2 (:cons 3 :hole))) :hole)
+                                (:left (:right 1 :hole) :hole))
+                         (:left (:left (:right 1 (:right 2 :hole)) :hole)
+                                (:left (:right 1 :hole) :hole))))
+      (build-test test:bind
+                  ,L (:in-hole (:nt W) (:name n (:nt n)))
+                  (:cons (:cons (:cons (:cons 1 (:cons 2 (:cons 3 4))) :hole)
+                                (:left (:right 1 :hole) :hole))
+                         (:left (:left (:right 1 (:right 2 :hole)) :hole)
+                                (:left (:right 1 :hole) :hole)))
+                  (((n 4))))))
    
    ;;;; tests originally written for non-syntax-directed matcher ;;;;
    
@@ -283,7 +276,7 @@
    (build-test test:no-match () (:in-hole :hole a) b)
    
    (build-test test:bind () (:in-hole (:name x (:cons a :hole)) b) (:cons a b)
-               (((x (:right a :no-ctxt)))))
+               (((x (:right a :hole)))))
    
    (build-test test:match () (:in-hole (:cons :hole b) a) (:cons a b))
    (build-test test:match () (:in-hole (:cons a :hole) b) (:cons a b))
@@ -304,8 +297,8 @@
                                        (:nt hole-or-n)))
                          (:nt n))
                (:cons 1 2)
-               (((x (:left 2 :no-ctxt)))
-                ((x (:right 1 :no-ctxt)))))
+               (((x (:left :hole 2)))
+                ((x (:right 1 :hole)))))
    
    (build-test test:match
                () 
@@ -315,8 +308,29 @@
                () 
                (:in-hole (:name x (:in-hole (:cons a :hole) (:cons b :hole))) c)
                (:cons a (:cons b c))
-               (((x (:right a (:right b :no-ctxt))))))
+               (((x (:right a (:right b :hole))))))
   
+   ;;;; matching contexts ;;;;
+   (build-test test:no-match () a (:left :hole a))
+   (build-test test:no-match () a (:right a :hole))
+   
+   (build-test test:match () (:cons :hole a) (:left :hole a))
+   (build-test test:match () (:cons a :hole) (:right a :hole))
+   
+   (build-test test:bind () (:name x (:cons :hole a)) (:left :hole a) 
+               (((x (:left :hole a)))))
+   (build-test test:bind () (:name x (:cons a :hole)) (:right a :hole) 
+               (((x (:right a :hole)))))
+   
+   (build-test test:bind ()
+               (:in-hole (:name x (:cons :hole :hole)) a)
+               (:left :hole a)
+               (((x (:right :hole :hole)))))
+   
+   (build-test test:match ()
+               (:in-hole (:cons :hole a) (:cons b :hole))
+               (:left (:right b :hole) a))
+   
    ;;;; other tests ;;;;
    (build-test test:no-match () (:name x (:cons (:name x a) b)) (:cons a b))
    
@@ -349,19 +363,17 @@
                  ,(encode-term '((λ x x) (reset (succ (reset ((λ x x) (r 2)))))))
                  (((C
                     (:right ,(encode-term '(λ x x))
-                     (:left mt
-                      (:left ,(encode-term '(2))
-                       :no-ctxt))))
+                            (:left (:left :hole ,(encode-term '(2))) 
+                                   mt)))
                    (M
                     (:right ,(encode-term '(λ x x))
-                     (:left mt
-                      (:right reset
-                       (:left mt
-                        (:right succ
-                         (:left mt
-                          (:right reset
-                           (:left mt
-                            :no-ctxt)))))))))))))))
+                            (:left (:right reset
+                                           (:left (:right succ
+                                                          (:left (:right reset
+                                                                         (:left :hole mt))
+                                                                 mt))
+                                                  mt))
+                                   mt)))))))))
 
 (define flattened-tests
   (foldr (λ (test/list tests)

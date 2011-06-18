@@ -37,9 +37,9 @@
     (match pat
       [':hole
        (if (eq? ':hole term)
-           (set (mtch (decomp ':no-ctxt ':hole) empty-bindings)
+           (set (mtch (decomp ':hole ':hole) empty-bindings)
                 (mtch (no-decomp) empty-bindings))
-           (set (mtch (decomp ':no-ctxt term) empty-bindings)))]
+           (set (mtch (decomp ':hole term) empty-bindings)))]
       [(? atom?)
        (if (eq? pat term)
            (set (mtch (no-decomp) empty-bindings))
@@ -55,7 +55,7 @@
        (==> (go p1 term seen)
             (match-lambda
               [(mtch (and (decomp C t1)) b1)
-               (==> (go p2 t1 (if (eq? C ':no-ctxt) seen (set)))
+               (==> (go p2 t1 (if (eq? C ':hole) seen (set)))
                     (match-lambda
                       [(mtch d2 b2)
                        (merge-decomp C b1 d2 b2)]))]
@@ -63,7 +63,7 @@
                (set)]))]
       [`(:cons ,p1 ,p2)
        (match term
-         [`(:cons ,t1 ,t2)
+         [`(,(? constructor?) ,t1 ,t2)
           (==> (go p1 t1 (set))
                (λ (m1)
                  (==> (go p2 t2 (set))
@@ -118,7 +118,7 @@
                         [((no-decomp) (no-decomp))
                          (set (mtch (no-decomp) b))]
                         [((decomp C t) (no-decomp))
-                         (set (mtch (decomp `(:left ,t2 ,C) t) b))]
+                         (set (mtch (decomp `(:left ,C ,t2) t) b))]
                         [((no-decomp) (decomp C t))
                          (set (mtch (decomp `(:right ,t1 ,C) t) b))]
                         [((decomp C1 u1) (decomp C2 u2))
@@ -127,5 +127,3 @@
 (define (==> xs f)
   (for/fold ([ys (set)]) ([x xs])
     (set-union (f x) ys)))
-
-(define atom? (redex-match patterns a))

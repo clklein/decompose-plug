@@ -6,35 +6,36 @@
 (provide (all-defined-out))
 
 (define-language patterns
-  ((t u) (:cons t t)
-         a)
-  (a :hole
-     literal)
   (p a
      (:name x p)
      (:nt n)
      (:in-hole p p)
-     (:cons p p))
-  (literal variable-not-otherwise-mentioned
-           number)
+     (:cons p p)
+     :hole)
+  (a variable-not-otherwise-mentioned
+     number)
   (x variable-not-otherwise-mentioned)
   (n variable-not-otherwise-mentioned)
   
+  (t a
+     (:cons t t)
+     C)
+  (C :hole
+     (:left C t)
+     (:right t C))
   
-  (b (set (pair x v) ...))
-  (v t C)
+  (b (set (pair x t) ...))
   
   (G (D ...))
   (D [x (p ...)])
   
-  (C :no-ctxt
-     (:left t C)
-     (:right t C))
+  (k :cons :left :right) ; for convenience in matching rules
   
   (otherwise-mentioned ⊤))
 
 (define pattern? (redex-match patterns p))
-(define value? (redex-match patterns v))
+(define atom? (redex-match patterns a))
+(define constructor? (redex-match patterns k))
 (define term? (redex-match patterns t))
 (define bindings? (redex-match patterns b))
 (define grammar? (redex-match patterns G))

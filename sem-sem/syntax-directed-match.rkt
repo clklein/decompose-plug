@@ -20,12 +20,12 @@
 (define-metafunction directed-matching
   M : G p t -> (m ...)
   [(M G :hole :hole)
-   (set/id (pair (pair :no-ctxt :hole) (no-bindings)) (pair • (no-bindings)))]
+   (set/id (pair (pair :hole :hole) (no-bindings)) (pair • (no-bindings)))]
   [(M G :hole t) ; t ≠ :hole
-   (set/id (pair (pair :no-ctxt t) (no-bindings)))]
-  [(M G a a) ; a ≠ :hole
+   (set/id (pair (pair :hole t) (no-bindings)))]
+  [(M G a a)
    (set/id (pair • (no-bindings)))]
-  [(M G (:cons p_l p_r) (:cons t_l t_r))
+  [(M G (:cons p_l p_r) (k t_l t_r))
    ,(set-comp* (term ((pair d b) (in d (select t_l d_l t_r d_r))
                                  (guard (neq b ⊤))
                                  (eq b (⊔ b_l b_r))
@@ -47,19 +47,19 @@
    (set/id)])
 
 (define-metafunction directed-matching
-  named : d t -> v
+  named : d t -> t
   [(named • t) t]
-  [(named (pair C t) u) C])
+  [(named (pair C t_1) t_2) C])
 
 (define-metafunction directed-matching
   select : t d t d -> (d) or ()
-  [(select t • u •)
+  [(select t_1 • t_2 •)
    (set/id •)]
-  [(select t (pair C t_^′) u •)
-   (set/id (pair (:left u C) t_^′))]
-  [(select t • u (pair C u_^′))
-   (set/id (pair (:right t C) u_^′))]
-  [(select t (pair C t_^′) u (pair C_^′ u_^′))
+  [(select t (pair C t_1^′) t_2 •)
+   (set/id (pair (:left C t_2) t_1^′))]
+  [(select t_1 • t_2 (pair C t_2^′))
+   (set/id (pair (:right t_1 C) t_2^′))]
+  [(select t_1 (pair C t_1^′) t_2 (pair C_^′ t_2^′))
    (set/id)])
 
 (define-metafunction directed-matching

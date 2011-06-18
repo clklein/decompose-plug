@@ -2,7 +2,6 @@
 
 (require "non-syntax-directed-match.rkt"
          "shared-test-cases.rkt"
-         "patterns.rkt"
          "common.rkt"
          redex/reduction-semantics
          racklog
@@ -21,18 +20,7 @@
     [(test:no-match _ L p t)
      (empty? (all-matches L p t))]
     [(test:bind _ L p t bs)
-     (equal-bindings?
-      (map raw-bindings (all-matches L p t)) 
-      (no-contexts-bindings bs))]))
-
-(define no-contexts-bindings
-  (let ([context? (redex-match patterns C)])
-    (λ (bs)
-      (for/list ([b bs])
-        (for/list ([m b])
-          (match m
-            [(list x v)
-             (list x (term (non-context ,v)))]))))))
+     (equal-bindings? (map raw-bindings (all-matches L p t)) bs)]))
 
 (run-tests test-non-syntax-directed)
 
