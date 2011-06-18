@@ -59,7 +59,7 @@
               (vl-append
                (render-language reduction)
                (non-bnf-def "f" (arbitrary-function-domain "t" "t")))))
-           (render-metafunctions inst plug plug-ctxt)
+           (render-metafunctions inst join plug)
            (render-relation no-ctxts))))]
       [(cons (list name rewriter) rs)
        (with-compound-rewriter name rewriter (loop rs))])))
