@@ -50,13 +50,12 @@ in an expression, reducing @rr[(+ (+ 1 2) (+ 3 4))] to two different expressions
 This example tells us that our context matching semantics must support multiple decompositions for
 any given term.
 
-
 @wfigure["fig:lc" "λ-calculus"]{
 @(render-language Λ/red #:nts (remove* '(x y) (language-nts Λ/red)))
 }
 A common use of contexts is to restrict the places where a reduction may occur in order to model 
-a realistic programming language's order of evaluation
-in the lambda calculus. @Figure-ref["fig:lc"] 
+a realistic programming language's order of evaluation. 
+@Figure-ref["fig:lc"] 
 gives a definition of @rr[E] that enforces left-to-right order of evaluation. 
 For example, consider this nested set of function calls, 
 @rr[((f x) (g y))],
@@ -100,7 +99,7 @@ may be, in the argument of the @rr[|1+|] primitive,
 as well as in the function position of an application, regardless of what
 appears in the argument position. The fourth case allows evaluation in the body of
 a lambda expression that is in the function position of an application. Intuitively,
-this case says that once we have determined that the function to be applied, then
+this case says that once we have determined the function to be applied, then
 we can begin to evaluate its body. Of course, the function is eventually going to
 need its argument and this is where the final production comes in. This production
 is the most interesting. It says that when a function in the function position
