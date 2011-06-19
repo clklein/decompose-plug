@@ -47,7 +47,7 @@ of plugging. (The other submitted solutions use structural operational
 semantics, do not address dynamic semantics at all, or are no longer available 
 online.)
 
-In pursuit of an efficient implementation technique, @citet[refocusing] and 
+@citet[refocusing] and 
 @citet[refocusing-formalized] provide an axiomatization of the various 
 components of a Felleisen-Hieb reduction semantics, 
 such as a decomposition relation, that together define the
