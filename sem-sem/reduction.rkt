@@ -73,25 +73,34 @@
    ,((term f) (term t))])
 
 (define (reductions language rules to-reduce)
-  (remove-duplicates
-   (append-map 
+  (define apply-rule
     (match-lambda
       [(list p r)
-       (map (λ (b) (term (inst ,r ,b)))
-            (matches language p to-reduce))])
-    rules)))
+       (apply-rule (list p r '()))]
+      [(list p r xs)
+       (map (λ (b) (term (inst ,r ,(add-fresh b to-reduce xs))))
+            (matches language p to-reduce))]))
+  (remove-duplicates (append-map apply-rule rules)))
 
 (define (reductions* language rules to-reduce)
   (define seen (set))
-  (define norms (set))
+  (define irred (set))
   (let loop ([t to-reduce])
     (unless (set-member? seen t)
       (set! seen (set-add seen t))
       (define ts (reductions language rules t))
       (if (empty? ts)
-          (set! norms (set-add norms t))
+          (set! irred (set-add irred t))
           (for-each loop ts))))
-  (set-map norms values))
+  (set-map irred values))
+
+(define (add-fresh bindings wrt vars)
+  (for/fold ([b bindings]) 
+            ([x vars]
+             [s (variables-not-in wrt vars)])
+            (match b
+              [`(set . ,others)
+               `(set (pair ,x ,s) ,@others)])))
 
 (define-relation reduction
   [(reduces G t p t_^′ r)

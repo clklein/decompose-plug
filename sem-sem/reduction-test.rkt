@@ -1,8 +1,6 @@
 #lang racket
 
 (require "reduction.rkt"
-         "../2-models/double.rkt"
-         "../2-models/models.rkt"
          (except-in redex/reduction-semantics plug))
 
 (define-syntax-rule (define-reduction-test-form name reduce)
@@ -130,9 +128,19 @@
                  (:cons 1 2)
                  ((:left :hole 2)))
 
+(test-reductions ()
+                 ([(:cons :variable :variable)
+                   (:cons (:var x) (:var x1))
+                   (x x1)])
+                 (:cons x x1)
+                 ((:cons x2 x3)))
+
 (test-reductions* ()
                   ([a b] [a e] [b c] [c c] [c d])
                   a
                   (d e))
-
+(test-reductions* ()
+                  ([a a])
+                  a
+                  ())
 (test-results)

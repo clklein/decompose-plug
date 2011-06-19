@@ -41,3 +41,12 @@
   (check-true (A? '(:cons (:cons λ (:cons (:cons (:cons λ (:cons λ :hole)) e) e)) e)))
   (check-false (A? '(:cons (:cons λ (:cons (:cons λ (:cons λ :hole)) e)) e)))
   (check-false (A? '(:cons (:cons (:cons λ (:cons (:cons λ (:cons λ :hole)) e)) e) e))))
+
+(check-equal? (grammar-keywords '([n (a 1)] [m (a b)]))
+              (set 'a 'b))
+(check-equal? (matches '([n (a)]) ':variable 'a)
+              '())
+(check-equal? (matches '([n (a)]) ':variable 'b)
+              '((set)))
+
+(check-equal? (matches '() ':number 7.5) '((set)))

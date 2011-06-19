@@ -10,16 +10,28 @@ Also has hide-hole removing capabilities
 |#
 
 (require racket/match
+         racket/list
+         racket/set
          racket/contract
          rackunit
          "../sem-sem/syntax-directed-match-total.rkt"
-         "../sem-sem/patterns.rkt")
+         "../sem-sem/patterns.rkt"
+         (only-in "../sem-sem/reduction.rkt" reductions reductions*))
 
 (require redex/reduction-semantics
          (for-syntax racket/base))
 
 (provide define-double-language
          define-double-extended-language
+         
+         double-reduction-relation
+         reinterp-red-rel
+         union-red-rels
+         apply-red-rel
+         apply-red-rel*
+         
+         test-double-reduction
+         test-double-reduction*
          
          ;; (test-double-match lang :lang r-pat r-term p-bindings)
          ;; lang should be an identifier bound to a Redex language or (literally) #f
@@ -38,9 +50,8 @@ Also has hide-hole removing capabilities
 ;; nts : (listof symbol)
 ;; lang : `([,nt ,pat ...] ...)   -- matches the language setup
 ;;                                -- of syntax directed match total
-;; kwds : (listof symbol)
 ;; grammar : sexp representation of the original, input grammar (used for language extension)
-(struct lang (nts lang kwds grammar) #:transparent)
+(struct lang (nts lang grammar) #:transparent)
 
 (define-syntax (define-double-language stx)
   (syntax-case stx ()
@@ -53,19 +64,99 @@ Also has hide-hole removing capabilities
            (define id2 (grammar->lang '((nt prods ...) ...) '()))
            (define-language id1 (nt prods ...) ...)))]))
 
+(struct red-rel (lang rules) #:transparent)
+(struct rule (lhs rhs fresh) #:transparent)
+
+(define ((make-red-rel-app app) model-rel redex-term)
+  (map p->rt
+       (app (lang-lang (red-rel-lang model-rel))
+            (for/list ([r (red-rel-rules model-rel)])
+              (match r
+                [(rule lhs rhs fresh)
+                 (list lhs rhs fresh)]))
+            (rt->t redex-term))))
+(define apply-red-rel (make-red-rel-app reductions))
+(define apply-red-rel* (make-red-rel-app reductions*))
+
+(define (reinterp-red-rel rel lang)
+  (red-rel lang (red-rel-rules rel)))
+(define (union-red-rels . rels)
+  (unless (> (length rels) 1)
+    (error 'union-red-rels "expected at least 2 but got ~s" (length rels)))
+  (let check-same ([rs rels])
+    (match rs
+      [(list r) (void)]
+      [(list-rest r s others)
+       (if (equal? (red-rel-lang r) (red-rel-lang s))
+           (check-same (cons s others))
+           (error 'union-red-rels "expected relations on the same language"))]))
+  (red-rel (red-rel-lang (car rels))
+           (append-map red-rel-rules rels)))
+
+(define-syntax (double-reduction-relation stx)
+  (syntax-case stx (-->)
+    [(_ lang :lang ([mf-name mf-impl] ...) (--> lhs rhs . extras) ...)
+     #'(values (reduction-relation lang (--> lhs rhs . extras) ...)
+               (red-rel :lang
+                        (for/list ([l '(lhs ...)] [r '(rhs ...)] [e '(extras ...)])
+                          (compile-red-rule :lang l r e 
+                                            (list (cons 'mf-name mf-impl) ...)))))]))
+
+(define (compile-red-rule lang lhs rhs extras mf-map)
+  (define :lhs (rp->p (lang-nts lang) lhs))
+  (define fresh (fresh-vars extras))
+  (define bound (append fresh (bound-vars :lhs)))
+  (rule :lhs
+        (redex-rhs->model-rhs rhs bound mf-map)
+        fresh))
+
+(define (redex-rhs->model-rhs rhs bound mf-map)
+  (define ((in xs) x) (member x xs))
+  (define (mf r) (assoc r mf-map))
+  (let translate ([r rhs])
+    (match r
+      [(? (in bound)) `(:var ,r)]
+      [`(in-hole ,s ,t)
+       `(:in-hole ,(translate s) ,(translate t))]
+      [`() 'empty]
+      [(cons (? mf f) args)
+       `(:app ,(cdr (mf f)) ,(translate args))]
+      [(cons s t)
+       `(:cons ,(translate s) ,(translate t))]
+      [_ r])))
+
+(define (fresh-vars extras)
+  (for/fold ([vars '()]) ([extra extras])
+            (match extra
+              [(or (? string?) (? symbol?)) vars]
+              [`(fresh ,(? symbol? xs) ...)
+               (append xs vars)])))
+
+(define (bound-vars pat)
+  (set-map
+   (let bound ([p pat])
+     (match p
+       [(? atom?) (set)]
+       [`(:name ,x ,p)
+        (set-add (bound p) x)]
+       [`(:nt ,n) (set)]
+       [`(:in-hole ,p ,q) 
+        (set-union (bound p) (bound q))]
+       [`(:cons ,p ,q) 
+        (set-union (bound p) (bound q))]
+       [`:hole (set)]))
+   values))
+
 (define (grammar->lang orig-grammar extensions)
   (define grammar (combine-grammars orig-grammar extensions))
   (define nts (map car grammar))
-  (define kwds (find-kwds grammar))
   (lang nts
-        (append (map (λ (nt/prods)
-                       (define nt (car nt/prods))
-                       (define prods (cdr nt/prods))
-                       `(,nt (,@(map (λ (prod) (rp->p nts kwds prod #f))
-                                     prods))))
-                     grammar)
-                built-in-nts)
-        kwds
+        (map (λ (nt/prods)
+               (define nt (car nt/prods))
+               (define prods (cdr nt/prods))
+               `(,nt (,@(map (λ (prod) (rp->p nts prod #f))
+                             prods))))
+             grammar)
         grammar))
 
 (define (combine-grammars orig-grammar extensions)
@@ -108,67 +199,24 @@ Also has hide-hole removing capabilities
            (define id2 (grammar->lang (lang-grammar id2-orig)
                                       '((nt prods ...) ...)))))]))
 
-(define (find-kwds grammar)
-  (define nts (append '(variable-not-otherwise-mentioned in-hole hole number)
-                      (map car built-in-nts)
-                      (map car grammar)))
-  (define kwds (make-hash))
-  (let loop ([x (map cdr grammar)])
-    (cond
-      [(pair? x)
-       (loop (car x))
-       (loop (cdr x))]
-      [(symbol? x)
-       (unless (member x nts)
-         (hash-set! kwds x #t))]))
-  (sort (hash-map kwds (λ (x y) x))
-        string<=?
-        #:key symbol->string))
-
-;; add this non-terminal into each language 
-;; and translate number constants back and
-;; forth from this notation; eg the number
-;; 123 is (:cons 1 (:cons 2 (:cons 3 empty)))
-(define built-in-nts
-  `([num ((:cons num (:nt digits)))]
-    [var ((:cons var (:nt digits)))]
-    [digits ((:cons 0 (:nt digits))
-             (:cons 1 (:nt digits))
-             (:cons 2 (:nt digits))
-             (:cons 3 (:nt digits))
-             (:cons 4 (:nt digits))
-             (:cons 5 (:nt digits))
-             (:cons 6 (:nt digits))
-             (:cons 7 (:nt digits))
-             (:cons 8 (:nt digits))
-             (:cons 9 (:nt digits))
-             empty)]))
-
-(define/contract (rt->t nts kwds pat)
-  (-> (listof symbol?) (listof symbol?) any/c any/c)
+(define/contract (rt->t pat)
+  (-> any/c any/c)
   (let loop ([pat pat])
     (match pat
       ['hole ':hole]
-      [(? number?) (number->p-number pat)]
+      [(? number?) pat]
       [(? pair?) `(:cons ,(loop (car pat)) ,(loop (cdr pat)))]
       [(? null?) `empty]
-      [(? symbol?) 
-       (cond
-         [(member pat kwds) pat]
-         [else (symbol->p-symbol pat)])])))
+      [(? symbol?) pat])))
 
-(define/contract (rp->p nts kwds pat [name-nts? #t])
-  (->* ((listof symbol?) (listof symbol?) any/c) (boolean?) any/c)
+(define/contract (rp->p nts pat [name-nts? #t])
+  (->* ((listof symbol?) any/c) (boolean?) any/c)
   (let loop ([pat pat])
     (match pat
       ['hole ':hole]
-      [(? number?) (number->p-number pat)]
+      [(? number?) pat]
       ['variable-not-otherwise-mentioned
-       ;; this one is simpler than the 'number' case because
-       ;; we assume that no examples do things like variable-not-otherwise-mentioned_1
-       ;; and non of the examples actually expect variable-not-otherwise-mentioned
-       ;; to be in the result binding table of a match
-       `(:nt var)]
+       ':variable]
       [(? symbol?)
        (define-values (prefix has-suffix?)
          (let ([m (regexp-match #rx"^([^_]+)_(.*)" (symbol->string pat))])
@@ -178,67 +226,23 @@ Also has hide-hole removing capabilities
        (cond
          [(eq? prefix 'number)
           (if name-nts?
-              `(:name ,pat (:nt num))
-              `(:nt num))]
+              `(:name ,pat :number)
+              `:number)]
          [(memq prefix nts)
           (if name-nts?
               `(:name ,pat (:nt ,prefix))
               `(:nt ,prefix))]
-         [(member pat kwds) pat]
-         [else (symbol->p-symbol pat)])]
+         [else pat])]
       [`(hide-hole ,p) (loop p)]
       [`(in-hole ,p1 ,p2) `(:in-hole ,(loop p1) ,(loop p2))]
       [(? pair?) `(:cons ,(loop (car pat)) ,(loop (cdr pat)))]
       [(? null?) `empty])))
-
-(define known-vars-table
-  '((x 0)
-    (y 1)
-    (f 2)
-    (g 3)
-    (k 4)
-    (blahblah 5)))
-
-(define (known-variable? v)
-  (for/or ([x (in-list known-vars-table)])
-    (eq? (car x) v)))
-
-(define/contract (symbol->p-symbol v)
-  (-> symbol? any/c)
-  (unless (known-variable? v)
-    (error 'double.rkt "found a variable that doesn't have an entry in the table: ~s" v))
-  `(:cons var ,(number->p-digits (cadr (assoc v known-vars-table)))))
-
-(define/contract (number->p-number n)
-  (-> exact-nonnegative-integer? any)
-  `(:cons num
-          ,(number->p-digits n)))
-
-(define (number->p-digits n)
-  (define digits
-    (let loop ([n n])
-      (cond
-        [(= n 0) '()]
-        [else (cons (modulo n 10) (loop (quotient n 10)))])))
-  (let loop ([ds (reverse digits)])
-    (cond
-      [(null? ds) 'empty]
-      [else `(:cons ,(car ds) ,(loop (cdr ds)))])))
-
-(check-equal? (number->p-number 0) '(:cons num empty))
-(check-equal? (number->p-number 1) '(:cons num (:cons 1 empty)))
-(check-equal? (number->p-number 2) '(:cons num (:cons 2 empty)))
-(check-equal? (number->p-number 10) '(:cons num (:cons 1 (:cons 0 empty))))
-(check-equal? (number->p-number 1234567890) 
-              `(:cons num (:cons 1 (:cons 2 (:cons 3 (:cons 4 (:cons 5 (:cons 6 (:cons 7 (:cons 8 (:cons 9 (:cons 0 empty))))))))))))
 
 (define (p->rt p)
   (let loop ([p p])
     (match p
       [`:hole (term hole)]
       [`(:in-hole ,a ,b) `(in-hole ,(loop a) ,(loop b))]
-      [`(:cons var ,stuff) (p-variable->variable stuff)]
-      [`(:cons num ,stuff) (p-digits->number stuff)]
       [`(:cons ,a ,b) (cons (loop a) (loop b))]
       [`empty '()]
       [`(:name ,x (:nt ,b)) x]
@@ -248,33 +252,6 @@ Also has hide-hole removing capabilities
       [`(:left ,x . ,stuff) (c->rt p)]
       [`:hole (c->rt p)]
       [else p])))
-
-(define/contract (p-digits->number stuff)
-  (-> any/c exact-nonnegative-integer?)
-  (define digits
-    (let loop ([stuff stuff])
-      (match stuff
-        [`(:cons ,d ,n)
-         (cons d (loop n))]
-        [`empty '()])))
-  (let loop ([digits (reverse digits)])
-    (cond
-      [(null? digits) 0]
-      [else
-       (+ (car digits)
-          (* 10 (loop (cdr digits))))])))
-
-(define (p-variable->variable stuff)
-  (define n (p-digits->number stuff))
-  (define v (assoc n (map reverse known-vars-table)))
-  (unless v
-    (error 'p-variable->variable "unknown encoded variable: ~s ~s" stuff n))
-  (cadr v))
-
-(check-equal? (p->rt '(:cons num empty)) 0)
-(check-equal? (p->rt '(:cons num (:cons 1 empty))) 1)
-(check-equal? (p->rt '(:cons num (:cons 1 (:cons 2 empty)))) 12)
-(check-equal? (p->rt '(:cons num (:cons 1 (:cons 2 (:cons 3 empty))))) 123)
 
 (define (c->rt p)
   (match p
@@ -307,6 +284,24 @@ Also has hide-hole removing capabilities
             (list (bind-name bd)
                   (bind-exp bd)))))))
 
+(define-syntax-rule (define-double-reduction-test name app :app)
+  (... (define-syntax (name stx)
+         (syntax-case stx ()
+           [(_ #:norm norm rr :rr trm expected ...)
+            #`(begin
+                #,(syntax/loc #'rr
+                    (test-equal
+                     (sort-alphabetically (map norm (app rr trm)))
+                     (sort-alphabetically (map norm (list expected ...)))))
+                #,(syntax/loc #':rr
+                    (test-equal
+                     (sort-alphabetically (map norm (:app :rr trm)))
+                     (sort-alphabetically (map norm (list expected ...))))))]
+           [(_ rr :rr trm expected ...)
+            #'(name #:norm values rr :rr trm expected ...)]))))
+(define-double-reduction-test test-double-reduction apply-reduction-relation apply-red-rel)
+(define-double-reduction-test test-double-reduction* apply-reduction-relation* apply-red-rel*)
+
 (define-syntax (test-double-match stx)
   (syntax-case stx ()
     [(_ lang :lang pat trm bindings)
@@ -322,15 +317,18 @@ Also has hide-hole removing capabilities
 
 (define (normalize-bindings bindings)
   (and bindings
-       (sort (for/list ([binding (in-list bindings)])
-               (sort binding string<=? #:key (compose symbol->string car)))
-             string<=?
-             #:key (λ (x) (format "~s" x))
-             #:cache-keys? #t)))
+       (sort-alphabetically
+        (for/list ([binding (in-list bindings)])
+          (sort binding string<=? #:key (compose symbol->string car))))))
+
+(define (sort-alphabetically xs)
+  (sort xs string<=? 
+        #:key (λ (x) (format "~s" x))
+        #:cache-keys? #t))
 
 (define (sem-sem-match lang r-pat r-term)
-  (define pat (rp->p (lang-nts lang) (lang-kwds lang) r-pat))
-  (define trm (rt->t (lang-nts lang) (lang-kwds lang) r-term))
+  (define pat (rp->p (lang-nts lang) r-pat))
+  (define trm (rt->t r-term))
   (b->rb (matches (lang-lang lang) pat trm)))
 
 

@@ -26,12 +26,10 @@
             (term (λ (z2) (z1 z2))))
 (test-equal (term (subst-1 x3 5 (λ (x2) x2)))
             (term (λ (x1) x1)))
-(test-equal (term (subst-1 z * (λ (z x) 1)))
-            (term (λ (z x) 1)))
-(test-equal (term (subst-1 q (λ (x) z) (λ (z x) q)))
-            (term (λ (z1 x1) (λ (x) z))))
-(test-equal (term (subst-1 x 1 (λ (x x) x)))
-            (term (λ (x x) x)))
+(test-equal (term (subst-1 z * (λ (z) 1)))
+            (term (λ (z) 1)))
+(test-equal (term (subst-1 q (λ (x) z) (λ (z) q)))
+            (term (λ (z1) (λ (x) z))))
 
 (test-equal (term (subst ((|+1| x) y) (x 1) (y 2)))
             (term ((|+1| 1) 2)))
@@ -175,40 +173,50 @@
 
 ;; reduction rules tests
 
-(test--> cbv-red
-         (term ((λ (x) x) 1))
-         (term 1))
-(test--> cbv-red
-         (term ((λ (x) (λ (y) x)) 1))
-         (term (λ (y) 1)))
-(test--> cbv-red
-         (term ((λ (x) (λ (x) x)) 1))
-         (term (λ (x) x)))
-(test--> cbv-red
+(test-double-reduction
+ cbv-red :cbv-red
+ (term ((λ (x) x) 1))
+ (term 1))
+(test-double-reduction
+ cbv-red :cbv-red
+ (term ((λ (x) (λ (y) x)) 1))
+ (term (λ (y) 1)))
+(test-double-reduction
+ cbv-red :cbv-red
+ (term ((λ (x) (λ (x) x)) 1))
+ (term (λ (x) x)))
+(test-double-reduction
+ cbv-red :cbv-red
          (term ((λ (x) (λ (y) x)) (λ (z) y)))
          (term (λ (y1) (λ (z) y))))
-(test-->> cbv-red
-          (term ((((λ (f) (λ (x) (λ (y) ((f x) y))))
-                  (λ (g) (λ (x) (g x))))
-                  (λ (x) x))
-                 2))
-          (term 2))
-(test--> cbv-red
-         (term (|+1| 2))
-         (term 3))
-(test-->> cbv-red
-          (term (|+1| (|+1| (|+1| (|+1| 2)))))
-          (term 6))
-(test-->> cbv-red
-          (term (((λ (f) (λ (x) (f (f x)))) |+1|) 3))
-          (term 5))
+(test-double-reduction*
+ cbv-red :cbv-red
+ (term ((((λ (f) (λ (x) (λ (y) ((f x) y))))
+          (λ (g) (λ (x) (g x))))
+         (λ (x) x))
+        2))
+ (term 2))
+(test-double-reduction
+ cbv-red :cbv-red
+ (term (|+1| 2))
+ (term 3))
+(test-double-reduction*
+ cbv-red :cbv-red
+ (term (|+1| (|+1| (|+1| (|+1| 2)))))
+ (term 6))
+(test-double-reduction*
+ cbv-red :cbv-red
+ (term (((λ (f) (λ (x) (f (f x)))) |+1|) 3))
+ (term 5))
 
 ;; in this language, call/cc is not a value, but a free variable
 ;; so this expression doesn't reduce
-(test--> cbv-red
-         (term ((λ (x) x) call/cc)))
+(test-double-reduction
+ cbv-red :cbv-red
+ (term ((λ (x) x) call/cc)))
 
-(test-->> cbv-red
+(test-double-reduction*
+ cbv-red :cbv-red
           (term (((λ (f) (λ (x) (f (f x)))) |+1|) 3))
           (term 5))
 
@@ -216,38 +224,56 @@
          (term (|+1| ((cont hole) 2)))
          (term 2))
 
-(test-->> cont-red
-          (term (|+1| (call/cc (λ (k) (k 1)))))
-          (term 2))
+(test-double-reduction*
+ cont-red :cont-red
+ (term (call/cc (λ (k) (|+1| (k 0)))))
+ (term 0))
 
-(test-->> cont-red
-          (term (((λ (x) x) (call/cc (λ (k) (k 2)))) x))
-          (term (2 x)))
-(test-->> cont-red
-          (term (|+1| (|+1| (|+1| (|+1| 2)))))
-          (term 6))
+(test-double-reduction*
+ cont-red :cont-red
+ (term (|+1| (call/cc (λ (k) (k 1)))))
+ (term 2))
+
+(test-double-reduction*
+ cont-red :cont-red
+ (term (((λ (x) x) (call/cc (λ (k) (k 2)))) x))
+ (term (2 x)))
+(test-double-reduction*
+ cont-red :cont-red
+ (term (|+1| (|+1| (|+1| (|+1| 2)))))
+ (term 6))
+
+(test-double-reduction*
+ cont-red :cont-red
+ ; plugs a context that contains another context
+ (term (|+1| (call/cc (λ (k1) (k1 (call/cc (λ (k2) (k2 1))))))))
+ (term 2))
 
 ;; no irreducible terms reachable from here (and also a finite graph)
-(test-->> cont-red 
-          #:cycles-ok
-          (term ((λ (x) ((call/cc call/cc) x))
-                 (call/cc call/cc))))
-(test-->> cbv-red
-          #:cycles-ok
-          (term ((λ (x) (x x)) (λ (y) (y y)))))
+(test-double-reduction*
+ cont-red :cont-red
+ (term ((λ (x) ((call/cc call/cc) x))
+        (call/cc call/cc))))
+(test-double-reduction*
+ cont-red :cont-red
+ (term ((λ (x) (x x)) (λ (y) (y y)))))
 
 ;; arith tests
-(test--> arith-red
-         (term (+ (+ 1 2) (+ 3 4)))
-         (term (+ 3 (+ 3 4)))
-         (term (+ (+ 1 2) 7)))
-(test-->> arith-red
-          (term (+ (+ 1 2) (+ 3 4)))
-          (term 10))
+(test-double-reduction
+ arith-red :arith-red
+ (term (+ (+ 1 2) (+ 3 4)))
+ (term (+ 3 (+ 3 4)))
+ (term (+ (+ 1 2) 7)))
+(test-double-reduction*
+ arith-red :arith-red
+ (term (+ (+ 1 2) (+ 3 4)))
+ (term 10))
 
 (define (cbn-equiv a1 a2)
   (equal? (term (subst-A ,a1))
           (term (subst-A ,a2))))
+(define (subst-A-norm e)
+  (term (subst-A ,e)))
 
 (test-equal (term (subst-A ((λ (x) 1) 2)))
             (term 1))
@@ -259,45 +285,68 @@
             (term (λ (y1) ((2 |+1|) y1))))
 
 ;; cbn tests
-(test-->> cbn-red
-          #:equiv cbn-equiv
-          (term ((λ (x) 1) (|+1| 2)))
-          (term ((λ (x) 1) (|+1| 2))))
-(test-->> cbn-red
-          #:equiv cbn-equiv
-          (term ((λ (x) x) (|+1| 2)))
-          (term ((λ (x) 3) 3)))
-(test-->> cbn-red
-          #:equiv cbn-equiv
-          (term (|+1| (|+1| 2)))
-          (term 4))
-(test-->> cbn-red
-          #:equiv cbn-equiv
-          (term (|+1| (|+1| (|+1| (|+1| 2)))))
-          (term 6))
-(test-->> cbn-red
-          #:equiv cbn-equiv
-          (term (((λ (x) x) (λ (y) (|+1| y))) 2))
-          (term 3))
-(test-->> cbn-red
-          #:equiv cbn-equiv
-          (term (((λ (x) (λ (y) (|+1| x))) 2) 1))
-          (term ((λ (x) ((λ (y) 3) 1)) 2)))
-(test-->> cbn-red
-          #:equiv cbn-equiv
-          (term (((λ (x) (λ (y) (|+1| y))) 2) 1))
-          (term ((λ (x) ((λ (y) 2) 1)) 2)))
-(test-->> cbn-red
-          #:equiv cbn-equiv
-          (term (((λ (f) (λ (x) (f (f (f x)))))
-                  (λ (x) (|+1| x)))
-                 0))
-          (term 3))
-(test-->> cbn-red
-          #:equiv cbn-equiv
-          (term (((λ (f) (λ (x) (f (f x)))) |+1|) 3))
-          (term 5))
+(test-double-reduction*
+ #:norm subst-A-norm cbn-red :cbn-red
+ (term ((λ (x) 1) (|+1| 2)))
+ (term ((λ (x) 1) (|+1| 2))))
+(test-double-reduction*
+ #:norm subst-A-norm cbn-red :cbn-red
+ (term ((λ (x) x) (|+1| 2)))
+ (term ((λ (x) 3) 3)))
+(test-double-reduction*
+ #:norm subst-A-norm cbn-red :cbn-red
+ (term (|+1| (|+1| 2)))
+ (term 4))
+(test-double-reduction*
+ #:norm subst-A-norm cbn-red :cbn-red
+ (term (|+1| (|+1| (|+1| (|+1| 2)))))
+ (term 6))
+(test-double-reduction*
+ #:norm subst-A-norm cbn-red :cbn-red
+ (term (((λ (x) x) (λ (y) (|+1| y))) 2))
+ (term 3))
+(test-double-reduction*
+ #:norm subst-A-norm cbn-red :cbn-red
+ (term (((λ (x) (λ (y) (|+1| x))) 2) 1))
+ (term ((λ (x) ((λ (y) 3) 1)) 2)))
+(test-double-reduction*
+ #:norm subst-A-norm cbn-red :cbn-red
+ (term (((λ (x) (λ (y) (|+1| y))) 2) 1))
+ (term ((λ (x) ((λ (y) 2) 1)) 2)))
+(test-double-reduction*
+ #:norm subst-A-norm cbn-red :cbn-red
+ (term (((λ (f) (λ (x) (f (f (f x)))))
+         (λ (x) (|+1| x)))
+        0))
+ (term 3))
+(test-double-reduction*
+ #:norm subst-A-norm cbn-red :cbn-red
+ (term (((λ (f) (λ (x) (f (f x)))) |+1|) 3))
+ (term 5))
+
+(test-double-reduction*
+ cont-plus-red :cont-plus-red
+ (term (call/cc (λ (k) (k 0))))
+ (term 1))
+
+(test-double-reduction*
+ cont-pair-red :cont-pair-red
+ (term (car (cons (|+1| 0) (|+1| 1))))
+ (term 1))
+
+(test-double-reduction*
+ cont-pair-red :cont-pair-red
+ (term (cdr (cons (|+1| 0) (|+1| 1))))
+ (term 2))
+
+(test-double-reduction*
+ cont-pair-red :cont-pair-red
+ (term (|+1| (call/cc (λ (k) (cons ((car k) 0) 1)))))
+ (term 1))
+
+(test-double-reduction*
+   cont-pair-red :cont-pair-red
+   (term (|+1| (call/cc (λ (k) (cons ((cdr k) 0) 1)))))
+   (term 2))
 
 (test-results)
-
-

@@ -10,7 +10,8 @@
          racket/set
          racket/match)
 (provide/contract
- [matches (-> grammar? pattern? term? (listof bindings?))])
+ [matches (-> grammar? pattern? term? (listof bindings?))]
+ [grammar-keywords (-> grammar? (set/c atom?))])
 
 ; decomposition : (or/c decomp no-decomp)
 ; binding : bindings?
@@ -33,6 +34,8 @@
   (define (memo-table-lookup x t)
     (hash-ref memo-table (cons x t) (set)))
   
+  (define keywords (grammar-keywords  lang))
+  
   (define (go pat term seen)
     (match pat
       [':hole
@@ -40,6 +43,14 @@
            (set (mtch (decomp ':hole ':hole) empty-bindings)
                 (mtch (no-decomp) empty-bindings))
            (set (mtch (decomp ':hole term) empty-bindings)))]
+      [`:number
+       (if (number? term)
+           (set (mtch (no-decomp) empty-bindings))
+           (set))]
+      [`:variable
+       (if (and (symbol? term) (not (set-member? keywords term)))
+           (set (mtch (no-decomp) empty-bindings))
+           (set))]
       [(? atom?)
        (if (eq? pat term)
            (set (mtch (no-decomp) empty-bindings))
@@ -123,6 +134,21 @@
                          (set (mtch (decomp `(:right ,t1 ,C) t) b))]
                         [((decomp C1 u1) (decomp C2 u2))
                          (set)])])]))
+
+(define (grammar-keywords G)
+  (define (pat-kw p)
+    (match p
+      [(? atom?) 
+       (if (symbol? p) (set p) (set))]
+      [`(:name ,x ,p) (pat-kw p)]
+      [`(:nt ,n) (set)]
+      [`(:in-hole ,q ,r) (set-union (pat-kw q) (pat-kw r))]
+      [`(:cons ,q ,r) (set-union (pat-kw q) (pat-kw r))]
+      [`:hole (set)]))
+  (match G
+    [`([,n (,ps ...)] ...)
+     (for/fold ([kws (set)]) ([p (apply append ps)])
+               (set-union kws (pat-kw p)))]))
 
 (define (==> xs f)
   (for/fold ([ys (set)]) ([x xs])
