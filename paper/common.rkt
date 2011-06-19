@@ -99,7 +99,8 @@
     (:app "app")
     (:left "left")
     (:right "right")
-    (:hole "hole")))
+    (:hole "hole")
+    (:number "number")))
 
 (define (with-keyword-rewriters thunk)
   (let loop ([rs atomic-rewriters])

@@ -45,7 +45,10 @@ Also has hide-hole removing capabilities
          test-double-match
          
          sem-sem-match
-         remove-hide-hole)
+         remove-hide-hole
+         
+         ;; used in the paper to check an example
+         lang-nts rp->p)
 
 ;; nts : (listof symbol)
 ;; lang : `([,nt ,pat ...] ...)   -- matches the language setup
