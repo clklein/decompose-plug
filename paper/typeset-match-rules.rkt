@@ -127,7 +127,7 @@
 (define patterns-and-terms
   (with-rewriters
    (vl-append
-    (parameterize ([render-language-nts '(t p)])
+    (parameterize ([render-language-nts '(t p C)])
       (render-language patterns))
     (non-bnf-def "a" "Literals")
     (non-bnf-def "x" "Variables")

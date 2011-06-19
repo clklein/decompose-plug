@@ -27,11 +27,11 @@
 (define-relation patterns
   decomposes ⊆ G × t × C × t × p × b
   [(decomposes G t :hole t :hole (no-bindings))]
-  [(decomposes G (k t_1 t_2) (:left t_2 C) t_1^′ (:cons p_1 p_2) b)
+  [(decomposes G (k t_1 t_2) (:left C t_2) t_1^′ (:cons p_1 p_2) b)
    (decomposes G t_1 C t_1^′ p_1 b_1)
    (matches G t_2 p_2 b_2)
    (lub-not-top b_1 b_2 b)]
-  [(decomposes G (k t_1 t_2) (:right t_1 C) t_1^′ (:cons p_1 p_2) b)
+  [(decomposes G (k t_1 t_2) (:right t_1 C) t_2^′ (:cons p_1 p_2) b)
    (matches G t_1 p_1 b_1)
    (decomposes G t_2 C t_2^′ p_2 b_2)
    (lub-not-top b_1 b_2 b)]
