@@ -41,8 +41,6 @@ the most complex uses of Felleisen-Hieb-style semantics available.
 @include-section["5-reduction.scrbl"]
 @include-section["6-related.scrbl"]
 
-@(generate-bibliography)
-
 @section[#:style (style #f '(hidden unnumbered))]{}
 @(element (style "paragraph" '()) '("Acknowledgments"))
 Thanks to Stephen Chang for his many 
@@ -50,6 +48,8 @@ interesting examples of contexts that challenged our
 understanding of evaluation context semantics.
 Thanks also to Matthias Felleisen and Matthew Flatt for
 helpful discussions on the work.
+
+@(generate-bibliography)
 
 @section[#:tag "sec:proof"]{Appendix}
 @element[(style "input" '(exact-chars)) '("core-algorithm-correctness-txt.tex")]
