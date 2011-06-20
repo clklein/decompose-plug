@@ -162,13 +162,23 @@ semantics must be able to support contexts that appear in a
 term that play no part in any decomposition (and yet must still
 match).
 
+@(require (only-in slideshow/pict blank))
 
 @wfigure["fig:delim" "Delimited Continuations"]{
 @(render-language Λdk/red)
 
 @paragraph[(style "vspace" '()) '(".1in")]
 
-@(render-reduction-relation delim-red)
+@(vl-append
+  (parameterize ([render-reduction-relation-rules '(0)])
+    (render-reduction-relation delim-red))
+  (blank 0 2)
+  (parameterize ([render-reduction-relation-rules '(1)]
+                 [rule-pict-style 'horizontal])
+    (render-reduction-relation delim-red))
+  (parameterize ([render-reduction-relation-rules '(2)]
+                 [rule-pict-style 'horizontal])
+    (render-reduction-relation delim-red)))
 }
 Generalizing from ordinary continuations to delimited 
 continuations is simply a matter of factoring the contexts
