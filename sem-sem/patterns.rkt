@@ -6,6 +6,13 @@
 (provide (all-defined-out))
 
 (define-language patterns
+  (t (:cons t t)
+     a
+     C)
+  (C :hole
+     (:left C t)
+     (:right t C))
+  
   (p a
      (:name x p)
      (:nt n)
@@ -16,13 +23,6 @@
      number)
   (x variable-not-otherwise-mentioned)
   (n variable-not-otherwise-mentioned)
-  
-  (t a
-     (:cons t t)
-     C)
-  (C :hole
-     (:left C t)
-     (:right t C))
   
   (b (set (pair x t) ...))
   

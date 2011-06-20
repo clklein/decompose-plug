@@ -113,8 +113,8 @@
 (define matching-data-defs
   (with-rewriters
    (vl-append
-    (non-bnf-def "G" (finite-function-domain "Non-Terminals" (powerset "p")))
-    (non-bnf-def "b" (finite-function-domain "Variables" "t")))))
+    (non-bnf-def "G" (finite-function-domain "Non-Terminal" (powerset "p")))
+    (non-bnf-def "b" (finite-function-domain "Variable" "t")))))
 
 (define combined-matching-rules
   (vl-append
