@@ -10,9 +10,9 @@
   [(append-contexts :hole C)
    C]
   [(append-contexts (:left C_1 t) C_2)
-   (:left (append-contexts C_1 C_2) t)]
+   (:left (group/id (append-contexts C_1 C_2)) t)]
   [(append-contexts (:right t C_1) C_2)
-   (:right t (append-contexts C_1 C_2))])
+   (:right t (group/id (append-contexts C_1 C_2)))])
 
 (define encode-term
   (match-lambda
@@ -68,3 +68,5 @@
 (define-metafunction patterns
   [(set-adjoin any_0 (set any_1 ...))
    (set any_0 any_1 ...)])
+(define-metafunction patterns
+  [(group/id any) any])

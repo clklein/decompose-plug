@@ -75,7 +75,7 @@ tries each production, discarding the binding component of each result. The
 final case, a catch-all, applies when the pattern does not match or decompose
 the input term.
 
-Putting aside the second problem described above, the call @mt[(M G p t)]
+Putting aside the problem of left recursion, the call @mt[(M G p t)]
 computes the set of @mt[b] such that @matches-schema/unframed or 
 @decomposes-schema/unframed for some @mt[C] and @mt[t_^′], and the top-level 
 wrapper function @mt[matches] restricts this set to the bindings associated with

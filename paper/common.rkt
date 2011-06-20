@@ -38,6 +38,9 @@
 (define (rewrite-pair lws)
   (list "(" (list-ref lws 2) ", " (list-ref lws 3) ")"))
 
+(define (rewrite-group/id lws)
+  (list "(" (list-ref lws 2) ")"))
+
 (define rewrite-set
   (match-lambda
     [(list _ _ elems ... _)

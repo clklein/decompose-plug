@@ -42,9 +42,8 @@ language matched by this definition (note that values and contexts are mututally
 or this bizarre, small one?
 @centered{@(lc-superimpose bkg raw2)}
 To remedy this lack, we have developed
-a semantics for matching that supports contexts in their full glory
-that is able to explain both of these examples, as well as match the
-intuitive meaning and countless existing research papers.
+a semantics for matching that not only supports these exotic languages and but
+also captures the intuitive meanings of countless existing research papers.
 
 Our motivation for studying context matching is its implementation
 in the domain-specific

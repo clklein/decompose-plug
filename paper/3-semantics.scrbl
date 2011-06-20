@@ -23,7 +23,7 @@ of matching.
 @patterns-and-terms
 }
 Terms @pt[t] are binary trees that have atoms as leaves. Embedded
-contexts (@pt[C]s) in an terms give path information for finding a hole 
+contexts (@pt[C]) in a term give path information for finding a hole 
 in a term that represents a context. That is, for matching purposes
 @pt[left], @pt[right], and @pt[cons] all mean the same thing; the difference
 is relevant only when plugging a context.
@@ -78,7 +78,7 @@ judgment @|decomposes-schema/unframed| that performs decompositions. Specificall
 it holds when @pt[t] matches @pt[p] and can be decomposed into a context
 @pt[C] with @pt[t_^′] in the hole.
 
-Many of the rules for these two judgments rely on the operator 
+Many of the rules for these two judgment forms rely on the operator 
 @pt[⊔]. It combines two pattern variable mappings into a single one by unioning their 
 domains and ranges, as long as the domains do not overlap. If the domains
 do overlap then the corresponding ranges must be the same; otherwise 
@@ -86,11 +86,8 @@ do overlap then the corresponding ranges must be the same; otherwise
 @pt[⊔] is well-defined.
 
 The atom rule produces an empty binding map because a pattern @pt[a] contains no
-pattern varibles. The @pt[:name] rule checks that the binding @pt[(pair x t)] is
-consistent with the bindings produced by matching @pt[p] against 
-@pt[t].@note{Alternatively, one could omit the check and consider patterns 
-@pt[(:name x p)] ill-formed when @pt[p] binds @pt[x], since such patterns are 
-not useful with finite terms.} The @pt[nt] rule applies 
+pattern varibles. The @pt[:name] rule matches @pt[p] with @pt[t] and produces a
+map extended with the binding @pt[(pair x t)]. The @pt[nt] rule applies 
 if any of the non-terminal's productions match. The scope of a production's 
 pattern variables is limited to that production, and consequently, the 
 @pt[nt] rule produces an empty binding map. The @pt[:cons] matches the 
@@ -109,13 +106,16 @@ decomposition of @pt[t_1] does, but places it within the larger context
 same for the pair's right sub-term. The @pt[:nt] decomposition rule propagates
 decompositions but, as in the corresponding matching rule, ignores binding maps.
 
+@wfigure[#:size 2.5 "fig:append-contexts" "Context Composition"]{
+@|append-contexts-rules|
+}
 The @pt[:in-hole] decomposition rule performs a nested decomposition. Nested 
 decomposition occurs, for example, when decomposing according to 
 call-by-need evaluation contexts (see the last production in @figure-ref{fig:cbn}).
 The @pt[:in-hole] rule decomposes @pt[t] into
 a composed context @pt[(append-contexts C_1 C_2)] and a sub-term @pt[t_^′], 
 where @pt[p_1] and @pt[p_2] match @pt[C_1] and @pt[C_2] respectively. 
-The context @pt[(C_1 ++ C_2)] is built by placing @pt[C_2] in the hole
-of @pt[C_1]. The @pt[:name] decomposition rule is similar to the 
+The definition of context composition (@figure-ref{fig:append-contexts}) follows
+the path in @pt[C_1]. The @pt[:name] decomposition rule is similar to the 
 corresponding matching rule, but it introduces a binding to the context
 that is matched, not the entire term.

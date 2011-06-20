@@ -8,6 +8,7 @@
 (provide pt
          with-rewriters
          combined-matching-rules
+         append-contexts-rules
          patterns-and-terms
          matching-data-defs
          matches-schema matches-schema/unframed
@@ -79,6 +80,7 @@
 
 (define compound-rewriters
   (list (list 'append-contexts rewrite-append-contexts)
+        (list 'group/id rewrite-group/id)
         (list 'matches rewrite-matches)
         (list 'decomposes rewrite-decomposes)
         (list 'no-bindings rewrite-no-bindings)
@@ -139,3 +141,7 @@
     (non-bnf-def "a" "Literals")
     (non-bnf-def "x" "Variables")
     (non-bnf-def "n" "Non-Terminals"))))
+
+(define append-contexts-rules
+  (with-rewriters
+   (render-metafunctions append-contexts)))
