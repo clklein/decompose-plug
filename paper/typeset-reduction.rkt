@@ -56,7 +56,6 @@
 (define (render-reduction)
   (with-rewriters
    (vc-append
-    vertical-gap-size 
     (hc-append
      horizontal-gap-size
      (render-relation reduces)
@@ -64,7 +63,25 @@
        (vl-append
         (render-language reduction)
         (non-bnf-def "f" (arbitrary-function-domain "t" "t")))))
-    (render-metafunctions inst plug join)
+    
+    (blank 0 vertical-gap-size)
+    
+    (vl-append
+     (metafunction-signature "inst" "r" "b" "t")
+     (render-metafunctions inst)
+     
+     (blank 0 vertical-gap-size)
+     
+     (metafunction-signature "plug" "C" "t" "t")
+     (render-metafunctions plug)
+     
+     (blank 0 vertical-gap-size)
+     
+     (metafunction-signature "join" "t" "t" "t")
+     (render-metafunctions join))
+    
+    (blank 0 vertical-gap-size)
+    
     (parameterize ([relation-clauses-combine (λ (l) (apply hbl-append 20 l))])
       (render-relation no-ctxts)))))
 

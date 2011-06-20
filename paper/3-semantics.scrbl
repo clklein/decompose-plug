@@ -36,8 +36,8 @@ Atomic patterns @pt[a] and @pt[:hole] match themselves. A pattern
 be identical. A pattern @pt[(:nt n)] matches terms that match any of the 
 productions of the non-terminal @pt[n] (defined outside the pattern). 
 We write decomposition patterns @math{p_1[p_2]} using a separate keyword
-for clarity: @pt[(:in-hole p_1 p_2)]. Finally, a pattern @pt[(:cons p_1 p_2)] matches 
-an interior node, with @pt[p_1] and @pt[p_2] matching the corresponding
+for clarity: @pt[(:in-hole p_1 p_2)]. Finally, interior nodes are matched
+by the pattern @pt[(:cons p_1 p_2)], with @pt[p_1] and @pt[p_2] matching the corresponding
 subterms.
 
 @(begin

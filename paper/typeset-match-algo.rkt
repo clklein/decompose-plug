@@ -75,22 +75,22 @@
      (parameterize ([render-language-nts '(d m)])
        (render-language directed-matching)))
     
-    (blank vertical-gap-size)
+    (blank 0 vertical-gap-size)
     
     (metafunction-signature "M" "G" "p" "t" (powerset "m"))
     (render-metafunction M)
     
-    (blank vertical-gap-size)
+    (blank 0 vertical-gap-size)
     
     (metafunction-signature "select" "t" "d" "t" "d" (powerset "d"))
     (render-metafunctions select)
     
-    (blank vertical-gap-size)
+    (blank 0 vertical-gap-size)
     
     (metafunction-signature "combine" "C" "d" "d")
     (render-metafunctions combine)
     
-    (blank vertical-gap-size)
+    (blank 0 vertical-gap-size)
     
     (metafunction-signature "named" "d" "t" "t")
     (render-metafunctions named))))

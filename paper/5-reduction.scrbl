@@ -36,7 +36,7 @@ instantiate to the result of applying the meta-function to the instantiated
 argument template. 
 
 The instantiation of @rt[:in-hole] templates makes use of a generic @rt[plug]
-function, defined only on contexts @rt[C]. This function follows the path 
+function, defined on contexts @rt[C]. This function follows the path 
 recorded for @rt[C] when it was constructed by decomposition. When plugging 
 a context @rt[C_1] with a context @rt[C_2], @rt[plug] preserves the path 
 superimposed on @rt[C_1], thereby connecting it with the path on @rt[C_2]. 
@@ -61,8 +61,8 @@ The instantiation rule for @rt[:cons] templates performs this inference via
 the function @rt[join]. When given a context and a term containing no contexts
 (as defined by the auxiliary judgment form @rt[no-ctxts]), @rt[join] extends the
 context's path through the extra layer. When both arguments contain contexts,
-@rt[join] combines the terms with @rt[:cons], preventing the result from being
-ambiguously plugged.
+@rt[join] combines the terms with @rt[:cons], preventing possibly ambiguity
+in a subsequent plugging operation.
 
 @(define-syntax-rule (Λkp-term t)
    (render-lw Λdk/red (to-lw t)))
