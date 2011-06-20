@@ -1,5 +1,6 @@
 #lang racket/base
-(require racket/cmdline)
+(require racket/cmdline
+         racket/match)
 
 (define txt-files
   (command-line 
@@ -46,43 +47,66 @@
                     (let ([bold? (regexp-match #rx"^[*]" line)])
                       (fprintf out-port "\\texttt{\\small{}\\hbox{}")
                       (when bold? (fprintf out-port "\\textbf{"))
-                      (fprintf out-port "~a" (escape-latex line))
+                      (fprintf out-port "~a" (latex-translate (string->list line)))
                       (when bold? (fprintf out-port "}"))
                       (fprintf out-port "}\\\\\n"))])
                  (loop (+ line-number 1))]))))
         #:exists 'truncate))))
 
-;; escape-latex : string -> string
-(define (escape-latex str)
-  (apply string-append (map latex-translate (string->list str))))
+;; latex-translate : (listof char) -> string
+(define (latex-translate chars)
+  (if (null? chars)
+      ""
+      (let loop ([table translation-table])
+        (match table
+          ['()
+           (unless (<= (char->integer (car chars)) 127)
+             (show-warning (car chars)))
+           (string-append (string (car chars)) 
+                          (latex-translate (cdr chars)))]
+          [(cons (list from to) rest-table)
+           (cond [(starts-with? chars from)
+                  => (λ (rest-chars)
+                       (string-append to (latex-translate rest-chars)))]
+                 [else (loop rest-table)])]))))
 
-;; latex-translate : char -> string
-(define (latex-translate x)
-  (case x 
-    [(#\~) "\\~{}"]
-    [(#\^) "{}$^{}${}"]
-    [(#\#) "\\#"]
-    [(#\{) "\\char`\\{"]
-    [(#\}) "\\char`\\}"]
-    [(#\$) "\\char`\\$"]
-    [(#\%) "\\char`\\%"]
-    [(#\&) "\\char`\\&"]
-    [(#\_) "\\char`\\_"]
-    [(#\\) "\\char`\\\\"]
-    [(#\space) "~"]
-    [(#\&) "\\&"]
-    [(#\∈) "\\ensuremath{\\in}"]
-    [(#\⊢) "\\ensuremath{\\vdash}"]
-    [(#\≠) "\\ensuremath{\\neq}"]
-    [(#\⊔) "\\ensuremath{\\sqcup}"]
-    [(#\⊤) "\\ensuremath{\\top}"]
-    [(#\•) "\\ensuremath{\\bullet}"]
-    [(#\⊆) "\\ensuremath{\\subseteq}"]
-    [(#\≤) "\\ensuremath{\\leq}"]
-    [else
-     (unless (<= (char->integer x) 127)
-       (show-warning x))
-     (string x)]))
+(define translation-table
+  '(["[| " "\\ensuremath{\\llbracket}"]
+    [" |]" "\\ensuremath{\\rrbracket}"]
+    ["->_G^*" "\\ensuremath{\\rightarrow_G^*}"]
+    ["->_G" "\\ensuremath{\\rightarrow_G}"]
+    ["-/>_G^*" "\\ensuremath{\\not \\rightarrow_G^*}"]
+    ["~" "\\~{}"]
+    ["^" "{}$^{}${}"]
+    ["#" "\\#"]
+    ["{" "\\char`\\{"]
+    ["}" "\\char`\\}"]
+    ["$" "\\char`\\$"]
+    ["%" "\\char`\\%"]
+    ["&" "\\char`\\&"]
+    ["_" "\\char`\\_"]
+    ["\\" "\\char`\\\\"]
+    [" " "~"]
+    ["&" "\\&"]
+    ["∈" "\\ensuremath{\\in}"]
+    ["⊢" "\\ensuremath{\\vdash}"]
+    ["≠" "\\ensuremath{\\neq}"]
+    ["⊔" "\\ensuremath{\\sqcup}"]
+    ["⊤" "\\ensuremath{\\top}"]
+    ["•" "\\ensuremath{\\bullet}"]
+    ["⊆" "\\ensuremath{\\subseteq}"]
+    ["≤" "\\ensuremath{\\leq}"]))
+
+(define (starts-with? given-chars string)
+  (let loop ([expected-chars (string->list string)]
+             [given-chars given-chars])
+    (match* (expected-chars given-chars)
+            [((list) _) given-chars]
+            [((cons e es) (cons g gs))
+             (if (equal? e g)
+                 (loop es gs)
+                 #f)]
+            [(_ _) #f])))
 
 (define warning-shown '())
 (define (show-warning x)
