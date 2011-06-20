@@ -71,6 +71,22 @@
 (define (rewrite-set-adjoin lws)
   (list "{" (list-ref lws 2) "} ∪ " (list-ref lws 3)))
 
+(define (rewrite-k-ok lws)
+  (define (d str)
+    (text str (default-style) (default-font-size)))
+  (define (l str)
+    (text str (literal-style) (default-font-size)))
+  (list ""
+        (list-ref lws 2) 
+        (hbl-append
+         (d " ∈ {")
+         (l "cons")
+         (d ", ")
+         (l "left")
+         (d ", ")
+         (l "right")
+         (d "}"))))
+
 (define compound-rewriters
   (list (list 'append-contexts rewrite-append-contexts)
         (list 'matches rewrite-matches)
@@ -82,7 +98,8 @@
         (list 'neq rewrite-neq)
         (list 'pair rewrite-pair)
         (list 'set-adjoin rewrite-set-adjoin)
-        (list 'set rewrite-set)))
+        (list 'set rewrite-set)
+        (list 'k-ok rewrite-k-ok)))
 
 (define matches-schema/unframed
   (with-rewriters (rule-schema patterns (matches G t p b))))
