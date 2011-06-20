@@ -67,6 +67,6 @@ hundreds@note{There are more than 400 citations to the original Felleisen-Hieb p
               languages landscape.}
 of papers that use evaluation context
 semantics to model programming languages for just as many different
-purposes. Although we have not implemented all of them in Redex, we have sought out
-interesting and non-standard ones to try them out and every one we have tried
-matches the semantics we present here.
+purposes. Although we have not implemented anywhere near all of them in Redex, we have sought out
+interesting and non-standard ones over the years to try them out and to build our intuition
+about how a semantics should behave.
