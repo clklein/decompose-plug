@@ -483,14 +483,20 @@
   (make-bib
    #:author (authors "Matthias Felleisen" "Robert Hieb")
    #:title "The Revised Report on the Syntactic Theories of Squential Control and State"
-   #:location (journal-location tcs)
-   #:date "1991"))
+   #:location (journal-location tcs
+                                #:pages '(235 271)
+                                #:number 2
+                                #:volume 103)
+   #:date "1992"))
 
 (define context-sensitive-rewriting-fundamentals
   (make-bib
    #:author "Salvador Lucas"
-   #:title "Fundamentals of Context-sensitive rewriting"
-   #:location (proceedings-location sofsem)
+   #:title "Fundamentals of Context-Sensitive Rewriting"
+   #:location (proceedings-location sofsem
+                                    #:series lncs
+                                    #:volume 1012
+                                    #:pages '(405 412))
    #:date "1995"))
 
 (define cbn-calculus
