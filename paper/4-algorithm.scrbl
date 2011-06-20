@@ -85,8 +85,8 @@ is given in @secref{sec:proof}).
 Parsing algorithms that support left recursive context-free grammars go back 
 nearly fifty years@~cite[kuno-cacm65]. We refer the reader to
 @citet[frost-iwpt07-sec3] for a summary. Some of these algorithms appear 
-adaptable to our setting,@note{We discovered this line of work only recently; if
-the PC knows of other papers we should read, we would love pointers.} though we 
+adaptable to our setting,@note{We realized the significance of this line of work to ours only recently; if
+the PC knows this area, we would be grateful for any advice.} though we 
 have investigated only one, an extension of the packrat parsing
 algorithm@~cite[warth-pepm08]. This extension dynamically detects left recursion and 
 treats the choice leading to it as a failure. If the other choices for the same 
