@@ -45,18 +45,21 @@ and a sub-term @mt[t] occurring in @mt[C]'s hole.
 The first two @mt[M] cases handle the pattern @mt[:hole]. If the term in 
 question is also @mt[:hole], then it may be considered either to match 
 @mt[:hole] or to decompose into @mt[:hole] in the empty context. If the term is
-not @mt[:hole], then only decomposition is possible. Similarly, the third case
-handles all other atomic patterns by producing a match result only if the given
+not @mt[:hole], then only decomposition is possible. The third case
+handles atomic patterns by producing a match result only if the given
 term is identical to the atom.
 
 The (meta) context in which a call to @mt[M] appears may eventually discard some 
 or all of the results it receives. For example, consider the fourth clause,
-which handles @mt[:cons] patterns. If the term is also a pair, the case makes
-two recursive calls and examines the cross product of the results. For each result
+which handles @mt[:cons] patterns. If the term is also a pair (constructed with
+any of @pt[:cons], @pt[:left], or @pt[:right]), then this case makes
+two recursive calls and examines the cross product of the results using the
+@pt[select] helper function. For each result
 pair, the case merges their bindings and checks that the results are not both 
-decompositions. If neither is a decomposition, the case combines the pair into
+decompositions. If neither is a decomposition, @pt[select] combines the pair into
 a match result; if exactly one is a decomposition, it extends the decomposition
-with the term matched by the non-decomposition.
+with the term matched by the non-decomposition. If both are decompositions, 
+then the match fails.
 
 The next case, for patterns @mt[(:in-hole p_c p_h)], recurs with @mt[p_c] and 
 the input term, expecting to receive decompositions. For each one, it makes 

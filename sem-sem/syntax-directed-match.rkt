@@ -9,8 +9,8 @@
 (provide (all-defined-out))
 
 (define-extended-language directed-matching patterns
-  (d (pair C t) •)
-  (m (pair d b)))
+  (m (pair d b))
+  (d (pair C t) •))
 
 (define-metafunction directed-matching
   matches : G p t -> (b ...)
@@ -26,7 +26,8 @@
   [(M G a a)
    (set/id (pair • (no-bindings)))]
   [(M G (:cons p_l p_r) (k t_l t_r))
-   ,(set-comp* (term ((pair d b) (in d (select t_l d_l t_r d_r))
+   ,(set-comp* (term ((pair d b) (in k (set/id :cons :left :right)) ;; this line added to clarify typeset version
+                                 (in d (select t_l d_l t_r d_r))
                                  (eq b (⊔ b_l b_r))
                                  (in (pair d_r b_r) (M G p_r t_r))
                                  (in (pair d_l b_l) (M G p_l t_l)))))]

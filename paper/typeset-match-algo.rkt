@@ -67,18 +67,30 @@
 (define (render-algorithm)
   (with-rewriters
    (vl-append
-    (hbl-append
-     horizontal-gap-size
-     (metafunction-signature "M" "G" "p" "t" (powerset "m"))
-     (parameterize ([render-language-nts '(m)])
-       (render-language directed-matching))
-     (parameterize ([render-language-nts '(d)])
+    (htl-append 
+     (vl-append
+      (metafunction-signature "matches" "G" "p" "t" (powerset "b"))
+      (render-metafunction matches))
+     (blank 80 0)
+     (parameterize ([render-language-nts '(d m)])
        (render-language directed-matching)))
+    
+    (blank vertical-gap-size)
+    
+    (metafunction-signature "M" "G" "p" "t" (powerset "m"))
     (render-metafunction M)
+    
     (blank vertical-gap-size)
     
-    (render-metafunctions named select combine)
+    (metafunction-signature "select" "t" "d" "t" "d" (powerset "d"))
+    (render-metafunctions select)
+    
     (blank vertical-gap-size)
     
-    (metafunction-signature "matches" "G" "p" "t" (powerset "b"))
-    (render-metafunction matches))))
+    (metafunction-signature "combine" "C" "d" "d")
+    (render-metafunctions combine)
+    
+    (blank vertical-gap-size)
+    
+    (metafunction-signature "named" "d" "t" "t")
+    (render-metafunctions named))))
