@@ -75,7 +75,7 @@
         [else (error 'pict/nt "expected pict or string but got ~s" t)]))
 
 (define (powerset s)
-  (hbl-append (text "℘(") (pict/nt s) (text ")")))
+  (hbl-append (text "℘" '() 20) (text "(") (pict/nt s) (text ")")))
 
 (define (metafunction-signature name . contract)
   (define domain (drop-right contract 1))
