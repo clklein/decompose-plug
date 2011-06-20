@@ -173,9 +173,9 @@ match).
 Generalizing from ordinary continuations to delimited 
 continuations is simply a matter of factoring the contexts
 into two parts, those that contain a prompt and those that
-do not. @Figure-ref["fig:delim"] shows one way to do this, as
-an extension of @figure-ref["fig:cont"]. The non-terminal @rr[M]
-matches an arbitrary context and @rr[E] matches a context
+do not. @Figure-ref["fig:lc"] shows one way to do this, as
+an extension of @figure-ref["fig:cont"]. The non-terminal @rr[E]
+matches an arbitrary context and @rr[M] matches a context
 that does not contain any prompt expressions. Accordingly,
 the rule for grabbing a continuation exploits this factoring
 to record only the portion of the context between
@@ -187,15 +187,15 @@ to record only the portion of the context between
   (render-language wacky)
   (render-language wacky-inside-out))
 }
-The interesting aspect of this system is how @rr[M] refers to @rr[E] 
+The interesting aspect of this system is how @rr[E] refers to @rr[M] 
 and how that makes it difficult to support an algorithm
-that matches @rr[M]. For all of the example systems so far in
+that matches @rr[E]. For all of the example systems so far in
 this section, a matching algorithm can match a pattern of the
 form @rr[(in-hole C e)] by attempting to match @rr[C] against
 the entire term and, once a match has been found, attempting to 
-match what appeared at the hole against @rr[e]. With @rr[M], however,
-this leads to an infinite loop because @rr[M] expands to a
-decomposition that includes @rr[M] in the first position.
+match what appeared at the hole against @rr[e]. With @rr[E], however,
+this leads to an infinite loop because @rr[E] expands to a
+decomposition that includes @rr[E] in the first position.
 
 A simple fix that works for the delimited continuations 
 example is to treat such

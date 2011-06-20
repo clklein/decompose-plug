@@ -292,10 +292,12 @@ Also has hide-hole removing capabilities
          (syntax-case stx ()
            [(_ #:norm norm rr :rr trm expected ...)
             #`(begin
-                #,(syntax/loc #'rr
-                    (test-equal
-                     (sort-alphabetically (map norm (app rr trm)))
-                     (sort-alphabetically (map norm (list expected ...)))))
+                #,@(if (syntax-e #'rr)
+                       (list (syntax/loc #'rr
+                               (test-equal
+                                (sort-alphabetically (map norm (app rr trm)))
+                                (sort-alphabetically (map norm (list expected ...))))))
+                       (list))
                 #,(syntax/loc #':rr
                     (test-equal
                      (sort-alphabetically (map norm (:app :rr trm)))

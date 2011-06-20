@@ -16,7 +16,7 @@
          cbv-red :cbv-red
          cont-red :cont-red
          cbn-red :cbn-red
-         delim-red
+         delim-red :delim-red
          cont-plus-red :cont-plus-red
          cont-pair-red :cont-pair-red
          
@@ -113,17 +113,29 @@
   (union-red-rels :cont-partial-red
                   (reinterp-red-rel :cbv-red :Λk/red)))
 
-(define-double-extended-language Λdk/red Λk/red :Λdk/red :Λk/red
-  (e .... (|#| e) call/comp)
-  (v .... call/comp)
-  (E (E e) (v E) hole)
-  (M E (in-hole M (|#| E))))
+(define-double-extended-language/hide-hole Λdk/red Λ/red :Λdk/red :Λ/red Λdk/red/no-hide-hole
+  (e .... (|#| e))
+  (v .... call/comp (comp (hide-hole M)))
+  (M (M e) (v M) hole)
+  (E M (in-hole E (|#| M))))
+
+(define-values (delim-partial-red :delim-partial-red)
+  (double-reduction-relation
+   Λdk/red :Λdk/red ()
+   (--> (in-hole E (|#| (in-hole M (call/comp v))))
+        (in-hole E (|#| (in-hole M (v (comp M))))))
+   (--> (in-hole E ((comp M) v))
+        (in-hole (in-hole E M) v))
+   (--> (in-hole E (|#| v))
+        (in-hole E v))))
 
 (define delim-red
-  (reduction-relation
-   Λdk/red
-   (--> (in-hole M (|#| (in-hole E (call/comp v))))
-        (in-hole M (|#| (in-hole E (v (cont E))))))))
+  (union-reduction-relations delim-partial-red
+                             (extend-reduction-relation cbv-red Λdk/red)))
+(define :delim-red
+  (union-red-rels :delim-partial-red
+                  (reinterp-red-rel :cbv-red :Λdk/red)))
+
 
 (define-double-language wacky :wacky
   (C (in-hole C (f hole)) hole))
@@ -131,16 +143,22 @@
   (C (f C) hole))
 
 (define-values (cont-plus-red :cont-plus-red)
-  (let-values ([(cont-plus-partial-red :cont-plus-partial-red)
+  (let-values ([(cont-plus-unshown-red :cont-plus-unshown-red)
+                (double-reduction-relation 
+                 Λk/red :Λk/red ()
+                 (--> (in-hole E_1 ((cont E_2) v))
+                      (in-hole E_2 v)))]
+               [(cont-plus-shown-red :cont-plus-shown-red)
                 (double-reduction-relation 
                  Λk/red :Λk/red ()
                  (--> (in-hole E (call/cc v))
-                      (in-hole E (v (cont (|+1| E)))))
-                 (--> (in-hole E_1 ((cont E_2) v))
-                      (in-hole E_2 v)))])
-    (values (union-reduction-relations cont-plus-partial-red
-                                       (extend-reduction-relation cbv-red Λk/red))
-            (union-red-rels :cont-plus-partial-red
+                      (in-hole E (v (cont (|+1| E))))))])
+    (values (union-reduction-relations
+             cont-plus-shown-red
+             (extend-reduction-relation cont-plus-unshown-red Λk/red) ; hide in typesetting
+             (extend-reduction-relation cbv-red Λk/red))
+            (union-red-rels :cont-plus-unshown-red
+                            :cont-plus-shown-red
                             (reinterp-red-rel :cbv-red :Λk/red)))))
 
 (define-double-extended-language Λkp/red Λk/red :Λkp/red :Λk/red
@@ -149,20 +167,26 @@
   (E (E e) (v E) (cons E e) (cons v E) hole))
 
 (define-values (cont-pair-red :cont-pair-red)
-  (let-values ([(cont-pair-partial-red :cont-pair-partial-red)
+  (let-values ([(cont-pair-unshown-red :cont-pair-unshown-red)
                 (double-reduction-relation 
                  Λkp/red :Λkp/red ()
-                 (--> (in-hole E (call/cc v))
-                      (in-hole E (v (cons (cont E) (cont (in-hole E E))))))
                  (--> (in-hole E_1 ((cont E_2) v))
                       (in-hole E_2 v))
                  (--> (in-hole E (car (cons v_1 v_2)))
                       (in-hole E v_1))
                  (--> (in-hole E (cdr (cons v_1 v_2)))
-                      (in-hole E v_2)))])
-    (values (union-reduction-relations cont-pair-partial-red
-                                       (extend-reduction-relation cbv-red Λkp/red))
-            (union-red-rels :cont-pair-partial-red
+                      (in-hole E v_2)))]
+               [(cont-pair-shown-red :cont-pair-shown-red)
+                (double-reduction-relation 
+                 Λkp/red :Λkp/red ()
+                 (--> (in-hole E (call/cc v))
+                      (in-hole E (v (cons (cont E) (cont (in-hole E E)))))))])
+    (values (union-reduction-relations 
+             cont-pair-shown-red
+             (extend-reduction-relation cont-pair-unshown-red Λkp/red)
+             (extend-reduction-relation cbv-red Λkp/red))
+            (union-red-rels :cont-pair-unshown-red
+                            :cont-pair-shown-red
                             (reinterp-red-rel :cbv-red :Λkp/red)))))
 
 (define-metafunction Λneed/red

@@ -324,6 +324,15 @@
  (term (((λ (f) (λ (x) (f (f x)))) |+1|) 3))
  (term 5))
 
+;; tests of delimited continuation examples
+
+(test-double-reduction*
+   #f :delim-red
+   (term (|+1| (|#| (|+1| (call/comp (λ (k) (k (k 0))))))))
+   (term 4))
+
+;; tests of exotic relations discussed in section 5
+
 (test-double-reduction*
  cont-plus-red :cont-plus-red
  (term (call/cc (λ (k) (k 0))))

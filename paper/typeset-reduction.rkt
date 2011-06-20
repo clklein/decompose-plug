@@ -5,7 +5,7 @@
          "common.rkt"
          "../sem-sem/common.rkt"
          "../sem-sem/reduction.rkt")
-(provide render-reduction)
+(provide rt render-reduction)
 
 (define (rewrite-reduces lws)
   (list ""
@@ -14,7 +14,7 @@
         (list-ref lws 3)
         " / "
         (list-ref lws 4)
-        " → "
+        (hbl-append (text " ") (arrow->pict '-->) (text " "))
         (list-ref lws 5)
         " / "
         (list-ref lws 6)
@@ -44,22 +44,29 @@
         (list 'matches rewrite-matches)
         (list 'reduces rewrite-reduces)))
 
-(define (render-reduction)
+(define-syntax-rule (with-rewriters expr)
   (let loop ([rws compound-rewriters])
     (match rws
       ['() 
        (with-keyword-rewriters
-        (λ ()
-          (vc-append
-           vertical-gap-size 
-           (hc-append
-            horizontal-gap-size
-            (render-relation reduces)
-            (parameterize ([render-language-nts '(r)])
-              (vl-append
-               (render-language reduction)
-               (non-bnf-def "f" (arbitrary-function-domain "t" "t")))))
-           (render-metafunctions inst join plug)
-           (render-relation no-ctxts))))]
+        (λ () expr))]
       [(cons (list name rewriter) rs)
        (with-compound-rewriter name rewriter (loop rs))])))
+
+(define (render-reduction)
+  (with-rewriters
+   (vc-append
+    vertical-gap-size 
+    (hc-append
+     horizontal-gap-size
+     (render-relation reduces)
+     (parameterize ([render-language-nts '(r)])
+       (vl-append
+        (render-language reduction)
+        (non-bnf-def "f" (arbitrary-function-domain "t" "t")))))
+    (render-metafunctions inst plug join)
+    (parameterize ([relation-clauses-combine (λ (l) (apply hbl-append 20 l))])
+      (render-relation no-ctxts)))))
+
+(define-syntax-rule (rt t) ; "reduction term"
+  (with-rewriters (lw->pict reduction (to-lw t))))

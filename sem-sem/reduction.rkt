@@ -14,23 +14,23 @@
 
 (define-extended-language reduction patterns
   (r a
-     (:cons r r)
-     (:in-hole r r)
      (:var x)
-     (:app f r))
+     (:app f r)
+     (:in-hole r r)
+     (:cons r r))
   (f (side-condition any_1 (procedure? (term any_1)))))
 
 (define-metafunction reduction
   inst : r b -> t
   [(inst a b) a]
-  [(inst (:cons r_1 r_2) b)
-   (join (inst r_1 b) (inst r_2 b))]
-  [(inst (:in-hole r_1 r_2) b)
-   (plug (inst r_1 b) (inst r_2 b))]
   [(inst (:var x) b)
    (lookup b x)]
   [(inst (:app f r) b)
-   (meta-app f (inst r b))])
+   (meta-app f (inst r b))]
+  [(inst (:in-hole r_1 r_2) b)
+   (plug (inst r_1 b) (inst r_2 b))]
+  [(inst (:cons r_1 r_2) b)
+   (join (inst r_1 b) (inst r_2 b))])
 
 (define-metafunction reduction
   join : t t -> t
