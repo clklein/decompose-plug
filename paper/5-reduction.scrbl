@@ -16,7 +16,7 @@ As with patterns, we consider a core specification language that lacks
 many of the conveniences of a language like Redex but nevertheless addresses the
 principal ideas.
 
-@figure["fig:reduction" "A semantics for reduction"]{
+@figure["fig:reduction" "A semantics for reduction (cases apply in order)."]{
 @(centered (render-reduction))
 }
 
@@ -77,7 +77,7 @@ example, consider the rule for yet another unusual control operator:
 This rule calls @Λkp-term[v] with a pair of continuation values. The term 
 denoting this pair is not itself pluggable, but the embedded contexts can
 be plugged by subsequent reduction steps, after they are extracted by the
-reduction rules for extracting @Λkp-term[tuple] components.
+reduction rules for projecting @Λkp-term[tuple] components.
 
-In addition to these contrived reduction systems, the semantics in 
+In addition to these contrived reduction rules, the semantics in 
 @figure-ref{fig:reduction} supports all of the systems in @secref{sec:examples}.

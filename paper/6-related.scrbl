@@ -18,12 +18,12 @@ to exactly one hole.
 formulation of selective contexts. This formulation defines contexts not by
 grammars but by specifying, for each function symbol, which sub-term positions
 may be reduced. Because the specification depends only on the function symbol's
-identity (i.e., and not on the sibling sub-terms), this formulation cannot express
+identity (i.e., and not on its sub-terms), this formulation cannot express
 common evaluation strategies, such as left-to-right, call-by-value evaluation. Follow-up
 work on this form of context-sensitive rewriting focuses on tools for proving
 termination, generally a topic of limited interest when studying reduction 
-systems designed to model a programming language (as programming languages typically
-are known not to terminate).
+systems designed to model a programming language (as programming languages are typically
+known not to terminate).
 
 As part of their work on SL, a meta-language similar to Redex, @citet[xiao-hosc01]
 define a semantics for Felleisen-Hieb contexts by translating grammars to finite 
@@ -38,7 +38,7 @@ contexts as meta-level term-to-term functions (restricted to coincide with the
 usual grammar defining call-by-value evaluation) and therefore models plug as 
 meta-application. The formulation does not use an explicit notion of 
 decomposition; instead, the contextual closure reduction rule applies to terms
-when they are plugged into a given context.
+that may be formed using the plug operation.
 
 Berghofer's, Leroy's, and Xi's solutions to the POPLmark Challenge@~cite[POPLmark] use 
 Dubois's encoding for the challenge's reduction semantics. Vouillon's solution uses a 
@@ -57,8 +57,9 @@ explicitly. Common practice leaves these definitions implicit, and one of our
 design goals for Redex is to support conventional definitions. 
 Second, the axiomatization requires decomposition to be a (single-valued) 
 function, ruling out the semantics in @figure-ref{fig:arith} and, more 
-problematically, reduction semantics for multi-threaded programs or 
-unspecified order of evaluation.
+problematically, reduction semantics for multi-threaded programs and programs in
+languages like C and Scheme, which do not specify an order for application 
+expressions.
 
 More broadly speaking, there are 
 hundreds@note{There are more than 400 citations to the original Felleisen-Hieb paper;

@@ -26,7 +26,7 @@ where evaluation occurs. These contexts allow the designer
 of a reduction semantics to factor the definition of 
 a calculus into one part that specifies that atomic steps
 of computation and a second part that controls where these
-steps may occur. This factoring enables concise specification that, e.g, 
+steps may occur. This factoring enables concise specification that, e.g., 
 a language is call-by-value (or call-by-name or call-by-need@~cite[cbn-calculus]),
 @racket[if] expressions must evaluate 
 the test position before the branches, and even the behavior of 
@@ -69,8 +69,9 @@ addition to proving a correspondence between a specification of
 context-sensitive matching and an algorithm for that specification, 
 we have conducted extensive testing of the semantics, using a Redex
 model of Redex (there is little danger of meta-circularity causing
-problems, as the embedding uses a relatively modest subset of Redex's
-functionality). This model allows us to test that our semantics gives
+problems, as the embedding uses a modest subset of Redex's
+functionality and, notably, no contexts or reduction relations). 
+This model allows us to test that our semantics gives
 the intended meanings to interesting calculi from the literature.
 
 The remainder of this paper builds up an intuitive understanding of 

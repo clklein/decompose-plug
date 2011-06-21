@@ -22,13 +22,13 @@ exponentially in the number of nested @pt[:cons] patterns matched (counting indi
 nesting through non-terminals). Second, the rules provide no answer to the 
 question of whether to proceed in expanding a non-terminal if none of the input 
 term has been consumed since last encountering that non-terminal. This question
-arises, for example, when decomposing by the pattern @pt[(:nt M)] from the 
-grammar in @figure-ref{fig:delim}, since @pt[M]'s second production causes the 
-@pt[:in-hole] rule to decompose the same term by the pattern @pt[(:nt M)]. This
+arises, for example, when decomposing by the pattern @pt[(:nt E)] from the 
+grammar in @figure-ref{fig:delim}, since @pt[E]'s second production causes the 
+@pt[:in-hole] rule to decompose the same term by the pattern @pt[(:nt E)]. This
 second problem is the manifestation of left recursion in the form of grammars
 we consider.
 
-@figure["fig:core-algo" "Core matching algorithm. Cases apply in order."]{
+@figure["fig:core-algo" "Core matching algorithm (cases apply in order)."]{
 @(render-algorithm)
 }
 
@@ -90,7 +90,7 @@ nearly fifty years@~cite[kuno-cacm65]. We refer the reader to
 @citet[frost-iwpt07-sec3] for a summary. Some of these algorithms appear 
 adaptable to our setting,@note{We realized the significance of this line of work to ours only recently; if
 the PC knows this area, we would be grateful for any advice.} though we 
-have investigated only one, an extension of the packrat parsing
+have implemented only one, an extension of the packrat parsing
 algorithm@~cite[warth-pepm08]. This extension dynamically detects left recursion and 
 treats the choice leading to it as a failure. If the other choices for the same 
 portion of the input make any progress at all, the algorithm repeats the parse
@@ -99,7 +99,7 @@ attempt will cause a second attempt to succeed. This process continues as long
 as repeated attempts make additional progress.
 Extending the algorithm in @figure-ref{fig:core-algo} with a similar iterative 
 phase allows matching of terms from left recursive grammars, such 
-@render-language[wacky]. 
+the ones in @figure-ref{fig:delim} and @figure-ref{fig:wacky}. 
 
 @;{|
 @(define-syntax-rule (wt t) ; "wacky term"

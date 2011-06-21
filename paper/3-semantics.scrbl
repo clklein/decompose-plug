@@ -22,15 +22,16 @@ of matching.
 @wfigure[#:size 1.7 "fig:pat-term" "Patterns and Terms"]{
 @patterns-and-terms
 }
-Terms @pt[t] are binary trees that have atoms as leaves. Embedded
-contexts (@pt[C]) in a term give path information for finding a hole 
-in a term that represents a context. That is, for matching purposes
-@pt[left], @pt[right], and @pt[cons] all mean the same thing; the difference
-is relevant only when plugging a context.
+
+Terms @pt[t] are binary trees that have atoms as leaves.
+A contexts @pt[c] within a term carry the path to its hole in the form
+of @pt[:left] and @pt[:right] annotations. For matching purposes, though,
+the @pt[:left] and @pt[:right] constructors are equivalent to @pt[:cons]; 
+the difference arises relevant only when plugging a context.
 Atoms @pt[a] include literals such as numbers and symbols.
 
 Patterns @pt[p] take one of six forms. 
-Atomic patterns @pt[a] and @pt[:hole] match themselves. A pattern 
+Atomic patterns @pt[a] and the @pt[:hole] pattern match only themselves. A pattern 
 @pt[(:name x p)] binds the pattern variable @pt[x] to the term matched by 
 @pt[p]. Repeated pattern variables force the corresponding sub-terms to
 be identical. A pattern @pt[(:nt n)] matches terms that match any of the 
@@ -38,7 +39,7 @@ productions of the non-terminal @pt[n] (defined outside the pattern).
 We write decomposition patterns @math{p_1[p_2]} using a separate keyword
 for clarity: @pt[(:in-hole p_1 p_2)]. Finally, interior nodes are matched
 by the pattern @pt[(:cons p_1 p_2)], with @pt[p_1] and @pt[p_2] matching the corresponding
-subterms.
+sub-terms.
 
 @(begin
    (require "../2-models/double.rkt"
@@ -75,31 +76,31 @@ The bindings @pt[b] is a finite map from pattern variables to terms showing how 
 pattern variables of @pt[p] can be instantiated to yield @pt[t]. 
 The @|matches-schema/unframed| judgment relies on an auxiliary
 judgment @|decomposes-schema/unframed| that performs decompositions. Specifically,
-it holds when @pt[t] matches @pt[p] and can be decomposed into a context
-@pt[C] with @pt[t_^′] in the hole.
+it holds when @pt[t] can be decomposed into a context @pt[C] that matches @pt[p] 
+and contains the sub-term @pt[t_^′] at its hole.
 
 Many of the rules for these two judgment forms rely on the operator 
-@pt[⊔]. It combines two pattern variable mappings into a single one by unioning their 
-domains and ranges, as long as the domains do not overlap. If the domains
+@pt[⊔]. It combines two mappings into a single one by unioning their 
+bindings, as long as the domains do not overlap. If the domains
 do overlap then the corresponding ranges must be the same; otherwise 
 @pt[⊔] is not defined. Accordingly, rules that uses @pt[⊔] apply only when
 @pt[⊔] is well-defined.
 
 The atom rule produces an empty binding map because a pattern @pt[a] contains no
-pattern varibles. The @pt[:name] rule matches @pt[p] with @pt[t] and produces a
+pattern variables. The @pt[:name] rule matches @pt[p] with @pt[t] and produces a
 map extended with the binding @pt[(pair x t)]. The @pt[nt] rule applies 
 if any of the non-terminal's productions match. The scope of a production's 
 pattern variables is limited to that production, and consequently, the 
-@pt[nt] rule produces an empty binding map. The @pt[:cons] matches the 
-sub-terms and their binding consistency. The @pt[:in-hole] rule uses
-the other judgment form to find a decomposition and then checks to make 
+@pt[nt] rule produces an empty binding map. The @pt[:cons] rule matches the 
+sub-terms and combines the resulting sets of bindings. The @pt[:in-hole] rule uses
+the decomposition judgment form to find a decomposition and then checks to make 
 sure that the term in the hole matches @pt[p_2].
 
-The rules for the @|decomposes-schema/unframed| judgment are organized
-around the pattern being matched (@pt[p]).
-The @pt[:hole] decomposition rule decomposes @pt[t] into the empty context
+The rules for the @|decomposes-schema/unframed| form are also organized
+around the pattern in question.
+The @pt[:hole] decomposition rule decomposes any term @pt[t] into the empty context
 and @pt[t] itself. The first of two @pt[:cons] decomposition rules applies
-when a decomposition's focus is placed within a pair's left sub-term.
+when a decomposition's focus may be placed within a pair's left sub-term.
 This decomposition highlights the same sub-term @pt[t_1^′] as the
 decomposition of @pt[t_1] does, but places it within the larger context 
 @pt[(:left C t_2)]. The second of the @pt[:cons] decomposition rules does the
