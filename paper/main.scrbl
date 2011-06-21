@@ -25,12 +25,12 @@ programming language designed to support Felleisen-Hieb-style
 semantics. This style of semantics is the de-facto standard in operational
 semantics and, as such, is widely used.
 Accordingly, our goal is that Redex programs should, as much as possible,
-look and behave like those semantics. Over the five years
-since Redex's first public release, the precise interpretation of
+look and behave like those semantics. Since Redex's first public release
+more than seven years ago, its precise interpretation of
 contexts has changed several times, as we repeatedly encountered
 reduction systems that did not behave according to their authors'
 intent. This work describes the result of that experience.
-To the best of our knowledge, the semantics given here matches even
+To the best of our knowledge, the semantics given here accommodates even
 the most complex uses of Felleisen-Hieb-style semantics available.
 }
 
