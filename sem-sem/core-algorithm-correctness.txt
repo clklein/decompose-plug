@@ -3,103 +3,9 @@ BEGIN-INLINE-LATEX
 END-INLINE-LATEX
 Proof:
 If b ∈ matches[| G, p, t |], then (•, b) ∈ M[| G, p, t |],
-which by soundness implies G ⊢ t : p | b.
-If G ⊢ t : p | b, then (•, b) ∈ M[| G, p, t |] by completeness,
-and so b ∈ matches[| G, p, t |].
-
-Lemma (Termination): 
-For all G, p, and t, M[| G, p, t |] terminates if G is not left recursive.
-Proof:
-Patterns and terms can be assigned sizes such that each recursive call
-supplies smaller arguments than the ones it received. In particular,
-we interpret the size |t| of a term t as:
-
-|a| = 1
-|(cons t t')| = 1 + |t| + |t'|
-|hole| = 1
-|(left C t)| = 1 + |C| + |t|
-|(right t C)| = 1 + |t| + |C|
-
-and the size |p| of a pattern p as:
-
-|a| = 0
-|(name x p)| = 1 + |p|
-|(nt n)| = 1 + max({|p| | p in G(n)|})|
-|(in-hole p p')| = 1 + max({|p|, |p'|})|
-|(cons p p')| = 0
-|hole| = 0
-
-This assignment of pattern sizes is possible because ->_G has no cycles.
-(It can be constructed bottom-up, by beginning with non-terminals n_0
-for which n_0 -/>_G^* n for any non-terminal n, proceeding with the
-non-terminals n_1 for which n_1 ->_G^* n_0 -/>_G^*n, and so on.)
-
-We interpret the overall size of the combined arguments
-lexicographically, treating the term argument as more significant than
-the pattern argument.
-
-Each recursive call supplies either a smaller term or a term of the
-same size and a smaller pattern.
-
-Case: within `cons' clause
-Each call supplies a strictly smaller term.
-
-Case: within `in-hole' clause
-The first call supplies the same term and a pattern whose size is at most
-|(in-hole p_c p_h)| - 1.
-
-The second call supplies a term that's no larger than the input term
-(by the non-increasing subterms lemma) and a pattern whose size is at
-most |(in-hole p_c p_h)| - 1.
-
-Case: within `name' clause
-The call supplies the same term and strips the `name' from the
-pattern, decreasing its size by 1.
-
-Case: within `nt' clause
-Each call supplies the same term and a pattern whose size is at most
-|(nt n)| - 1.
-
-Lemma (Non-increasing subterms)
-If ((C, t'), b) ∈ M[| G, p, t |], then |t'| ≤ |t|.
-Proof: By induction on the M derivation.
-
-Case: hole (and t = hole)
-t = t'
-
-Case: hole (and t ≠ hole)
-t = t'
-
-Case: atom
-Impossible, since the result is not a decomposition.
-
-Case: cons
-By the definition of `select', there are two possibilities that make
-the result a decomposition:
-  Subcase: d_l = (C_l, t_l') and d_r = •.
-
-    select[| t_l, (C_l, t_l'), t_r, • |] = {((left C_l t_r), t_l')}
-    |t_l'| ≤ |t_l| by induction
-           < |(cons t_l t_r)|
-
-  Subcase: d_l = • and d_r = (C_r, t_r').
-
-    By a similar argument.
-
-Case: in-hole
-By the definition of `combine', there is one possibility that makes
-the result a decomposition:
-
-d_h = ((C_h, t_h), b_h) ∈ M[| G, p_h, t_c |].
-combine[| C, (C_h, t_h) |] = (C ++ C_h, t_h).
-|t_h| ≤ |t_c| and |t_c| ≤ |t|, both by induction.
-
-Case: name
-Suppose d = ((C, t'), b) ∈ M[| G, p, t |].
-By induction, |t'| ≤ |t|.
-
-Case: M-nt
-Similar to the `name' case. 
+which by the soundness lemma below, implies G ⊢ t : p | b.
+If G ⊢ t : p | b, then (•, b) ∈ M[| G, p, t |] by the completeness lemmma below;
+consequently b ∈ matches[| G, p, t |].
 
 Lemma (Soundness):
 For all G, p, t, b, C, and t',
@@ -136,7 +42,7 @@ Case: cons
 
   Subcase: d_1 = d_2 = •
     Then d = • by the first `select' clause, requiring
-      G ⊢ (k t_1 t_2) : (:cons p_1 p_2) : b,
+      G ⊢ (k t_1 t_2) : (cons p_1 p_2) : b,
     which holds by the cons matching rule, since:
       1. G ⊢ t_1 : p_1 | b_1 by induction,
       2. G ⊢ t_2 : p_2 | b_2 by induction, and
@@ -144,7 +50,7 @@ Case: cons
 
   Subcase: d_1 = • and d_2 = (C, t_2')
     Then d = ((right t_1 C), t_2') by the third `select' clause, requiring
-    G ⊢ (k t_1 t_2) = (right t_1 C)[t_2'] : (:cons p_1 p_2) : b,
+      G ⊢ (k t_1 t_2) = (right t_1 C)[t_2'] : (:cons p_1 p_2) : b,
     which holds by the cons-right decomposition rule, since:
       1. G ⊢ t_1 : p_1 | b_1 by induction,
       2. G ⊢ t_2 = C[t_2'] : p_2 | b_2 by induction, and
@@ -174,7 +80,7 @@ Case: in-hole
 
   Subcase: d_2 = (C_2, t_2)
     combine[| C_1, (C_2, t_2) |] = (C_1 ++ C_2, t_2), requiring:
-      G ⊢ t = (C_1 ++ C_2)[t_2] : (:in-hole p_1 p_2) b,
+      G ⊢ t = (C_1 ++ C_2)[t_2] : (in-hole p_1 p_2) | b,
     which holds by the in-hole decomposition rule, since:
       1. G ⊢ t = C_1[t_1] : p_1 | b_1 by induction,
       2. G ⊢ t_1 = C_2[t_2] : p_2 | b_2 by induction, and
@@ -187,15 +93,15 @@ Case: name
 
   Subcase: d = •
     By the name matching rule, G ⊢ t : (name x p) | b' since:
-      1. G ⊢ t : p | b, by induction.
+      1. G ⊢ t : p | b, by induction, and
       2. {(x, t)} ⊔ b = b', since {(x, named[| d, t |])} ⊔ b = b' 
-      and t = named[| •, t |] by the first `named' clause.
+      and named[| •, t |] = t by the first `named' clause.
  
   Subcase: d = (C, t')
-    By the name decomposition rule, G ⊢ t = C[t'] : (:name x p) | b' since:
-      1. G ⊢ t = C[t'] : p | b, by induction.
+    By the name decomposition rule, G ⊢ t = C[t'] : (name x p) | b' since:
+      1. G ⊢ t = C[t'] : p | b, by induction, and
       2. {(x, C)} ⊔ b = b', since {(x, named[| (C, t'), t |])} ⊔ b = b' 
-      and C = named[| (C, t'), t |] by the second `named' clause.
+      and named[| (C, t'), t |] = C by the second `named' clause.
 
 Case: nt 
   Let (d, ∅) ∈ M[| G, (nt n), t |], i.e.,
@@ -214,7 +120,7 @@ Case: the "else" clause
   Impossible since M[| G, p, t |] = ∅
 
 Lemma (Completeness): 
-For all G, p, t, b, C, and t' such that G is not left recursive:
+For all G, p, t, b, C, and t', if G is not left recursive, then
 1. G ⊢ t : p | b implies (•, b) ∈ M[| G, p, t |], and
 2. G ⊢ t = C[t'] : p | b implies ((C, t'), b) ∈ M[| G, p, t |].
 Proof: By (mutual) induction on the matching/decomposition derivation.
@@ -225,7 +131,7 @@ Case: atom matching
 
 Case: hole matching
   Given: G ⊢ hole : hole | ∅
-  (•, ∅) ∈ M[| G, hole, hole |] by M's hole case
+  (•, ∅) ∈ M[| G, hole, hole |] by M's hole case for the term hole
 
 Case: name matching
   Given: 
@@ -246,15 +152,15 @@ Case: nt matching
     1. p ∈ G(n) by hypothesis.
     2. (•, b) ∈ M[| G, p, t |] by induction.
     3. M[| G, p', t |] terminates for n's other productions p' by the 
-    termination lemma.
+    termination lemma below
 
 Case: cons matching
   Given:
-    1. G ⊢ (k t_1 t_2) : (:cons p_1 p_2) | b,
+    1. G ⊢ (k t_1 t_2) : (cons p_1 p_2) | b,
     2. G ⊢ t_1 : p_1 | b_1,
     3. G ⊢ t_2 : p_2 | b_2, and
     4. b_1 ⊔ b_2 = b.
-  By M's cons clause, (•, b) ∈ M[| G, (:cons p_1 p_2), (k t_1 t_2) |] since:
+  By M's cons clause, (•, b) ∈ M[| G, (cons p_1 p_2), (k t_1 t_2) |] since:
     1. (•, b_1) ∈ M[| G, p_1, t_1 |] by induction,
     2. (•, b_2) ∈ M[| G, p_2, t_2 |] by induction,
     3. b_1 ⊔ b_2 = b by hypothesis, and
@@ -283,7 +189,7 @@ Case: hole decomposition
 
 Case: cons-left decomposition
   Given:
-    1. G ⊢ (k t_1 t_2) = (left C t_2)[t_1'] : (:cons p_1 p_2) | b,
+    1. G ⊢ (k t_1 t_2) = (left C t_2)[t_1'] : (cons p_1 p_2) | b,
     2. G ⊢ t_1 = C[t_1'] : p_1 | b_1,
     3. G ⊢ t_2 : p_2 | b_2, and
     4. b_1 ⊔ b_2 = b'.
@@ -308,7 +214,7 @@ Case: nt decomposition
     1. p ∈ G(n) by hypothesis, 
     2. ((C, t'), b) ∈ M[| G, p, t |] by induction, and
     3. M[| G, p', t |] terminates for n's other productions p' by the 
-    termination lemma.
+    termination lemma below.
 
 Case: in-hole decomposition
   Given:
@@ -333,3 +239,98 @@ Case: name decomposition
     1. ((C, t'), b) ∈ M[| G, p, t |] by induction,
     2. named[| (C, t'), t |] = C by its second clause,
     3. b ⊔ {(x, C)} = b' by hypothesis.
+
+Lemma (Termination): 
+For all G, p, and t, M[| G, p, t |] terminates if G is not left recursive.
+Proof:
+Patterns and terms can be assigned sizes such that each recursive call of M
+supplies smaller arguments than the ones it received. In particular,
+we interpret the size |t| of a term t as:
+
+|a| = 1
+|(cons t t')| = 1 + |t| + |t'|
+|hole| = 1
+|(left C t)| = 1 + |C| + |t|
+|(right t C)| = 1 + |t| + |C|
+
+and the size |p| of a pattern p as:
+
+|a| = 0
+|(name x p)| = 1 + |p|
+|(nt n)| = 1 + max({|p| | p ∈ G(n)|})|
+|(in-hole p p')| = 1 + max({|p|, |p'|})|
+|(cons p p')| = 0
+|hole| = 0
+
+This assignment of pattern sizes is possible because the graph induced
+by ->_G has no cycles. The assignment can be constructed bottom-up, by 
+beginning with non-terminals n_0 for which n_0 -/>_G^* n for any 
+non-terminal n, proceeding with the non-terminals n_1 for which 
+n_1 ->_G^* n_0 for only the previous n_0, and so on.
+
+We interpret the overall size of the combined arguments
+lexicographically, treating the term argument as more significant than
+the pattern argument.
+
+Each recursive call supplies either a smaller term or a term of the
+same size and a smaller pattern.
+
+Case: within `cons' clause
+Each call supplies a strictly smaller term.
+
+Case: within `in-hole' clause
+The first call supplies the same term and a pattern whose size is at most
+|(in-hole p_c p_h)| - 1.
+
+The second call supplies a term that's no larger than the input term
+(by the non-increasing subterms lemma below) and a pattern whose size is 
+at most |(in-hole p_c p_h)| - 1.
+
+Case: within `name' clause
+The call supplies the same term and strips the `name' from the
+pattern, decreasing its size by 1.
+
+Case: within `nt' clause
+Each call supplies the same term and a pattern whose size is at most
+|(nt n)| - 1.
+
+Lemma (Non-increasing subterms)
+If ((C, t'), b) ∈ M[| G, p, t |], then |t'| ≤ |t|.
+Proof: By induction on the M derivation.
+
+Case: hole (and t = hole)
+t = t'
+
+Case: hole (and t ≠ hole)
+t = t'
+
+Case: atom
+Impossible, since the result is not a decomposition.
+
+Case: cons
+By the definition of `select', there are two possibilities that make
+the result a decomposition:
+  Subcase: d_l = (C_l, t_l') and d_r = •.
+
+    Then select[| t_l, (C_l, t_l'), t_r, • |] = {((left C_l t_r), t_l')}
+    |t_l'| ≤ |t_l| by induction
+           < |(cons t_l t_r)|
+
+  Subcase: d_l = • and d_r = (C_r, t_r').
+
+    By a similar argument.
+
+Case: in-hole
+By the definition of `combine', there is one possibility that makes
+the result a decomposition:
+
+d_h = ((C_h, t_h), b_h) ∈ M[| G, p_h, t_c |].
+Then combine[| C, (C_h, t_h) |] = (C ++ C_h, t_h).
+|t_h| ≤ |t_c| and |t_c| ≤ |t|, both by induction.
+
+Case: name
+Suppose d = ((C, t'), b) ∈ M[| G, p, t |].
+By induction, |t'| ≤ |t|.
+
+Case: M-nt
+Similar to the `name' case. 

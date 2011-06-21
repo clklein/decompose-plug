@@ -76,6 +76,8 @@
     ["->_G^*" "\\ensuremath{\\rightarrow_G^*}"]
     ["->_G" "\\ensuremath{\\rightarrow_G}"]
     ["-/>_G^*" "\\ensuremath{\\not \\rightarrow_G^*}"]
+    ["Lemma" "{\\bf Lemma}"]
+    ["Proof" "{\\it Proof}"]
     ["~" "\\~{}"]
     ["^" "{}$^{}${}"]
     ["#" "\\#"]
