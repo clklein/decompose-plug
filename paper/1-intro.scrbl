@@ -41,7 +41,7 @@ cover the full power of contexts. For example, which terms match the
 pattern @|ex1-pat| from this language (in which values are contexts
 are mutually referential)?
 @centered{@(lc-superimpose bkg raw1)}
-And which match this bizarre, small language?
+And which terms match this bizarre, small language?
 @centered{@(lc-superimpose bkg raw2)}
 To remedy this lack, we have developed
 a semantics for matching and reduction that not only supports these exotic languages but
