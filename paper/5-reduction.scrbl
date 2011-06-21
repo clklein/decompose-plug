@@ -24,7 +24,7 @@ principal ideas.
 @(hbl-append 2 (rt p) (arrow->pict '-->) (rt r))
 consists of a pattern @rt[p] and a term template @rt[r]. The grammar in the
 figure's top-right gives the syntax for term templates, which include atoms,
-references to a variables bound by the left-hand side, applications of meta-level
+references to variables bound by the left-hand side, applications of meta-level
 functions (e.g., substitution), hole-filling operations, and pairing operations.
 The rule in the top-left defines when a term @rt[t] reduces to @rt[t_^′] by such
 a rule, namely when @rt[p] matches @rt[t] and instantiating @rt[r] with the 
@@ -62,7 +62,7 @@ The instantiation rule for @rt[:cons] templates performs this inference via
 the function @rt[join]. When given a context and a term containing no contexts
 (as defined by the auxiliary judgment form @rt[no-ctxts]), @rt[join] extends the
 context's path through the extra layer. When both arguments contain contexts,
-@rt[join] combines the terms with @rt[:cons], preventing possibly ambiguity
+@rt[join] combines the terms with @rt[:cons], preventing possible ambiguity
 in a subsequent plugging operation.
 
 @(define-syntax-rule (Λkp-term t)

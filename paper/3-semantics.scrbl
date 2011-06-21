@@ -25,7 +25,7 @@ but this core captures an essence suitable for explaining the semantics
 of matching.
 
 Terms @pt[t] are binary trees that have atoms as leaves.
-A contexts @pt[c] within a term carry the path to its hole in the form
+A contexts @pt[c] within a term carries the path to its hole in the form
 of @pt[:left] and @pt[:right] annotations. For matching purposes, though,
 the @pt[:left] and @pt[:right] constructors are equivalent to @pt[:cons]; 
 the difference arises relevant only when plugging a context.
@@ -83,7 +83,7 @@ and contains the sub-term @pt[t_^′] at its hole.
 Many of the rules for these two judgment forms rely on the operator 
 @pt[⊔]. It combines two mappings into a single one by unioning their 
 bindings, as long as the domains do not overlap. If the domains
-do overlap then the corresponding ranges must be the same; otherwise 
+do overlap, then the corresponding ranges must be the same; otherwise 
 @pt[⊔] is not defined. Accordingly, rules that uses @pt[⊔] apply only when
 @pt[⊔] is well-defined.
 

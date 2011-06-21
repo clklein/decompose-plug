@@ -61,7 +61,7 @@ random testing, automatic typesetting, and, via its embedding
 in Racket, access to a large palette of standard programming
 tools. Redex is widely used, having supported several dozen research papers
 as well as the latest Scheme standard@~cite[R6RS] and a number of larger
-models, including a model of the Racket virtual machine@~cite[racket-VM].
+models, including one of the Racket virtual machine@~cite[racket-VM].
 
 In keeping with the spirit of Redex, we augment the standard
 proof-based validation techniques with testing. More concretely, in
@@ -70,7 +70,7 @@ context-sensitive matching and an algorithm for that specification,
 we have conducted extensive testing of the semantics, using a Redex
 model of Redex (there is little danger of meta-circularity causing
 problems, as the embedding uses a modest subset of Redex's
-functionality and, notably, no contexts or reduction relations). 
+functionality---notably, no contexts or reduction relations). 
 This model allows us to test that our semantics gives
 the intended meanings to interesting calculi from the literature.
 

@@ -8,7 +8,7 @@
 @citet[berendregt] makes frequent use of a notion of contexts specialized to 
 @math{λ}-terms. Like ours, these contexts may contain multiple holes, but
 plug's behavior differs in that it fills all of the context's holes. 
-@citet[felleisen-hieb] exploited the power of a selective notion of context 
+@citet[felleisen-hieb] exploit the power of a selective notion of context 
 to give equational semantics for many aspects of programming languages, 
 notably continuations and state. The meaning of multi-holed contexts does
 not arise in their work, since the grammar for contexts restricts them
@@ -58,7 +58,7 @@ design goals for Redex is to support conventional definitions.
 Second, the axiomatization requires decomposition to be a (single-valued) 
 function, ruling out the semantics in @figure-ref{fig:arith} and, more 
 problematically, reduction semantics for multi-threaded programs and programs in
-languages like C and Scheme, which do not specify an order for application 
+languages like C and Scheme, which do not specify an order of evaluation for application 
 expressions.
 
 More broadly speaking, there are 

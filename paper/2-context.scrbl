@@ -24,7 +24,7 @@ This section introduces the notion of a context and explains, through a series o
 Each example model comes with a lesson that informs the design of our context-sensitive reduction semantics semantics.
 
 In its essence, a pattern of the form @rr[(in-hole C e)] matches an expression when the expression can be split into two parts,
-an outer part (the context) that matches @rr[C] and an inner part that matches @rr[e]. The outer part also marks where the inner
+an outer part (the context) that matches @rr[C] and an inner part that matches @rr[e]. The outer part marks where the inner
 part appears with a hole, written @rr[hole]. In other words, when thinking of an expression as a tree, matching against
 @rr[(in-hole C e)] finds some subtree of the expression that matches @rr[e], and then replaces that sub-term with the hole
 to build a new expression in such a way that new expression matches @rr[C].
@@ -51,10 +51,10 @@ any given term.
                    @paragraph[(style #f '()) @list{@rr[a] = @rr[2]}]))]}
 }
 
-A common use of contexts is to restrict the places where a reduction may occur in order to model 
+A common use of contexts is to restrict the places where reduction may occur in order to model 
 a realistic programming language's order of evaluation. 
 @Figure-ref["fig:lc"] 
-gives a definition of @rr[E] that enforces left-to-right order of evaluation. 
+gives a definition of @rr[E] that enforces call-by-value left-to-right order of evaluation. 
 For example, consider this nested set of function calls, 
 @rr[((f x) (g y))],
 in which the result of @rr[(g y)] is passed to the result of @rr[(f x)].
@@ -63,7 +63,7 @@ It decomposes into the context
 allowing
 evaluation in the first position of the
 application. It does not, however, decompose into the context
-@rr[((f x) hole)].
+@rr[((f x) hole)],
 since the grammar for @rr[E]
 allows the hole to appear
 in the argument position of
@@ -83,7 +83,7 @@ in this case).
 
 Contexts can also be used in clever ways to model the call-by-need λ-calculus.
 Like call-by-name, call-by-need evaluates the argument to a function only if
-the value is actually needed by the body. 
+the value is actually needed by the function's body. 
 Unlike call-by-name, however, each 
 function argument is evaluated at most once. 
 A typical implementation of
@@ -96,10 +96,10 @@ but it is also possible to give a direct explanation, exploiting contexts to con
 
 @Figure-ref["fig:cbn"] shows the contexts from @citet[cbn-calculus]'s model of call-by-need.
 The first three productions of @rr[E] are standard, allowing evaluation
-in the argument of the @rr[|1+|] primitive, 
+in the argument of the @rr[|+1|] primitive, 
 as well as in the function position of an application (regardless of what
-appears in the argument position). The fourth case allows evaluation in the body of
-a lambda expression that is in the function position of an application. Intuitively,
+appears in the argument position). The fourth production allows evaluation in the body of
+a @rr[λ]-expression that is in the function position of an application. Intuitively,
 this case says that once we have determined the function to be applied, then
 we can begin to evaluate its body. Of course, the function is eventually going to
 need its argument and this is where the final production comes in. 
@@ -125,7 +125,7 @@ into the context
 @rr[((λ (x) (|+1| x)) hole)].
 This use of contexts tell us that our semantics must be
 able to support a sophisticated form of nesting, namely that
-a decomposition may occur in one part of a term in order
+sometimes a decomposition must occur in one part of a term in order
 for a decomposition to occur in another.
 
 @wfigure[#:size 2.5 "fig:cont" "Continuations"]{
@@ -206,8 +206,8 @@ A simple fix that works for the delimited continuations
 example is to backtrack when encountering such cycles; that fix, however, does not work
 for the first definition of @rr[C] given in @figure-ref["fig:wacky"]. 
 Specifically, @rr[C] would match only @rr[hole] with an algorithm
-that treated those cycles as a failure to match, but the
-context @rr[(f hole)] should match @rr[C] and, more generally,
+that treats that cycle as a failure to match, but the
+context @rr[(f hole)] should match @rr[C], and more generally,
 the two definitions of @rr[C] in @figure-ref["fig:wacky"]
 should be equivalent.
 (A more complex version of this context came up when one of our Redex
