@@ -91,11 +91,14 @@
     ["∈" "\\ensuremath{\\in}"]
     ["⊢" "\\ensuremath{\\vdash}"]
     ["≠" "\\ensuremath{\\neq}"]
+    ["=" "\\ensuremath{=}"]
     ["⊔" "\\ensuremath{\\sqcup}"]
     ["⊤" "\\ensuremath{\\top}"]
     ["•" "\\ensuremath{\\bullet}"]
     ["⊆" "\\ensuremath{\\subseteq}"]
-    ["≤" "\\ensuremath{\\leq}"]))
+    ["≤" "\\ensuremath{\\leq}"]
+    ["<" "\\ensuremath{<}"]
+    ["∅" "\\ensuremath{\\emptyset}"]))
 
 (define (starts-with? given-chars string)
   (let loop ([expected-chars (string->list string)]

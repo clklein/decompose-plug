@@ -109,23 +109,23 @@ Proof: By induction on the M derivation.
 
 Case: hole (and t = hole)
   Given:
-    M[| G, hole, hole |] = {((hole, hole), {}), (•, {})}
+    M[| G, hole, hole |] = {((hole, hole), ∅), (•, ∅)}
   By the hole decomposition rule,
-    G ⊢ hole = hole[hole] : hole | {}
+    G ⊢ hole = hole[hole] : hole | ∅
   By the hole matching rule,
-    G ⊢ hole : hole | {}
+    G ⊢ hole : hole | ∅
 
 Case: hole (and t ≠ hole)
   Given: 
-    M[| G, hole, t |] = {((hole, t), {})}
+    M[| G, hole, t |] = {((hole, t), ∅)}
   By the hole decomposition rule, 
-    G ⊢ t = hole[t] : hole | {}
+    G ⊢ t = hole[t] : hole | ∅
 
 Case: atom
   Given:
-    M[| G, a, a |] = {(•, {})}, and
+    M[| G, a, a |] = {(•, ∅)}, and
   By the atom matching rule,
-    G ⊢ a : a | {}
+    G ⊢ a : a | ∅
 
 Case: cons
   Let (d, b) ∈ M[| G, (cons p_1 p_2), (k t_1 t_2) |], i.e.,
@@ -155,7 +155,7 @@ Case: cons
     decomposition rule. 
 
   Subcase: d_1 = (C_1, t_1') and d_2 = (C_2, t_2')
-    Impossible since select[| t_1, (C_1, t_1'), t_2, (C_2, t_2') |] = {}
+    Impossible since select[| t_1, (C_1, t_1'), t_2, (C_2, t_2') |] = ∅
 
 Case: in-hole
   Let (d, b) ∈ M[| G, (in-hole p_1 p_2), t |], i.e.,
@@ -198,12 +198,12 @@ Case: name
       and C = named[| (C, t'), t |] by the second `named' clause.
 
 Case: nt 
-  Let (d, {}) ∈ M[| G, (nt n), t |], i.e.,
+  Let (d, ∅) ∈ M[| G, (nt n), t |], i.e.,
     1. p ∈ G(n), and
     2. (d, b) ∈ M[| G, p, t |].
 
   Subcase: d = •
-    By the nt matching rule, G ⊢ t : (nt n) | {} since:
+    By the nt matching rule, G ⊢ t : (nt n) | ∅ since:
       1. p ∈ G(n) by hypotheis, and
       2. G ⊢ t : p | b by induction.
 
@@ -211,7 +211,7 @@ Case: nt
     Similarly by the nt decomposition rule.
 
 Case: the "else" clause
-  Impossible since M[| G, p, t |] = {}
+  Impossible since M[| G, p, t |] = ∅
 
 Lemma (Completeness): 
 For all G, p, t, b, C, and t' such that G is not left recursive:
@@ -220,12 +220,12 @@ For all G, p, t, b, C, and t' such that G is not left recursive:
 Proof: By (mutual) induction on the matching/decomposition derivation.
 
 Case: atom matching
-  Given: G ⊢ a : a | {}
-  (•, {}) ∈ M[| G, a, a |] by M's atom case
+  Given: G ⊢ a : a | ∅
+  (•, ∅) ∈ M[| G, a, a |] by M's atom case
 
 Case: hole matching
-  Given: G ⊢ hole : hole | {}
-  (•, {}) ∈ M[| G, hole, hole |] by M's hole case
+  Given: G ⊢ hole : hole | ∅
+  (•, ∅) ∈ M[| G, hole, hole |] by M's hole case
 
 Case: name matching
   Given: 
@@ -239,10 +239,10 @@ Case: name matching
 
 Case: nt matching
   Given:
-    1. G ⊢ t : (:nt n) | {},
+    1. G ⊢ t : (:nt n) | ∅,
     2. p ∈ G(n), and
     3. G ⊢ t : p | b. 
-  By M's nt clause, (•, {}) ∈ M[| G, (nt n), t |] since:
+  By M's nt clause, (•, ∅) ∈ M[| G, (nt n), t |] since:
     1. p ∈ G(n) by hypothesis.
     2. (•, b) ∈ M[| G, p, t |] by induction.
     3. M[| G, p', t |] terminates for n's other productions p' by the 
@@ -273,13 +273,13 @@ Case: in-hole matching
     4. • = combine[| C, • |] by its first clause.
 
 Case: hole decomposition
-  Given: G ⊢ t = hole[t] : :hole | {}
+  Given: G ⊢ t = hole[t] : :hole | ∅
   Subcase: t = hole
     By the M clause that applies when the pattern and term are hole,
-      ((hole, hole), {}) ∈ M[| G, hole, t |]
+      ((hole, hole), ∅) ∈ M[| G, hole, t |]
   Subcase: t ≠ :hole
     By the M clause that applies when the pattern is hole but the term is not,
-      ((hole, t), {}) ∈ M[| G, hole, t |]
+      ((hole, t), ∅) ∈ M[| G, hole, t |]
 
 Case: cons-left decomposition
   Given:
@@ -301,10 +301,10 @@ Case: cons-right decomposition
 
 Case: nt decomposition
   Given:
-    1. G ⊢ t = C[t'] : (nt n) | {},
+    1. G ⊢ t = C[t'] : (nt n) | ∅,
     2. p ∈ G(n), and
     3. G ⊢ t = C[t'] : p | b.
-  By M's nt clause, ((C, t'), {}) ∈ M[| G, (nt n), t |] since:
+  By M's nt clause, ((C, t'), ∅) ∈ M[| G, (nt n), t |] since:
     1. p ∈ G(n) by hypothesis, 
     2. ((C, t'), b) ∈ M[| G, p, t |] by induction, and
     3. M[| G, p', t |] terminates for n's other productions p' by the 
