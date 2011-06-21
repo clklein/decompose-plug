@@ -412,7 +412,7 @@
    #:author (authors "Casey Klein" "Matthew Flatt" "Robert Bruce Findler")
    #:title "The Racket Virtual Machine and Randomized Testing"
    #:url "http://plt.eecs.northwestern.edu/racket-machine/"
-   #:date "2011"))
+   #:date "2010"))
 
 (define maude2
   (make-bib
@@ -515,13 +515,6 @@
     #:title "The Lambda Calculus: Its Syntax and Semantics"
     #:location (book-location #:publisher "North Holland")
     #:date 1984))
-
-(define racket-vm
-  (make-bib
-    #:title "The Racket Virtual Machine and Randomized Testing"
-    #:author (authors "Casey Klein" "Matthew Flatt" "Robert Bruce Findler")
-    #:url "http://plt.eecs.northwestern.edu/racket-machine/"
-    #:date "to appear"))
 
 (define example-of-using-contexts-with-explicit-deompose-and-plug
   (make-bib

@@ -61,7 +61,7 @@ random testing, automatic typesetting, and, via its embedding
 in Racket, access to a large palette of standard programming
 tools. Redex is widely used, having supported several dozen research papers
 as well as the latest Scheme standard@~cite[R6RS] and a number of larger
-models, including a model of the Racket virtual machine@~cite[racket-vm].
+models, including a model of the Racket virtual machine@~cite[racket-VM].
 
 In keeping with the spirit of Redex, we augment the standard
 proof-based validation techniques with testing. More concretely, in
