@@ -105,4 +105,4 @@
 (define-relation reduction
   [(reduces G t p t_^′ r)
    (matches G t p b)
-   (eq (inst r b) t_^’)])
+   (eq (inst r b) t_^′)])
