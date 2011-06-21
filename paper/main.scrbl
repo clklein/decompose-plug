@@ -51,5 +51,8 @@ helpful discussions on the work.
 
 @(generate-bibliography)
 
+@section[#:style (style #f '(hidden unnumbered))]{}
+@(element (style "newpage" '()) '())
+
 @section[#:tag "sec:proof"]{Appendix}
 @element[(style "input" '(exact-chars)) '("core-algorithm-correctness-txt.tex")]

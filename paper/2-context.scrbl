@@ -129,10 +129,15 @@ sometimes a decomposition must occur in one part of a term in order
 for a decomposition to occur in another.
 
 @wfigure[#:size 2.5 "fig:cont" "Continuations"]{
-@(render-language Λk/red)
-
-@(parameterize ([rule-pict-style 'horizontal])
-   (render-reduction-relation cont-red))
+@(vl-append
+  (render-language Λk/red)
+  (blank 0 6)
+  (parameterize ([rule-pict-style 'horizontal]
+                 [render-reduction-relation-rules '(0)])
+    (render-reduction-relation cont-red))
+  (parameterize ([rule-pict-style 'horizontal]
+                 [render-reduction-relation-rules '(1)])
+    (render-reduction-relation cont-red)))
 }
 
 When building a model of first-class continuations, there is an easy connection to make, namely that
@@ -144,25 +149,16 @@ for continuations.
 It adds @rr[call/cc], the operator that grabs a continuation, and the new value form
 @rr[(cont E)] that represents a continuation. 
 
-@wfigure["fig:delim" "Delimited Continuations"]{
-@(render-language Λdk/red)
-
-@paragraph[(style "vspace" '()) '(".1in")]
-
-@(parameterize ([render-reduction-relation-rules '(0)])
-   (render-reduction-relation delim-red))}
-
-For example, the next reduction step
-for this expression
+For example, the expression
 @rr[(|+1| (call/cc (λ (k) (k 2))))] 
-is to grab a continuation. In this model that continuation is represented as
+reduces by grabbing a continuation. In this model that continuation is represented as
 @rr[(cont (|+1| hole))], 
 which is then applied to @rr[call/cc]'s argument
-in the original context, yielding this expression:
-@(para (hbl-append (blank 20 0) (rr (|+1| ((λ (k) (k 2)) (cont (|+1| hole)))))))
+in the original context, yielding the expression
+@(rr (|+1| ((λ (k) (k 2)) (cont (|+1| hole))))).
 The next step is to substitute for @rr[k], 
 which yields the expression
-@(para (hbl-append (blank 20 0) (rr (|+1| ((cont (|+1| hole)) 2)))))
+@(rr (|+1| ((cont (|+1| hole)) 2))).
 This expression has a continuation value in the function
 position of an application, and the next step is to
 invoke the continuation. So, we can simply replace the context
@@ -174,6 +170,14 @@ semantics must be able to support contexts that appear in a
 term that play no part in any decomposition (and yet must still
 match a specified pattern, such as @rr[E]).
 
+@wfigure["fig:delim" "Delimited Continuations"]{
+@(render-language Λdk/red)
+
+@paragraph[(style "vspace" '()) '(".1in")]
+
+@(parameterize ([render-reduction-relation-rules '(0)])
+   (render-reduction-relation delim-red))}
+
 Generalizing from ordinary continuations to delimited 
 continuations is simply a matter of factoring the contexts
 into two parts, those that contain a prompt and those that
@@ -182,7 +186,7 @@ an extension of @figure-ref["fig:lc"]. The non-terminal @rr[E]
 matches an arbitrary evaluation context and @rr[M] matches an evaluation context
 that does not contain any prompt expressions. Accordingly,
 the rule for grabbing a continuation exploits this factoring
-to record only the portion of the context between
+to record only the portion of the context between the call to
 @rr[call/comp] and the nearest enclosing prompt in a continuation.
 
 @wfigure["fig:wacky" "Wacky Context"]{

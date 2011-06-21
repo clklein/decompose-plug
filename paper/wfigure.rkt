@@ -41,7 +41,7 @@
      (make-paragraph
       plain
       (list
-       (make-element (make-style "Legend" figure-style-extras)
+       (make-element (make-style "WLegend" figure-style-extras)
                      (list (Figure-target tag) ": " 
                            caption))))))))
 
