@@ -3,7 +3,7 @@
 @(require redex/pict
           redex/reduction-semantics
           (only-in scribble/core table paragraph style element)
-          (only-in slideshow/pict vl-append)
+          (only-in slideshow/pict vl-append hbl-append blank)
           "../2-models/models.rkt"
           "../2-models/util.rkt"
           "wfigure.rkt"
@@ -29,6 +29,14 @@ part appears with a hole, written @rr[hole]. In other words, when thinking of an
 @rr[(in-hole C e)] finds some subtree of the expression that matches @rr[e], and then replaces that sub-term with the hole
 to build a new expression in such a way that new expression matches @rr[C].
 
+To get warmed up, consider @figure-ref["fig:arith"]. In this language @rr[a] matches addition expressions and @rr[C] matches
+contexts for addition expressions. More precisely, @rr[C] matches an addition expression that has exactly one hole.
+For example, the expression @rr[(+ 1 2)] matches  @rr[(in-hole C a)] three ways, as shown in @figure-ref["fig:ex"].
+Accordingly, the reduction relation given in @figure-ref["fig:arith"] reduces addition expressions wherever they appear
+in an expression, e.g., reducing @rr[(+ (+ 1 2) (+ 3 4))] to two different expressions, @rr[(+ 3 (+ 3 4))] and @rr[(+ (+ 1 2) 7)].
+This example tells us that our context matching semantics must support multiple decompositions for
+any given term.
+
 @wfigure["fig:ex" "Example Decomposition"]{
 @centered{
 @table[(style #f '())
@@ -41,18 +49,6 @@ to build a new expression in such a way that new expression matches @rr[C].
              (list @paragraph[(style #f '()) @list{@rr[C] = @rr[(+ 1 hole)]}]
                    @paragraph[(style "hspace" '())]{.1in}
                    @paragraph[(style #f '()) @list{@rr[a] = @rr[2]}]))]}
-}
-
-To get warmed up, consider @figure-ref["fig:arith"]. In this language @rr[a] matches addition expressions and @rr[C] matches
-contexts for addition expressions. More precisely, @rr[C] matches an addition expression that has exactly one hole.
-For example, the expression @rr[(+ 1 2)] matches  @rr[(in-hole C a)] three ways, as shown in @figure-ref["fig:ex"].
-Accordingly, the reduction relation given in @figure-ref["fig:arith"] reduces addition expressions wherever they appear
-in an expression, e.g., reducing @rr[(+ (+ 1 2) (+ 3 4))] to two different expressions, @rr[(+ 3 (+ 3 4))] and @rr[(+ (+ 1 2) 7)].
-This example tells us that our context matching semantics must support multiple decompositions for
-any given term.
-
-@wfigure["fig:lc" "λ-calculus"]{
-@(render-language Λ/red #:nts (remove* '(x y) (language-nts Λ/red)))
 }
 
 A common use of contexts is to restrict the places where a reduction may occur in order to model 
@@ -80,6 +76,10 @@ must be able to support multiple different ways to
 decompose each expression form, depending on the subexpressions of
 that form (application expressions
 in this case).
+
+@wfigure["fig:lc" "λ-calculus"]{
+@(render-language Λ/red #:nts (remove* '(x y) (language-nts Λ/red)))
+}
 
 Contexts can also be used in clever ways to model the call-by-need λ-calculus.
 Like call-by-name, call-by-need evaluates the argument to a function only if
@@ -142,17 +142,27 @@ is the continuation. @Figure-ref["fig:cont"] extends the
 left-to-right call-by-value model in @figure-ref["fig:lc"] with support
 for continuations.
 It adds @rr[call/cc], the operator that grabs a continuation, and the new value form
-@rr[(cont E)] that represents a continuation. For example, the next reduction step
+@rr[(cont E)] that represents a continuation. 
+
+@wfigure["fig:delim" "Delimited Continuations"]{
+@(render-language Λdk/red)
+
+@paragraph[(style "vspace" '()) '(".1in")]
+
+@(parameterize ([render-reduction-relation-rules '(0)])
+   (render-reduction-relation delim-red))}
+
+For example, the next reduction step
 for this expression
 @rr[(|+1| (call/cc (λ (k) (k 2))))] 
 is to grab a continuation. In this model that continuation is represented as
 @rr[(cont (|+1| hole))], 
 which is then applied to @rr[call/cc]'s argument
-in the original context, yielding the expression 
-@rr[(|+1| ((λ (k) (k 2)) (cont (|+1| hole))))].
+in the original context, yielding this expression:
+@(para (hbl-append (blank 20 0) (rr (|+1| ((λ (k) (k 2)) (cont (|+1| hole)))))))
 The next step is to substitute for @rr[k], 
-which yields this expression
-@rr[(|+1| ((cont (|+1| hole)) 2))].
+which yields the expression
+@(para (hbl-append (blank 20 0) (rr (|+1| ((cont (|+1| hole)) 2)))))
 This expression has a continuation value in the function
 position of an application, and the next step is to
 invoke the continuation. So, we can simply replace the context
@@ -163,17 +173,6 @@ This reduction system tells us that our context decomposition
 semantics must be able to support contexts that appear in a
 term that play no part in any decomposition (and yet must still
 match a specified pattern, such as @rr[E]).
-
-@(require (only-in slideshow/pict blank))
-
-@wfigure["fig:delim" "Delimited Continuations"]{
-@(render-language Λdk/red)
-
-@paragraph[(style "vspace" '()) '(".1in")]
-
-@(parameterize ([render-reduction-relation-rules '(0)])
-    (render-reduction-relation delim-red))
-}
 
 Generalizing from ordinary continuations to delimited 
 continuations is simply a matter of factoring the contexts

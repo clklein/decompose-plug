@@ -11,6 +11,11 @@
           "../sem-sem/non-syntax-directed-match-define-relation.rkt")
 
 @title[#:tag "sec:match-rules"]{A Semantics for Matching}
+
+@wfigure[#:size 1.7 "fig:pat-term" "Patterns and Terms"]{
+@patterns-and-terms
+}
+
 This section formalizes the notion of matching used in the definitions of
 the example reduction systems in @secref{sec:examples}. For ease of 
 presentation, we stick to the core language of patterns and terms in
@@ -18,10 +23,6 @@ presentation, we stick to the core language of patterns and terms in
 (notably including a notion of Kleene star), 
 but this core captures an essence suitable for explaining the semantics
 of matching.
-
-@wfigure[#:size 1.7 "fig:pat-term" "Patterns and Terms"]{
-@patterns-and-terms
-}
 
 Terms @pt[t] are binary trees that have atoms as leaves.
 A contexts @pt[c] within a term carry the path to its hole in the form
@@ -107,16 +108,13 @@ decomposition of @pt[t_1] does, but places it within the larger context
 same for the pair's right sub-term. The @pt[:nt] decomposition rule propagates
 decompositions but, as in the corresponding matching rule, ignores binding maps.
 
-@wfigure[#:size 2.5 "fig:append-contexts" "Context Composition"]{
-@|append-contexts-rules|
-}
 The @pt[:in-hole] decomposition rule performs a nested decomposition. Nested 
 decomposition occurs, for example, when decomposing according to 
 call-by-need evaluation contexts (see the last production in @figure-ref{fig:cbn}).
 The @pt[:in-hole] rule decomposes @pt[t] into
 a composed context @pt[(append-contexts C_1 C_2)] and a sub-term @pt[t_^′], 
 where @pt[p_1] and @pt[p_2] match @pt[C_1] and @pt[C_2] respectively. 
-The definition of context composition (@figure-ref{fig:append-contexts}) follows
+The definition of context composition (@figure-ref{fig:matching}, bottom-right) follows
 the path in @pt[C_1]. The @pt[:name] decomposition rule is similar to the 
 corresponding matching rule, but it introduces a binding to the context
 that is matched, not the entire term.

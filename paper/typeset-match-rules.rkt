@@ -8,7 +8,6 @@
 (provide pt
          with-rewriters
          combined-matching-rules
-         append-contexts-rules
          patterns-and-terms
          matching-data-defs
          matches-schema matches-schema/unframed
@@ -118,21 +117,6 @@
     (non-bnf-def "G" (finite-function-domain "Non-Terminal" (powerset "p")))
     (non-bnf-def "b" (finite-function-domain "Variable" "t")))))
 
-(define combined-matching-rules
-  (vl-append
-   20
-   matching-data-defs
-   (pin-over
-    (pin-over
-     (vc-append (+ (* 2 vertical-gap-size)
-                   (pict-height decomposes-schema))
-                matches-rules 
-                decomposes-rules)
-     0 (+ vertical-gap-size
-          (pict-height matches-rules))
-     decomposes-schema)
-    0 0 matches-schema)))
-
 (define patterns-and-terms
   (with-rewriters
    (vl-append
@@ -145,3 +129,21 @@
 (define append-contexts-rules
   (with-rewriters
    (render-metafunctions append-contexts)))
+
+(define combined-matching-rules
+  (vc-append
+   20
+   (pin-over
+    (pin-over
+     (vc-append (+ (* 2 vertical-gap-size)
+                   (pict-height decomposes-schema))
+                matches-rules 
+                decomposes-rules)
+     0 (+ vertical-gap-size
+          (pict-height matches-rules))
+     decomposes-schema)
+    0 0 matches-schema)
+   (ht-append
+    20
+    matching-data-defs
+    append-contexts-rules)))
