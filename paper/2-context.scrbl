@@ -42,6 +42,7 @@ to build a new expression in such a way that that new expression matches @rr[C].
                    @paragraph[(style "hspace" '())]{.1in}
                    @paragraph[(style #f '()) @list{@rr[a] = @rr[2]}]))]}
 }
+
 To get warmed up, consider @figure-ref["fig:arith"]. In this language @rr[a] matches addition expressions and @rr[C] matches
 contexts for addition expressions. More precisely, @rr[C] matches an addition expression that has exactly one hole.
 For example, the expression @rr[(+ 1 2)] matches  @rr[(in-hole C a)] three ways, as shown in @figure-ref["fig:ex"].
@@ -53,6 +54,7 @@ any given term.
 @wfigure["fig:lc" "λ-calculus"]{
 @(render-language Λ/red #:nts (remove* '(x y) (language-nts Λ/red)))
 }
+
 A common use of contexts is to restrict the places where a reduction may occur in order to model 
 a realistic programming language's order of evaluation. 
 @Figure-ref["fig:lc"] 
@@ -93,6 +95,7 @@ but it is also possible to give a direct explanation, expoiting contexts to cont
 @wfigure[#:size 2 "fig:cbn" "Call-by-need Contexts"]{
 @(render-language Λneed/red #:nts '(E))
 }
+
 @Figure-ref["fig:cbn"] shows the contexts from @citet[cbn-calculus]'s model of call-by-need.
 The first three productions of @rr[E] are standard, allowing evaluation wherever @rr[E]
 may be, in the argument of the @rr[|1+|] primitive, 
@@ -133,6 +136,7 @@ for a decomposition to occur in another.
 @(parameterize ([rule-pict-style 'horizontal])
    (render-reduction-relation cont-red))
 }
+
 When building a model for continuations, there is an easy connection to make, namely that
 an evaluation context is itself a natural representation for a continuation. That is,
 at the point that when a continuation is grabbed, the context in which it is grabbed
@@ -172,6 +176,7 @@ match).
 @(parameterize ([render-reduction-relation-rules '(0)])
     (render-reduction-relation delim-red))
 }
+
 Generalizing from ordinary continuations to delimited 
 continuations is simply a matter of factoring the contexts
 into two parts, those that contain a prompt and those that
