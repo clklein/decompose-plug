@@ -169,22 +169,14 @@ match).
 
 @paragraph[(style "vspace" '()) '(".1in")]
 
-@(vl-append
-  (parameterize ([render-reduction-relation-rules '(0)])
+@(parameterize ([render-reduction-relation-rules '(0)])
     (render-reduction-relation delim-red))
-  (blank 0 2)
-  (parameterize ([render-reduction-relation-rules '(1)]
-                 [rule-pict-style 'horizontal])
-    (render-reduction-relation delim-red))
-  (parameterize ([render-reduction-relation-rules '(2)]
-                 [rule-pict-style 'horizontal])
-    (render-reduction-relation delim-red)))
 }
 Generalizing from ordinary continuations to delimited 
 continuations is simply a matter of factoring the contexts
 into two parts, those that contain a prompt and those that
-do not. @Figure-ref["fig:lc"] shows one way to do this, as
-an extension of @figure-ref["fig:cont"]. The non-terminal @rr[E]
+do not. @Figure-ref["fig:delim"] shows one way to do this, as
+an extension of @figure-ref["fig:lc"]. The non-terminal @rr[E]
 matches an arbitrary context and @rr[M] matches a context
 that does not contain any prompt expressions. Accordingly,
 the rule for grabbing a continuation exploits this factoring
@@ -197,6 +189,7 @@ to record only the portion of the context between
   (render-language wacky)
   (render-language wacky-inside-out))
 }
+
 The interesting aspect of this system is how @rr[E] refers to @rr[M] 
 and how that makes it difficult to support an algorithm
 that matches @rr[E]. For all of the example systems so far in
