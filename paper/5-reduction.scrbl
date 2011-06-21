@@ -76,7 +76,7 @@ example, consider another unusual definition for @Λkp-term[call/cc]:
 This rule calls @Λkp-term[v] with a pair of continuation values. The term 
 denoting this pair is not itself pluggable, but the embedded contexts can
 be plugged by subsequent reduction steps, after they are extracted by the
-reduction rules for @Λkp-term[car] and @Λkp-term[cdr] (not shown).
+reduction rules for extracting @Λkp-term[tuple] components.
 
 In addition to these contrived reduction systems, the semantics in 
 @figure-ref{fig:reduction} supports all of the systems in @secref{sec:examples}.

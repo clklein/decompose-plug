@@ -162,9 +162,9 @@
                             (reinterp-red-rel :cbv-red :Λk/red)))))
 
 (define-double-extended-language Λkp/red Λk/red :Λkp/red :Λk/red
-  (e .... (cons e e))
-  (v .... call/cc car cdr (cons v v))
-  (E (E e) (v E) (cons E e) (cons v E) hole))
+  (e .... (tuple e e))
+  (v .... call/cc fst snd (tuple v v))
+  (E (E e) (v E) (tuple E e) (tuple v E) hole))
 
 (define-values (cont-pair-red :cont-pair-red)
   (let-values ([(cont-pair-unshown-red :cont-pair-unshown-red)
@@ -172,15 +172,15 @@
                  Λkp/red :Λkp/red ()
                  (--> (in-hole E_1 ((cont E_2) v))
                       (in-hole E_2 v))
-                 (--> (in-hole E (car (cons v_1 v_2)))
+                 (--> (in-hole E (fst (tuple v_1 v_2)))
                       (in-hole E v_1))
-                 (--> (in-hole E (cdr (cons v_1 v_2)))
+                 (--> (in-hole E (snd (tuple v_1 v_2)))
                       (in-hole E v_2)))]
                [(cont-pair-shown-red :cont-pair-shown-red)
                 (double-reduction-relation 
                  Λkp/red :Λkp/red ()
                  (--> (in-hole E (call/cc v))
-                      (in-hole E (v (cons (cont E) (cont (in-hole E E)))))))])
+                      (in-hole E (v (tuple (cont E) (cont (in-hole E E)))))))])
     (values (union-reduction-relations 
              cont-pair-shown-red
              (extend-reduction-relation cont-pair-unshown-red Λkp/red)

@@ -340,22 +340,22 @@
 
 (test-double-reduction*
  cont-pair-red :cont-pair-red
- (term (car (cons (|+1| 0) (|+1| 1))))
+ (term (fst (tuple (|+1| 0) (|+1| 1))))
  (term 1))
 
 (test-double-reduction*
  cont-pair-red :cont-pair-red
- (term (cdr (cons (|+1| 0) (|+1| 1))))
+ (term (snd (tuple (|+1| 0) (|+1| 1))))
  (term 2))
 
 (test-double-reduction*
  cont-pair-red :cont-pair-red
- (term (|+1| (call/cc (λ (k) (cons ((car k) 0) 1)))))
+ (term (|+1| (call/cc (λ (k) (tuple ((fst k) 0) 1)))))
  (term 1))
 
 (test-double-reduction*
    cont-pair-red :cont-pair-red
-   (term (|+1| (call/cc (λ (k) (cons ((cdr k) 0) 1)))))
+   (term (|+1| (call/cc (λ (k) (tuple ((snd k) 0) 1)))))
    (term 2))
 
 (test-results)
