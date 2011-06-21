@@ -6,10 +6,11 @@
           "citations.rkt")
 
 @(define-language ex1
-   (C (v C) (C e))
+   (C hole (v C) (C e))
    (e v (e e))
    (v (λ (x) e) (cont C)))
-
+@(define ex1-pat
+   (render-lw ex1 (to-lw (in-hole C e))))
 @(define-language ex2
    (C (in-hole C (f hole)) hole))
 
@@ -34,16 +35,20 @@ all without cluttering the rules that describe the atomic steps
 of computation.
 
 Unfortunately, the precise meaning of context decomposition has not
-been nailed down in the literature. Although an intuitive definition
+been nailed down in a way that captures its diverse usage in the literature. Although an intuitive definition
 is easy to understand from a few examples, this intuition does not
-cover the full power of contexts. For example, what is the precise
-language matched by this definition (note that values and contexts are mututally referential)?
+cover the full power of contexts. For example, which terms match the
+pattern @|ex1-pat| from this language (in which values are contexts
+are mutually referential)?
 @centered{@(lc-superimpose bkg raw1)}
-or this bizarre, small one?
+And which match this bizarre, small language?
 @centered{@(lc-superimpose bkg raw2)}
 To remedy this lack, we have developed
-a semantics for matching that not only supports these exotic languages and but
-also captures the intuitive meanings of countless existing research papers.
+a semantics for matching and reduction that not only supports these exotic languages but
+also captures the intuitive meanings of countless existing research papers. 
+This semantics does not assume explicit language-specific definitions of 
+plugging and decomposition, since most expositions leave these concepts 
+implicit.
 
 Our motivation for studying context matching is its implementation
 in the domain-specific
