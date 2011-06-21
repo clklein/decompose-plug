@@ -40,21 +40,22 @@ function, defined on contexts @rt[C]. This function follows the path
 recorded for @rt[C] when it was constructed by decomposition. When plugging 
 a context @rt[C_1] with a context @rt[C_2], @rt[plug] preserves the path 
 superimposed on @rt[C_1], thereby connecting it with the path on @rt[C_2]. 
-This extended path provides an  unambiguous interpretation of the second 
-reduction rule in @figure-ref{fig:delim}, which plugs the result of plugging
-a context with a context.
+This path extension is necessary, for example, to support the following rule
+for an unusual control operator:
+@(centered
+  (parameterize ([rule-pict-style 'horizontal])
+    (render-reduction-relation cont-double-red)))
 
-@(define-syntax-rule (Λdk-term t)
+@(define-syntax-rule (Λk-term t)
    (render-lw Λdk/red (to-lw t)))
 
 The restriction of @rt[plug] to contexts creates a potential problem for rules
-like this unusual definition for @Λdk-term[call/cc], which extends the captured 
-continuation with a @Λdk-term[|+1|] frame:
+which extend contexts, like this one for another unusual control operator:
 @(centered
   (parameterize ([rule-pict-style 'horizontal])
     (render-reduction-relation cont-plus-red)))
 Although the rule does not explicitly define a path for the extended context,
-one can be safely inferred, since the term paired with @Λdk-term[E] does not
+one can be safely inferred, since the term paired with @Λk-term[E] does not
 contain any pluggable sub-terms. 
 
 The instantiation rule for @rt[:cons] templates performs this inference via 
@@ -69,7 +70,7 @@ in a subsequent plugging operation.
 
 Note, however, that the embedded contexts themselves remain remain pluggable by
 reduction rules and meta-functions that later pick apart the result term. For
-example, consider another unusual definition for @Λkp-term[call/cc]:
+example, consider the rule for yet another unusual control operator:
 @(centered
   (parameterize ([rule-pict-style 'horizontal])
     (render-reduction-relation cont-pair-red)))

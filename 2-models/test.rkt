@@ -334,8 +334,13 @@
 ;; tests of exotic relations discussed in section 5
 
 (test-double-reduction*
+ cont-double-red :cont-double-red
+ (term (|+1| (call/cc2 (λ (k) (k 0)))))
+ (term 2))
+
+(test-double-reduction*
  cont-plus-red :cont-plus-red
- (term (call/cc (λ (k) (k 0))))
+ (term (call/cc+ (λ (k) (k 0))))
  (term 1))
 
 (test-double-reduction*
@@ -350,12 +355,12 @@
 
 (test-double-reduction*
  cont-pair-red :cont-pair-red
- (term (|+1| (call/cc (λ (k) (tuple ((fst k) 0) 1)))))
+ (term (|+1| (call/ccs (λ (k) (tuple ((fst k) 0) 1)))))
  (term 1))
 
 (test-double-reduction*
    cont-pair-red :cont-pair-red
-   (term (|+1| (call/cc (λ (k) (tuple ((snd k) 0) 1)))))
+   (term (|+1| (call/ccs (λ (k) (tuple ((snd k) 0) 1)))))
    (term 2))
 
 (test-results)

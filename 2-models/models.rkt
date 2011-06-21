@@ -17,6 +17,8 @@
          cont-red :cont-red
          cbn-red :cbn-red
          delim-red :delim-red
+         
+         cont-double-red :cont-double-red
          cont-plus-red :cont-plus-red
          cont-pair-red :cont-pair-red
          
@@ -125,7 +127,7 @@
    (--> (in-hole E (|#| (in-hole M (call/comp v))))
         (in-hole E (|#| (in-hole M (v (comp M))))))
    (--> (in-hole E ((comp M) v))
-        (in-hole (in-hole E M) v))
+        (in-hole E (in-hole M v)))
    (--> (in-hole E (|#| v))
         (in-hole E v))))
 
@@ -142,23 +144,38 @@
 (define-double-language wacky-inside-out :wacky-inside-out
   (C (f C) hole))
 
+(define-values (abortive-cont-apply :abortive-cont-apply)
+  (double-reduction-relation 
+   Λk/red :Λk/red ()
+   (--> (in-hole E_1 ((cont E_2) v))
+        (in-hole E_2 v))))
+
+(define-values (cont-double-red :cont-double-red)
+  (let-values ([(cont-double-capt-red :cont-double-capt-red)
+                (double-reduction-relation 
+                 Λk/red :Λk/red ()
+                 (--> (in-hole E (call/cc2 v))
+                      (in-hole E (v (cont (in-hole E E))))))])
+    (values (union-reduction-relations
+             cont-double-capt-red
+             (extend-reduction-relation abortive-cont-apply Λk/red) ; hide in typesetting
+             (extend-reduction-relation cbv-red Λk/red))
+            (union-red-rels :abortive-cont-apply
+                            :cont-double-capt-red
+                            (reinterp-red-rel :cbv-red :Λk/red)))))
+
 (define-values (cont-plus-red :cont-plus-red)
-  (let-values ([(cont-plus-unshown-red :cont-plus-unshown-red)
+  (let-values ([(cont-plus-capt-red :cont-plus-capt-red)
                 (double-reduction-relation 
                  Λk/red :Λk/red ()
-                 (--> (in-hole E_1 ((cont E_2) v))
-                      (in-hole E_2 v)))]
-               [(cont-plus-shown-red :cont-plus-shown-red)
-                (double-reduction-relation 
-                 Λk/red :Λk/red ()
-                 (--> (in-hole E (call/cc v))
+                 (--> (in-hole E (call/cc+ v))
                       (in-hole E (v (cont (|+1| E))))))])
     (values (union-reduction-relations
-             cont-plus-shown-red
-             (extend-reduction-relation cont-plus-unshown-red Λk/red) ; hide in typesetting
+             cont-plus-capt-red
+             (extend-reduction-relation abortive-cont-apply Λk/red) ; hide in typesetting
              (extend-reduction-relation cbv-red Λk/red))
-            (union-red-rels :cont-plus-unshown-red
-                            :cont-plus-shown-red
+            (union-red-rels :abortive-cont-apply
+                            :cont-plus-capt-red
                             (reinterp-red-rel :cbv-red :Λk/red)))))
 
 (define-double-extended-language Λkp/red Λk/red :Λkp/red :Λk/red
@@ -167,26 +184,26 @@
   (E (E e) (v E) (tuple E e) (tuple v E) hole))
 
 (define-values (cont-pair-red :cont-pair-red)
-  (let-values ([(cont-pair-unshown-red :cont-pair-unshown-red)
+  (let-values ([(tuple-proj-red :tuple-proj-red)
                 (double-reduction-relation 
                  Λkp/red :Λkp/red ()
-                 (--> (in-hole E_1 ((cont E_2) v))
-                      (in-hole E_2 v))
                  (--> (in-hole E (fst (tuple v_1 v_2)))
                       (in-hole E v_1))
                  (--> (in-hole E (snd (tuple v_1 v_2)))
                       (in-hole E v_2)))]
-               [(cont-pair-shown-red :cont-pair-shown-red)
+               [(cont-pair-capt-red :cont-pair-capt-red)
                 (double-reduction-relation 
                  Λkp/red :Λkp/red ()
-                 (--> (in-hole E (call/cc v))
+                 (--> (in-hole E (call/ccs v))
                       (in-hole E (v (tuple (cont E) (cont (in-hole E E)))))))])
     (values (union-reduction-relations 
-             cont-pair-shown-red
-             (extend-reduction-relation cont-pair-unshown-red Λkp/red)
+             cont-pair-capt-red
+             (extend-reduction-relation abortive-cont-apply Λkp/red)
+             (extend-reduction-relation tuple-proj-red Λkp/red) ; hide in typesetting
              (extend-reduction-relation cbv-red Λkp/red))
-            (union-red-rels :cont-pair-unshown-red
-                            :cont-pair-shown-red
+            (union-red-rels :tuple-proj-red
+                            (reinterp-red-rel :abortive-cont-apply :Λkp/red)
+                            :cont-pair-capt-red
                             (reinterp-red-rel :cbv-red :Λkp/red)))))
 
 (define-metafunction Λneed/red
