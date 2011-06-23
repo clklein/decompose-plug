@@ -41,7 +41,7 @@ the most complex uses of Felleisen-Hieb-style semantics available.
 @include-section["5-reduction.scrbl"]
 @include-section["6-related.scrbl"]
 
-@section[#:style (style #f '(hidden unnumbered))]{}
+@section[#:tag "sec:acknowledgments" #:style (style #f '(hidden unnumbered))]{}
 @(element (style "paragraph" '()) '("Acknowledgments"))
 Thanks to Stephen Chang for his many 
 interesting examples of contexts that challenged our
@@ -51,7 +51,7 @@ helpful discussions on the work.
 
 @(generate-bibliography)
 
-@section[#:style (style #f '(hidden unnumbered))]{}
+@section[#:tag "sec:pre-appendix" #:style (style #f '(hidden unnumbered))]{}
 @(element (style "newpage" '()) '())
 
 @section[#:tag "sec:proof"]{Appendix}
