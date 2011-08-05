@@ -5,10 +5,6 @@
          "patterns.rkt")
 (provide matches decomposes)
 
-;; Visible changes (check paper text and proof)
-;; 1. TODO: rewriter for lub -> ⊔ change
-;; 2. TODO: are premises in OK order?
-
 (define-judgment-form patterns
   mode : I I I O
   matches ⊆ G × t × p × b
