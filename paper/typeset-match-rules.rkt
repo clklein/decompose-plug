@@ -3,7 +3,7 @@
          slideshow/pict
          "../sem-sem/patterns.rkt"
          "../sem-sem/common.rkt"
-         "../sem-sem/non-syntax-directed-match-define-relation.rkt"
+         "../sem-sem/non-syntax-directed-match.rkt"
          "common.rkt")
 (provide pt
          with-rewriters
@@ -84,7 +84,6 @@
         (list 'decomposes rewrite-decomposes)
         (list 'no-bindings rewrite-no-bindings)
         (list 'nt-has-prod rewrite-nt-has-prod)
-        (list 'lub rewrite-lub)
         (list '⊔ rewrite-lub)
         (list 'neq rewrite-neq)
         (list 'pair rewrite-pair)
@@ -102,14 +101,14 @@
                    (match-lambda
                      [(list-rest atom hole others)
                       (apply vc-append 20 (hb-append 20 atom hole) others)])])
-     (render-relation matches))))
+     (render-judgment-form matches))))
 
 (define decomposes-schema/unframed
   (with-rewriters (rule-schema patterns (decomposes G t C t_^′ p b))))
 (define decomposes-schema
   (frame-rule-schema decomposes-schema/unframed))
 (define decomposes-rules 
-  (with-rewriters (with-rewriters (render-relation decomposes))))
+  (with-rewriters (with-rewriters (render-judgment-form decomposes))))
 
 (define matching-data-defs
   (with-rewriters

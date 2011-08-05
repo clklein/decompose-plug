@@ -54,6 +54,11 @@
     [`(set (pair ,xs ,ts) ...)
      (map list xs ts)]))
 
+(define-judgment-form patterns
+  mode : O I I
+  nt-has-prod ⊆ p × G × n
+  [(nt-has-prod p_ij (D_0 ... [n_i (p_i0 ... p_ij p_ij+1 ...)] D_i+1 ...) n_i)])
+
 ;; metafunctions to facilitate typesetting
 (define-metafunction patterns
   [(neq any_1 any_1) #f]
@@ -61,8 +66,8 @@
 (define-metafunction patterns
   [(no-bindings) (set)])
 (define-metafunction patterns
-  [(productions (D_0 ... [n_i (p ...)] D_i+1 ...) n_i)
-   (p ...)])
+  [(productions G n)
+   ,(judgment-holds (nt-has-prod p G n) p)])
 (define-metafunction patterns
   [(: F C) (F C)])
 (define-metafunction patterns

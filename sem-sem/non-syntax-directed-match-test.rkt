@@ -3,15 +3,10 @@
 (require "non-syntax-directed-match.rkt"
          "shared-test-cases.rkt"
          "common.rkt"
-         redex/reduction-semantics
-         racklog
-         rackunit)
+         redex/reduction-semantics)
 
 (define (all-matches lang pat term)
-  (match (%find-all (b) (matches lang term pat b))
-    [`(#f) empty]
-    [`(((b . ,bindings)) ...)
-     (remove-duplicates bindings)]))
+  (remove-duplicates (judgment-holds (matches ,lang ,term ,pat b) b)))
 
 (define test-non-syntax-directed
   (match-lambda
@@ -23,12 +18,3 @@
      (equal-bindings? (map raw-bindings (all-matches L p t)) bs)]))
 
 (run-tests test-non-syntax-directed)
-
-(check-equal? (%find-all () (is-atom 'adfd))
-              '(()))
-(check-equal? (%find-all () (is-atom ':cons))
-              '(#f))
-
-(check-exn exn:fail? (λ () (%find-all (X) (%is/nonvar (X) 1 X))))
-(check-equal? (%find-all (X) (%and (%is X 1) (%is/nonvar (X) 1 X)))
-              '(((X . 1))))

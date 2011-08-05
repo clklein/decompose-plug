@@ -1,106 +1,62 @@
-#lang racket
+#lang racket/base
 
-(require (except-in racklog atom?)
-         redex/reduction-semantics
-         unstable/dict
-         unstable/debug
-         "common.rkt"
+(require redex/reduction-semantics
+         (except-in "common.rkt" :)
          "patterns.rkt")
+(provide matches decomposes)
 
-(provide (all-defined-out))
+;; Visible changes (check paper text and proof)
+;; 1. TODO: rewriter for lub -> ⊔ change
+;; 2. TODO: are premises in OK order?
 
-(define-syntax-rule (relation [vars conc prem ...] ...)
-  (let ([r %empty-rel])
-    (%assert! r vars [conc prem ...]) ...
-    r))
+(define-judgment-form patterns
+  mode : I I I O
+  matches ⊆ G × t × p × b
+  [(matches G a a (no-bindings))]
+  [(matches G :hole :hole (no-bindings))]
+  [(matches G t (:name x p) (⊔ (set (pair x t)) b))
+   (matches G t p b)
+   (where/hidden b_lub (⊔ (set (pair x t)) b))]
+  [(matches G t (:nt n) (no-bindings))
+   (nt-has-prod p G n)
+   (matches G t p b)]
+  [(matches G (k t_1 t_2) (:cons p_1 p_2) (⊔ b_1 b_2))
+   (matches G t_1 p_1 b_1)
+   (matches G t_2 p_2 b_2)
+   (k-ok k)
+   (where/hidden b (⊔ b_1 b_2))]
+  [(matches G t_1 (:in-hole p_1 p_2) (⊔ b_1 b_2))
+   (decomposes G t_1 C t_2 p_1 b_1)
+   (matches G t_2 p_2 b_2)
+   (where/hidden b (⊔ b_1 b_2))])
 
-(define matches ; (G t p b)
-  (relation
-   [(G a) ; atom
-    (G a a '(set))
-    (is-atom a)]
-   [(G) ; hole
-    (G ':hole ':hole '(set))]
-   [(G t x p b b+) ; name
-    (G t `(:name ,x ,p) b+)
-    (matches G t p b)
-    (merges `(set (pair ,x ,t)) b b+)]
-   [(G t x ps p b) ; non-terminal
-    (G t `(:nt ,x) '(set))
-    (%is/nonvar (G x) ps (productions/proc G x))
-    (%member p ps)
-    (matches G t p b)]
-   [(G k t1 t2 p1 p2 b1 b2 b) ; cons
-    (G `(,k ,t1 ,t2) `(:cons ,p1 ,p2) b)
-    (is-constructor k)
-    (matches G t1 p1 b1)
-    (matches G t2 p2 b2)
-    (merges b1 b2 b)]
-   [(G t1 C t2 p1 p2 b1 b2 b) ; in-hole
-    (G t1 `(:in-hole ,p1 ,p2) b)
-    (decomposes G t1 C t2 p1 b1)
-    (matches G t2 p2 b2)
-    (merges b1 b2 b)]))
+(define-judgment-form patterns
+  mode : I I O O I O
+  decomposes ⊆ G × t × C × t × p × b
+  [(decomposes G t :hole t :hole (no-bindings))]
+  [(decomposes G (k t_1 t_2) (:left C t_2) t_1^′ (:cons p_1 p_2) (⊔ b_1 b_2))
+   (decomposes G t_1 C t_1^′ p_1 b_1)
+   (matches G t_2 p_2 b_2)
+   (k-ok k)
+   (where/hidden b (⊔ b_1 b_2))]
+  [(decomposes G (k t_1 t_2) (:right t_1 C) t_2^′ (:cons p_1 p_2) (⊔ b_1 b_2))
+   (matches G t_1 p_1 b_1)
+   (decomposes G t_2 C t_2^′ p_2 b_2)
+   (k-ok k)
+   (where/hidden b (⊔ b_1 b_2))]
+  [(decomposes G t_1 C t_2 (:nt n) (no-bindings))
+   (nt-has-prod p G n)
+   (decomposes G t_1 C t_2 p b)]
+  [(decomposes G t (group/id (append-contexts C_1 C_2)) t_2 (:in-hole p_1 p_2) (⊔ b_1 b_2))
+   (decomposes G t C_1 t_1 p_1 b_1)
+   (decomposes G t_1 C_2 t_2 p_2 b_2)
+   (where/hidden b (⊔ b_1 b_2))]
+  [(decomposes G t_1 C t_2 (:name x p) (⊔ (set (pair x C)) b))
+   (decomposes G t_1 C t_2 p b)
+   (where/hidden b_lub (⊔ (set (pair x C)) b))])
 
-(define decomposes ; (G t C t p b)
-  (relation
-   [(G t) ; hole
-    (G t ':hole t ':hole '(set))]
-   [(G t1 C t2 x p t b b+) ; name
-    (G t1 C t2 `(:name ,x ,p) b+)
-    (decomposes G t1 C t2 p b)
-    (merges `(set (pair ,x ,C)) b b+)]
-   [(G k t1 t2 C t p1 p2 b1 b2 b) ; cons-left
-    (G `(,k ,t1 ,t2) `(:left ,C ,t2) t `(:cons ,p1 ,p2) b)
-    (is-constructor k)
-    (decomposes G t1 C t p1 b1)
-    (matches G t2 p2 b2)
-    (merges b1 b2 b)]
-   [(G k t1 t2 C t p1 p2 b1 b2 b) ; cons-right
-    (G `(,k ,t1 ,t2) `(:right ,t1 ,C) t `(:cons ,p1 ,p2) b)
-    (is-constructor k)
-    (matches G t1 p1 b1)
-    (decomposes G t2 C t p2 b2)
-    (merges b1 b2 b)]
-   [(G t t1 t2 C C1 C2 p1 p2 b1 b2 b) ; in-hole
-    (G t C t2 `(:in-hole ,p1 ,p2) b)
-    (decomposes G t C1 t1 p1 b1)
-    (decomposes G t1 C2 t2 p2 b2)
-    (%is/nonvar (C1 C2) C (append-contexts/proc C1 C2))
-    (merges b1 b2 b)]
-   [(G t C u x b ps p) ; non-terminal
-    (G t C u `(:nt ,x) '(set))
-    (%is/nonvar (G x) ps (productions/proc G x))
-    (%member p ps)
-    (decomposes G t C u p b)]))
-
-(define (productions/proc G x)
-  (term (productions ,G ,x)))
-
-(define merges
-  (relation
-   [(b1 b2 b)
-    (b1 b2 b)
-    (%is/nonvar (b1 b2) b (⊔/proc b1 b2))
-    (%/= b '⊤)]))
-
-(define (append-contexts/proc C D)
-  (term (append-contexts ,C ,D)))
-
-(define-syntax-rule (make-matches p)
-  (let ([p? (redex-match patterns p)])
-    (λ (x)
-      (%is/nonvar (x) true (and (p? x) true)))))
-(define is-atom (make-matches a))
-(define is-constructor (make-matches k))
-
-(define-syntax (%is/nonvar stx)
-  (syntax-case stx ()
-    [(_ () E1 E2)
-     #'(%is E1 E2)]
-    [(form-name (X0 X1 ...) E1 E2)
-     (identifier? #'X0)
-     #'(%if-then-else
-        (%nonvar X0)
-        (form-name (X1 ...) E1 E2)
-        (%is 'dont-care (error 'form-name "~s uninstantiated" 'X0)))]))
+;; this is here for a typesetting hook, so
+;; we don't have to add the k non-terminal
+(define-judgment-form patterns
+  mode : I
+  [(k-ok k)])
