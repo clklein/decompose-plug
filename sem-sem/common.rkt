@@ -55,8 +55,8 @@
      (map list xs ts)]))
 
 (define-judgment-form patterns
-  mode : O I I
-  nt-has-prod ⊆ p × G × n
+  #:mode (nt-has-prod O I I)
+  #:contract (nt-has-prod p G n)
   [(nt-has-prod p_ij (D_0 ... [n_i (p_i0 ... p_ij p_ij+1 ...)] D_i+1 ...) n_i)])
 
 ;; metafunctions to facilitate typesetting
