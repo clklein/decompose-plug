@@ -1,0 +1,7 @@
+This repository provides a semantics for context-sensitive reduction
+semantics.
+
+The sem-sem directory contains a Redex encoding of the semantics.
+
+The paper directory contains a Scribble document describing the
+semantics.
