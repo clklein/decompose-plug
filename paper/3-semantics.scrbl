@@ -2,13 +2,8 @@
 
 @(require scriblib/figure
           scribble/manual
-          scriblib/footnote
-          redex/pict
-          slideshow/pict
           "typeset-match-rules.rkt"
-          "wfigure.rkt"
-          "../sem-sem/patterns.rkt"
-          "../sem-sem/non-syntax-directed-match-define-relation.rkt")
+          "wfigure.rkt")
 
 @title[#:tag "sec:match-rules"]{A Semantics for Matching}
 
