@@ -82,7 +82,6 @@
         (list 'group/id rewrite-group/id)
         (list 'matches rewrite-matches)
         (list 'decomposes rewrite-decomposes)
-        (list 'no-bindings rewrite-no-bindings)
         (list 'nt-has-prod rewrite-nt-has-prod)
         (list '⊔ rewrite-lub)
         (list 'neq rewrite-neq)

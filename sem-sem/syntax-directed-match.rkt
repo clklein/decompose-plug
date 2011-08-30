@@ -20,11 +20,11 @@
 (define-metafunction directed-matching
   M : G p t -> (m ...)
   [(M G :hole :hole)
-   (set/id (pair (pair :hole :hole) (no-bindings)) (pair • (no-bindings)))]
+   (set/id (pair (pair :hole :hole) no-bindings) (pair • no-bindings))]
   [(M G :hole t) ; t ≠ :hole
-   (set/id (pair (pair :hole t) (no-bindings)))]
+   (set/id (pair (pair :hole t) no-bindings))]
   [(M G a a)
-   (set/id (pair • (no-bindings)))]
+   (set/id (pair • no-bindings))]
   [(M G (:cons p_l p_r) (k t_l t_r))
    ,(set-comp* (term ((pair d b) (in k (set/id :cons :left :right)) ;; this line added to clarify typeset version
                                  (in d (select t_l d_l t_r d_r))
@@ -40,7 +40,7 @@
    ,(set-comp* (term ((pair d b_^′) (eq b_^′ (⊔ (set (pair x (named d t))) b))
                                     (in (pair d b) (M G p t)))))]
   [(M G (:nt n) t)
-   ,(set-comp* (term ((pair d (no-bindings)) (in (pair d b) (M G p t)) (in p (productions G n)))))]
+   ,(set-comp* (term ((pair d no-bindings) (in (pair d b) (M G p t)) (in p (productions G n)))))]
   [(M G p t) ; else 
    (set/id)])
 

@@ -32,9 +32,6 @@
 (define rewrite-eq (make-infix-binop-rewriter '=))
 (define rewrite-in (make-infix-binop-rewriter '∈))
 
-(define (rewrite-no-bindings _)
-  (list "∅"))
-
 (define (rewrite-pair lws)
   (list "(" (list-ref lws 2) ", " (list-ref lws 3) ")"))
 
@@ -103,7 +100,8 @@
     (:left "left")
     (:right "right")
     (:hole "hole")
-    (:number "number")))
+    (:number "number")
+    (no-bindings "∅")))
 
 (define (with-keyword-rewriters thunk)
   (let loop ([rs atomic-rewriters])

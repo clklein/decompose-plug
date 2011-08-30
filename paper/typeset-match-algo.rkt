@@ -15,7 +15,6 @@
         (list 'set/id rewrite-set)
         (list 'set rewrite-set)
         (list 'pair rewrite-pair)
-        (list 'no-bindings rewrite-no-bindings)
         (list '⊔ rewrite-lub)
         (list 'neq rewrite-neq)
         (list 'productions rewrite-productions)))

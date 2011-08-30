@@ -8,12 +8,12 @@
 (define-judgment-form patterns
   #:mode (matches I I I O)
   #:contract (matches G t p b)
-  [(matches G a a (no-bindings))]
-  [(matches G :hole :hole (no-bindings))]
+  [(matches G a a no-bindings)]
+  [(matches G :hole :hole no-bindings)]
   [(matches G t (:name x p) (⊔ (set (pair x t)) b))
    (matches G t p b)
    (where/hidden b_lub (⊔ (set (pair x t)) b))]
-  [(matches G t (:nt n) (no-bindings))
+  [(matches G t (:nt n) no-bindings)
    (nt-has-prod p G n)
    (matches G t p b)]
   [(matches G (k t_1 t_2) (:cons p_1 p_2) (⊔ b_1 b_2))
@@ -29,7 +29,7 @@
 (define-judgment-form patterns
   #:mode (decomposes I I O O I O)
   #:contract (decomposes G t C t p b)
-  [(decomposes G t :hole t :hole (no-bindings))]
+  [(decomposes G t :hole t :hole no-bindings)]
   [(decomposes G (k t_1 t_2) (:left C t_2) t_1^′ (:cons p_1 p_2) (⊔ b_1 b_2))
    (decomposes G t_1 C t_1^′ p_1 b_1)
    (matches G t_2 p_2 b_2)
@@ -40,7 +40,7 @@
    (decomposes G t_2 C t_2^′ p_2 b_2)
    (k-ok k)
    (where/hidden b (⊔ b_1 b_2))]
-  [(decomposes G t_1 C t_2 (:nt n) (no-bindings))
+  [(decomposes G t_1 C t_2 (:nt n) no-bindings)
    (nt-has-prod p G n)
    (decomposes G t_1 C t_2 p b)]
   [(decomposes G t (group/id (append-contexts C_1 C_2)) t_2 (:in-hole p_1 p_2) (⊔ b_1 b_2))
