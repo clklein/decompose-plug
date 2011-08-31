@@ -68,7 +68,7 @@ in a subsequent plugging operation.
 @(define-syntax-rule (Λkp-term t)
    (render-lw Λdk/red (to-lw t)))
 
-Note, however, that the embedded contexts themselves remain remain pluggable by
+Note, however, that the embedded contexts themselves remain pluggable by
 reduction rules and meta-functions that later pick apart the result term. For
 example, consider the rule for yet another unusual control operator:
 @(centered

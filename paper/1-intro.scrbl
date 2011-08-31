@@ -7,7 +7,7 @@
 
 @(define-language ex1
    (C hole (v C) (C e))
-   (e v (e e))
+   (e v x (e e))
    (v (λ (x) e) (cont C)))
 @(define ex1-pat
    (render-lw ex1 (to-lw (in-hole C e))))
@@ -24,7 +24,7 @@ The dominant style of operational semantics technique in use today
 has at its heart the notion of a context that controls 
 where evaluation occurs. These contexts allow the designer
 of a reduction semantics to factor the definition of 
-a calculus into one part that specifies that atomic steps
+a calculus into one part that specifies the atomic steps
 of computation and a second part that controls where these
 steps may occur. This factoring enables concise specification that, e.g., 
 a language is call-by-value (or call-by-name or call-by-need@~cite[cbn-calculus]),

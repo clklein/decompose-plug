@@ -27,7 +27,7 @@ In its essence, a pattern of the form @rr[(in-hole C e)] matches an expression w
 an outer part (the context) that matches @rr[C] and an inner part that matches @rr[e]. The outer part marks where the inner
 part appears with a hole, written @rr[hole]. In other words, when thinking of an expression as a tree, matching against
 @rr[(in-hole C e)] finds some subtree of the expression that matches @rr[e], and then replaces that sub-term with the hole
-to build a new expression in such a way that new expression matches @rr[C].
+to build a new expression in such a way that the new expression matches @rr[C].
 
 To get warmed up, consider @figure-ref["fig:arith"]. In this language @rr[a] matches addition expressions and @rr[C] matches
 contexts for addition expressions. More precisely, @rr[C] matches an addition expression that has exactly one hole.
@@ -101,8 +101,8 @@ as well as in the function position of an application (regardless of what
 appears in the argument position). The fourth production allows evaluation in the body of
 a @rr[λ]-expression that is in the function position of an application. Intuitively,
 this case says that once we have determined the function to be applied, then
-we can begin to evaluate its body. Of course, the function is eventually going to
-need its argument and this is where the final production comes in. 
+we can begin to evaluate its body. Of course, the function may eventually need its 
+argument, and at that point, the final production comes into play.
 It says that when an applied function needs its argument, then that argument may be
 evaluated.
 
@@ -113,12 +113,12 @@ reduces by simplifying the body of the
 without reducing the argument, because 
 it decomposes into this context
 @rr[((λ (x) hole) (|+1| 2))]
-using the third production of @rr[E].
+using the fourth production of @rr[E].
 In contrast,
 @rr[((λ (x) (|+1| x)) (|+1| 2))]
 reduces to
 @rr[((λ (x) (|+1| x)) 3)]
-because the body of of the @rr[λ]-expression decomposes into
+because the body of the @rr[λ]-expression decomposes into
 the context @rr[(|+1| hole)] with @rr[x] in
 the hole, and thus the entire expression decomposes
 into the context
@@ -142,7 +142,7 @@ for a decomposition to occur in another.
 
 When building a model of first-class continuations, there is an easy connection to make, namely that
 an evaluation context is itself a natural representation for a continuation. That is,
-at the point that when a continuation is grabbed, the context in which it is grabbed
+at the point that a continuation is grabbed, the context in which it is grabbed
 is the continuation. @Figure-ref["fig:cont"] extends the 
 left-to-right call-by-value model in @figure-ref["fig:lc"] with support
 for continuations.

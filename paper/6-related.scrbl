@@ -22,8 +22,8 @@ identity (i.e., and not on its sub-terms), this formulation cannot express
 common evaluation strategies, such as left-to-right, call-by-value evaluation. Follow-up
 work on this form of context-sensitive rewriting focuses on tools for proving
 termination, generally a topic of limited interest when studying reduction 
-systems designed to model a programming language (as programming languages are typically
-known not to terminate).
+systems designed to model a programming language since these systems are
+not expected to terminate.
 
 As part of their work on SL, a meta-language similar to Redex, @citet[xiao-hosc01]
 define a semantics for Felleisen-Hieb contexts by translating grammars to finite 
