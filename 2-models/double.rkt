@@ -16,7 +16,7 @@ Also has hide-hole removing capabilities
          rackunit
          "../sem-sem/syntax-directed-match-total.rkt"
          "../sem-sem/patterns.rkt"
-         (only-in "../sem-sem/reduction.rkt" reductions reductions*))
+         (only-in "../sem-sem/reduction.rkt" reductions/multi reductions*/multi))
 
 (require redex/reduction-semantics
          (for-syntax racket/base))
@@ -78,8 +78,8 @@ Also has hide-hole removing capabilities
                 [(rule lhs rhs fresh)
                  (list lhs rhs fresh)]))
             (rt->t redex-term))))
-(define apply-red-rel (make-red-rel-app reductions))
-(define apply-red-rel* (make-red-rel-app reductions*))
+(define apply-red-rel (make-red-rel-app reductions/multi))
+(define apply-red-rel* (make-red-rel-app reductions*/multi))
 
 (define (reinterp-red-rel rel lang)
   (red-rel lang (red-rel-rules rel)))

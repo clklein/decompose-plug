@@ -58,7 +58,8 @@
    (vc-append
     (hc-append
      horizontal-gap-size
-     (render-relation reduces)
+     (parameterize ([metafunction-cases '(0)])
+       (render-judgment-form reduces))
      (parameterize ([render-language-nts '(r)])
        (vl-append
         (render-language reduction)

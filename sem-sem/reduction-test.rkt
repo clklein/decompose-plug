@@ -13,8 +13,8 @@
 (define (alphabetical xs)
   (sort xs string<=? #:key (λ (x) (format "~s" x))))
 
-(define-reduction-test-form test-reductions reductions)
-(define-reduction-test-form test-reductions* reductions*)
+(define-reduction-test-form test-reductions reductions/multi)
+(define-reduction-test-form test-reductions* reductions*/multi)
 
 (define bool-lang
   '((B (true

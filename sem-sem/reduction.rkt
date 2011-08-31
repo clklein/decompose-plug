@@ -6,10 +6,11 @@
          racket/match
          "patterns.rkt"
          "common.rkt"
-         "syntax-directed-match-total.rkt")
+         (only-in "syntax-directed-match-total.rkt"
+                  [matches total-matches/proc]))
 
 (provide reduction
-         reductions reductions* reduces
+         reduces reductions/multi reductions*/multi
          inst join plug no-ctxts)
 
 (define-extended-language reduction patterns
@@ -18,6 +19,8 @@
      (:app f r)
      (:in-hole r r)
      (:cons r r))
+  (s (r (x ...)) ; optional freshness declarations
+     r)
   (f (side-condition any_1 (procedure? (term any_1)))))
 
 (define-metafunction reduction
@@ -72,37 +75,55 @@
   [(meta-app f t)
    ,((term f) (term t))])
 
-(define (reductions language rules to-reduce)
+(define-judgment-form reduction
+  #:mode (matches I I I O)
+  #:contract (matches G t p b)
+  [(matches G t p b_i)
+   (where (b_0 ... b_i b_i+1 ...)
+          (total-matches G t p))])
+(define-metafunction reduction
+  [(total-matches G t p)
+   ,(total-matches/proc (term G) (term p) (term t))])
+
+(define-judgment-form reduction
+  #:mode (reduces I I I O I)
+  #:contract (reduces G t p t s)
+  [(reduces G t p t_^′ r)
+   (matches G t p b)
+   (where t_^′ (inst r b))]
+  ; Rules with freshness declarations (not shown in paper)
+  [(reduces G t p t_^′ (r (x ...)))
+   (matches G t p b)
+   (where t_^′ (inst r (add-fresh b t (x ...))))])
+(define-metafunction reduction
+  [(add-fresh b t (x ...))
+   ,(add-fresh/proc (term b) (term t) (term (x ...)))])
+
+(define (reductions/multi language rules to-reduce)
   (define apply-rule
     (match-lambda
       [(list p r)
-       (apply-rule (list p r '()))]
+       (judgment-holds (reduces ,language ,to-reduce ,p t ,r) t)]
       [(list p r xs)
-       (map (λ (b) (term (inst ,r ,(add-fresh b to-reduce xs))))
-            (matches language p to-reduce))]))
+       (judgment-holds (reduces ,language ,to-reduce ,p t (,r ,xs)) t)]))
   (remove-duplicates (append-map apply-rule rules)))
 
-(define (reductions* language rules to-reduce)
+(define (reductions*/multi language rules to-reduce)
   (define seen (set))
   (define irred (set))
   (let loop ([t to-reduce])
     (unless (set-member? seen t)
       (set! seen (set-add seen t))
-      (define ts (reductions language rules t))
+      (define ts (reductions/multi language rules t))
       (if (empty? ts)
           (set! irred (set-add irred t))
           (for-each loop ts))))
   (set-map irred values))
 
-(define (add-fresh bindings wrt vars)
+(define (add-fresh/proc bindings wrt vars)
   (for/fold ([b bindings]) 
             ([x vars]
              [s (variables-not-in wrt vars)])
             (match b
               [`(set . ,others)
                `(set (pair ,x ,s) ,@others)])))
-
-(define-relation reduction
-  [(reduces G t p t_^′ r)
-   (matches G t p b)
-   (eq (inst r b) t_^′)])
