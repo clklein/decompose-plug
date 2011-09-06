@@ -15,6 +15,7 @@
 
 (define-extended-language reduction patterns
   (r a
+     :hole
      (:var x)
      (:app f r)
      (:in-hole r r)
@@ -26,6 +27,7 @@
 (define-metafunction reduction
   inst : r b -> t
   [(inst a b) a]
+  [(inst :hole b) :hole]
   [(inst (:var x) b)
    (lookup b x)]
   [(inst (:app f r) b)

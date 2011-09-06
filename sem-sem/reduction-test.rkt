@@ -135,6 +135,12 @@
                  (:cons x x1)
                  ((:cons x2 x3)))
 
+(test-reductions ([n (1 2 3)])
+                 ([(:cons (:name n_1 (:nt n)) (:name n_2 (:nt n)))
+                   (:cons (:var n_1) :hole)])
+                 (:cons 1 2)
+                 ((:right 1 :hole)))
+
 (test-reductions* ()
                   ([a b] [a e] [b c] [c c] [c d])
                   a
