@@ -24,13 +24,15 @@ principal ideas.
 @(hbl-append 2 (rt p) (arrow->pict '-->) (rt r))
 consists of a pattern @rt[p] and a term template @rt[r]. The grammar in the
 figure's top-right gives the syntax for term templates, which include atoms,
+the context @rt[:hole],
 references to variables bound by the left-hand side, applications of meta-level
 functions (e.g., substitution), hole-filling operations, and pairing operations.
 The rule in the top-left defines when a term @rt[t] reduces to @rt[t_^′] by such
 a rule, namely when @rt[p] matches @rt[t] and instantiating @rt[r] with the 
 resulting bindings produces @rt[t_^′].
 
-The rest of the figure defines template instantiation. Atoms instantiate to 
+The rest of the figure defines template instantiation. Atoms 
+and @rt[:hole] instantiate to 
 themselves, variables instantiate to their values, and meta-applications
 instantiate to the result of applying the meta-function to the instantiated
 argument template. 
