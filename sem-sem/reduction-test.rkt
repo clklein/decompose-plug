@@ -3,6 +3,11 @@
 (require "reduction.rkt"
          (except-in redex/reduction-semantics plug))
 
+(test-equal (term (inst (:in-hole (:in-hole (:var x) (:var y)) b)
+                        (set (pair x (:left :hole :hole))
+                             (pair y (:right a :hole)))))
+            (term (:cons (:cons a b) :hole)))
+
 (define-syntax-rule (define-reduction-test-form name reduce)
   (define-syntax (name stx)
     (syntax-case stx ()
@@ -87,12 +92,12 @@
                   ((:name a (:nt a))
                    (:var a)))
                  aa
-                 (aa (:left :hole aa)))
+                 (aa (:cons :hole aa)))
 (test-reductions ((a (aa)))
                  (((:in-hole (:name x :hole) (:name a (:nt a)))
                    (:cons (:var a) (:var x))))
                  aa
-                 ((:right aa :hole)))
+                 ((:cons aa :hole)))
 
 (test-reductions ()
                  ([a (:cons a a)])
@@ -139,7 +144,7 @@
                  ([(:cons (:name n_1 (:nt n)) (:name n_2 (:nt n)))
                    (:cons (:var n_1) :hole)])
                  (:cons 1 2)
-                 ((:right 1 :hole)))
+                 ((:cons 1 :hole)))
 
 (test-reductions* ()
                   ([a b] [a e] [b c] [c c] [c d])

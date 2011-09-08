@@ -37,6 +37,7 @@ themselves, variables instantiate to their values, and meta-applications
 instantiate to the result of applying the meta-function to the instantiated
 argument template. 
 
+@margin-note{Stale explanation!}
 The instantiation of @rt[:in-hole] templates makes use of a generic @rt[plug]
 function, defined on contexts @rt[C]. This function follows the path 
 recorded for @rt[C] when it was constructed by decomposition. When plugging 

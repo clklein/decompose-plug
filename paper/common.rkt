@@ -109,3 +109,9 @@
       ['() (thunk)]
       [(cons (list s r) rs)
        (with-atomic-rewriter s r (loop rs))])))
+
+(define-syntax-rule
+  (rule-schema language schema)
+  (render-lw language (to-lw schema)))
+(define (frame-rule-schema s)
+  (frame (inset s 3 3)))

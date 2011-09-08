@@ -11,7 +11,7 @@
 
 (provide reduction
          reduces reductions/multi reductions*/multi
-         inst join plug no-ctxts)
+         inst plug no-ctxts non-ctxt)
 
 (define-extended-language reduction patterns
   (r a
@@ -33,39 +33,49 @@
   [(inst (:app f r) b)
    (meta-app f (inst r b))]
   [(inst (:in-hole r_1 r_2) b)
-   (plug (inst r_1 b) (inst r_2 b))]
+   t
+   (judgment-holds (plug (inst r_1 b) (inst r_2 b) t))]
   [(inst (:cons r_1 r_2) b)
-   (join (inst r_1 b) (inst r_2 b))])
+   (:cons (inst r_1 b) (inst r_2 b))])
 
-(define-metafunction reduction
-  join : t t -> t
-  [(join C t)
-   (:left C t)
-   (side-condition (term (no-ctxts t)))]
-  [(join t C)
-   (:right t C)
-   (side-condition (term (no-ctxts t)))]
-  [(join t_1 t_2)
-   (:cons t_1 t_2)])
+(define-judgment-form reduction
+  #:mode (plug I I O)
+  #:contract (plug t t t)
+  
+  [(plug :hole t t)]
+  
+  [(plug (:left C_l t_r) C (:left t_l t_r))
+   (plug C_l C t_l)]
+  [(plug (:left C_l t_r) t (:cons t_l t_r))
+   (plug C_l t t_l)
+   (non-ctxt t)]
+  
+  [(plug (:right t_l C_r) C (:right t_l t_r))
+   (plug C_r C t_r)]
+  [(plug (:right t_l C_r) t (:cons t_l t_r))
+   (plug C_r t t_r)
+   (non-ctxt t)]
+  
+  [(plug (:cons t_l t_r) t (:cons t_l^′ t_r))
+   (plug t_l t t_l^′)
+   (no-ctxts t_r)]
+  [(plug (:cons t_l t_r) t (:cons t_l t_r^′))
+   (plug t_r t t_r^′)
+   (no-ctxts t_l)])
 
-(define-metafunction reduction
-  plug : C t -> t
-  [(plug :hole t) t]
-  [(plug (:left C_1 t) C_2)
-   (:left (plug C_1 C_2) t)]
-  [(plug (:left C t_1) t_2)
-   (:cons (plug C t_2) t_1)]
-  [(plug (:right t C_1) C_2)
-   (:right t (plug C_1 C_2))]
-  [(plug (:right t_1 C) t_2)
-   (:cons t_1 (plug C t_2))])
-
-(define-relation reduction
-  no-ctxts ⊆ t
+(define-judgment-form reduction
+  #:mode (no-ctxts I)
+  #:contract (no-ctxts t)
   [(no-ctxts a)]
   [(no-ctxts (:cons t_1 t_2))
    (no-ctxts t_1)
    (no-ctxts t_2)])
+
+(define-judgment-form reduction
+  #:mode (non-ctxt I)
+  #:contract (non-ctxt t)
+  [(non-ctxt a)]
+  [(non-ctxt (:cons t_1 t_2))])
 
 (define-metafunction reduction
   lookup : b x -> t

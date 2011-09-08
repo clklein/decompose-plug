@@ -339,6 +339,23 @@
  (term 2))
 
 (test-double-reduction*
+ cont-double-red :cont-double-red
+ (term (call/cc2 
+        (λ (k)
+          ((call/cc2 
+            (λ (k)
+              ;; The continuation is ([] (cont [])), making
+              ;;   k = (cont ([] (cont []))[([] (cont []))])
+              ;;     = (cont (([] (cont [])) (cont [])))
+              ;; If plugging a context with a context did not form
+              ;; a context, then k would be a non-context with
+              ;; multiple embedded contexts, and thus not pluggable
+              ;; by the continuation invocation rule.
+              (k (λ (_) (λ (_) 1)))))
+           k))))
+ (term 1))
+
+(test-double-reduction*
  cont-plus-red :cont-plus-red
  (term (call/cc+ (λ (k) (k 0))))
  (term 1))

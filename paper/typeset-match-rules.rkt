@@ -19,12 +19,6 @@
   (with-rewriters arg)
   (with-rewriters/proc (λ () arg)))
 
-(define-syntax-rule
-  (rule-schema language schema)
-  (render-lw language (to-lw schema)))
-(define (frame-rule-schema s)
-  (frame (inset s 3 3)))
-
 (define (with-rewriters/proc thunk)
   (let loop ([rs compound-rewriters])
     (match rs
