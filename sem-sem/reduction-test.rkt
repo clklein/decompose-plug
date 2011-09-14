@@ -3,10 +3,37 @@
 (require "reduction.rkt"
          (except-in redex/reduction-semantics plug))
 
+(test-equal (judgment-holds (plug :hole x x)) #t)
+(test-equal (judgment-holds (plug x x x)) #f)
+(test-equal (judgment-holds (plug (:left (:right :hole :hole) :hole) 
+                                  x 
+                                  (:left (:right :hole x) :hole))) 
+            #t)
+(test-equal (judgment-holds (plug (:cons :hole :hole) 
+                                  x 
+                                  (:cons :hole :hole))) 
+            #f)
+(test-equal (judgment-holds (plug (:cons :hole :hole) 
+                                  x 
+                                  (:cons x :hole))) 
+            #f)
+(test-equal (judgment-holds (plug (:cons :hole :hole) 
+                                  x 
+                                  (:cons :hole x))) 
+            #f)
+(test-equal (judgment-holds (plug (:cons :hole :hole) 
+                                  x 
+                                  (:cons x x))) 
+            #f)
+(test-equal (judgment-holds (plug (:cons :hole y) 
+                                  x 
+                                  (:cons x y))) 
+            #t)
+
 (test-equal (term (inst (:in-hole (:in-hole (:var x) (:var y)) b)
                         (set (pair x (:left :hole :hole))
                              (pair y (:right a :hole)))))
-            (term (:cons (:cons a b) :hole)))
+            (term (:left (:right a b) :hole)))
 
 (define-syntax-rule (define-reduction-test-form name reduce)
   (define-syntax (name stx)
@@ -84,7 +111,7 @@
 (test-reductions ,bool-lang
                  ,bool-rr
                  (:cons and (:cons (:cons or (:cons true false)) false))
-                 ((:cons and (:cons true false))))
+                 ((:right and (:left true false))))
 
 (test-reductions ((a (aa)))
                  (((:in-hole (:name x :hole) (:name a (:nt a)))

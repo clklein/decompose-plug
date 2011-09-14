@@ -11,7 +11,7 @@
 
 (provide reduction
          reduces reductions/multi reductions*/multi
-         inst plug no-ctxts non-ctxt)
+         inst plug no-ctxts)
 
 (define-extended-language reduction patterns
   (r a
@@ -44,17 +44,11 @@
   
   [(plug :hole t t)]
   
-  [(plug (:left C_l t_r) C (:left t_l t_r))
-   (plug C_l C t_l)]
-  [(plug (:left C_l t_r) t (:cons t_l t_r))
-   (plug C_l t t_l)
-   (non-ctxt t)]
+  [(plug (:left t_l t_r) t (:left t_2 t_r))
+   (plug t_l t t_2)]
   
-  [(plug (:right t_l C_r) C (:right t_l t_r))
-   (plug C_r C t_r)]
-  [(plug (:right t_l C_r) t (:cons t_l t_r))
-   (plug C_r t t_r)
-   (non-ctxt t)]
+  [(plug (:right t_l t_r) t (:right t_l t_2))
+   (plug t_r t t_2)]
   
   [(plug (:cons t_l t_r) t (:cons t_l^′ t_r))
    (plug t_l t t_l^′)
@@ -70,12 +64,6 @@
   [(no-ctxts (:cons t_1 t_2))
    (no-ctxts t_1)
    (no-ctxts t_2)])
-
-(define-judgment-form reduction
-  #:mode (non-ctxt I)
-  #:contract (non-ctxt t)
-  [(non-ctxt a)]
-  [(non-ctxt (:cons t_1 t_2))])
 
 (define-metafunction reduction
   lookup : b x -> t
