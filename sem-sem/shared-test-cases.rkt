@@ -333,6 +333,10 @@
    
    ;;;; other tests ;;;;
    (build-test test:no-match () (:name x (:cons (:name x a) b)) (:cons a b))
+
+   (build-test test:match () 
+               (:cons (:cons (:cons a b) (:cons c d)) e)
+               (:cons (:left (:cons a b) (:right c d)) e))
    
    (let ([shift-reset ; like http://arxiv.org/pdf/cs/0508048v4 (Section 4.4)
           `([t ((:nt v) 

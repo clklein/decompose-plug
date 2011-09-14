@@ -22,3 +22,5 @@
             '((1 a) (2 a)))
 (test-equal (set-comp L ,(+ (term x) (term y)) (in x (1 2)) (in y (1 2)))
             '(2 3 4))
+
+(test-results)

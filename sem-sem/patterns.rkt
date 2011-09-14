@@ -7,18 +7,18 @@
 
 (define-language patterns
   (t (:cons t t)
-     a
-     C)
+     (:left t t)
+     (:right t t)
+     a :hole)
   (C :hole
      (:left C t)
      (:right t C))
   
-  (p a
+  (p a :hole
      (:name x p)
      (:nt n)
      (:in-hole p p)
-     (:cons p p)
-     :hole)
+     (:cons p p))
   (a variable-not-otherwise-mentioned
      number)
   (x variable-not-otherwise-mentioned)
