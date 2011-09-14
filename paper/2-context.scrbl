@@ -41,13 +41,13 @@ any given term.
 @centered{
 @table[(style #f '())
        (list (list @paragraph[(style #f '()) @list{@rr[C] = @rr[hole]}]
-                   @paragraph[(style "hspace" '())]{.1in}
+                   @paragraph[(style #f '()) (list @element[(style "hspace" '())]{.2in})]
                    @paragraph[(style #f '()) @list{@rr[a] = @rr[(+ 1 2)]}])
              (list @paragraph[(style #f '()) @list{@rr[C] = @rr[(+ hole 2)]}]
-                   @paragraph[(style "hspace" '())]{.1in}
+                   @paragraph[(style #f '()) (list @element[(style "hspace" '())]{.2in})]
                    @paragraph[(style #f '()) @list{@rr[a] = @rr[1]}])
              (list @paragraph[(style #f '()) @list{@rr[C] = @rr[(+ 1 hole)]}]
-                   @paragraph[(style "hspace" '())]{.1in}
+                   @paragraph[(style #f '()) (list @element[(style "hspace" '())]{.2in})]
                    @paragraph[(style #f '()) @list{@rr[a] = @rr[2]}]))]}
 }
 
