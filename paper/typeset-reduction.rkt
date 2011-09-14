@@ -27,7 +27,27 @@
   (list "δ(" (list-ref lws 2) ", " (list-ref lws 3) ")"))
 
 (define (rewrite-plug lws)
-  (list "" (list-ref lws 2) "[" (list-ref lws 3) "] = " (list-ref lws 4)))
+  (list (text
+         (symbol->string (lw-e (list-ref lws 1)))
+         (metafunction-style)
+         (metafunction-font-size))
+        (white-bracket "[") (list-ref lws 2) "," (list-ref lws 3) (white-bracket "]")
+        " = " (list-ref lws 4)))
+
+(define (white-bracket str)
+  (let-values ([(left-inset-amt right-inset-amt left-space right-space)
+                ((white-bracket-sizing) str 
+                                        (default-font-size))])
+    (let ([main-bracket (text str (default-style) (default-font-size))])
+      (inset (refocus (cbl-superimpose main-bracket
+                                       (hbl-append (blank left-inset-amt)
+                                                   (text str (default-style) (default-font-size))
+                                                   (blank right-inset-amt)))
+                      main-bracket)
+             left-space
+             0
+             right-space
+             0))))
 
 (define (no-white-brackets lws)
   (list (text
