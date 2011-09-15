@@ -251,19 +251,10 @@ Also has hide-hole removing capabilities
       [`(:name ,x (:nt ,b)) x]
       [`(:name ,x ,p) `(name ,x ,(loop p))]
       [`(:nt ,x) x]
-      [`(:right ,x . ,stuff) (c->rt p)]
-      [`(:left ,x . ,stuff) (c->rt p)]
-      [`:hole (c->rt p)]
+      [`(:right ,x ,rest) (cons (p->rt x) (p->rt rest))]
+      [`(:left ,rest ,x) (cons (p->rt rest) (p->rt x))]
+      [`:hole (term hole)]
       [else p])))
-
-(define (c->rt p)
-  (match p
-    [`(:right ,x ,rest)
-     (cons (p->rt x) (c->rt rest))]
-    [`(:left ,rest ,x)
-     (cons (c->rt rest) (p->rt x))]
-    [`:hole
-     (term hole)]))
 
 (define (b->rb b)
   (normalize-bindings
