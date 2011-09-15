@@ -3,25 +3,27 @@
 \spnewtheorem*{theorem*}{Theorem}{\bfseries}{\rmfamily}
 \spnewtheorem*{definition*}{Definition}{\bfseries}{\rmfamily}
 
+\newcommand{\patkwd}[1]{\textbf{#1}}
+
 \newcommand{\leftrecurdef}{
 \begin{definition*}
-A grammar $G$ is \emph{left recursive} if $p \rightarrow_G^* p'$ and
-$p' \rightarrow_G^* p$ for some $p$ and $p'$, where $\rightarrow_G^*$
-is the transitive closure of $\rightarrow_G\ \subseteq p \times p$, the
-least relation satisfying the following conditions:
+A grammar $G$ is \emph{left recursive} if $p \rightarrow_G^* p$ for
+some $p$, where $\rightarrow_G^*$ is the transitive (but not
+reflexive) closure of $\rightarrow_G\ \subseteq p \times p$, the least
+relation satisfying the following conditions:
 \begin{enumerate}
-\item $(\textbf{nt}~n) \rightarrow_G p ~\textrm{if}~ p \in G(n)$,
-\item $(\textbf{in-hole}~p~p') \rightarrow_G p$,
-\item $(\textbf{in-hole}~p~p') \rightarrow_G p' ~\textrm{if}~ 
-       G \vdash \textbf{hole} : p~|~b$, and
-\item $(\textbf{name}~n~p) \rightarrow_G p$.
+\item $(\patkwd{nt}~n) \rightarrow_G p ~\textrm{if}~ p \in G(n)$,
+\item $(\patkwd{name}~n~p) \rightarrow_G p$.
+\item $(\patkwd{in-hole}~p~p') \rightarrow_G p$,
+\item $(\patkwd{in-hole}~p~p') \rightarrow_G p' ~\textrm{if}~ 
+       G \vdash \patkwd{hole} : p~|~b$, and
 \end{enumerate}
 \end{definition*}
 }
 \newcommand{\correctnessthm}{
 \begin{theorem*}
 For all $G$, $p$, and $t$, if $G$ is not left recursive, 
-then $b \in \textbf{matches} \llbracket{} G, p, t \rrbracket{} 
+then $b \in \patkwd{matches} \llbracket{} G, p, t \rrbracket{} 
 \Leftrightarrow G \vdash t : p~|~b$.
 \end{theorem*}
 }

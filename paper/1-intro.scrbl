@@ -38,7 +38,7 @@ Unfortunately, the precise meaning of context decomposition has not
 been nailed down in a way that captures its diverse usage in the literature. Although an intuitive definition
 is easy to understand from a few examples, this intuition does not
 cover the full power of contexts. For example, which terms match the
-pattern @|ex1-pat| from this language (in which values are contexts
+pattern @|ex1-pat| from this language (in which values and contexts
 are mutually referential)?
 @centered{@(lc-superimpose bkg raw1)}
 And which terms match this bizarre, small language?

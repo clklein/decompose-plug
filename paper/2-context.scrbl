@@ -2,6 +2,7 @@
 
 @(require redex/pict
           redex/reduction-semantics
+          scriblib/footnote
           (only-in scribble/core table paragraph style element)
           (only-in slideshow/pict vl-append hbl-append blank)
           "../2-models/models.rkt"
@@ -178,11 +179,23 @@ match a specified pattern, such as @rr[E]).
 @(parameterize ([render-reduction-relation-rules '(0)])
    (render-reduction-relation delim-red))}
 
+@(define-language non-left-recur
+   (E M (in-hole M (|#| E)))
+   (M whatever))
+
 Generalizing from ordinary continuations to delimited 
 continuations is simply a matter of factoring the contexts
 into two parts, those that contain a prompt and those that
 do not. @Figure-ref["fig:delim"] shows one way to do this, as
-an extension of @figure-ref["fig:lc"]. The non-terminal @rr[E]
+an extension of @figure-ref["fig:lc"].@note{Some find the equivalent, 
+non-left recursive grammar @(render-language non-left-recur #:nts '(E)) clearer.
+At least one author of the present paper, however, does not and
+was surprised when Redex failed to terminate on a similar example. 
+Along similar lines we have gotten similar comments from Redex users
+when they were surprised along these lines, suggesting that Redex
+should support these kinds of languages.}
+
+The non-terminal @rr[E]
 matches an arbitrary evaluation context and @rr[M] matches an evaluation context
 that does not contain any prompt expressions. Accordingly,
 the rule for grabbing a continuation exploits this factoring

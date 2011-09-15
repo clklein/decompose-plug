@@ -8,7 +8,8 @@
           "../sem-sem/syntax-directed-match.rkt"
           "citations.rkt"
           "typeset-match-rules.rkt"
-          "typeset-match-algo.rkt")
+          "typeset-match-algo.rkt"
+          "extended.rkt")
 
 @title{An Algorithm for Matching}
 
@@ -22,13 +23,13 @@ exponentially in the number of nested @pt[:cons] patterns matched (counting indi
 nesting through non-terminals). Second, the rules provide no answer to the 
 question of whether to proceed in expanding a non-terminal if none of the input 
 term has been consumed since last encountering that non-terminal. This question
-arises, for example, when decomposing by the pattern @pt[(:nt E)] from the 
+arises, for example, when decomposing by the non-terminal @pt[E] from the 
 grammar in @figure-ref{fig:delim}, since @pt[E]'s second production causes the 
-@pt[:in-hole] rule to decompose the same term by the pattern @pt[(:nt E)]. This
+@pt[:in-hole] rule to decompose the same term by @pt[E]. This
 second problem is the manifestation of left recursion in the form of grammars
 we consider.
 
-@figure["fig:core-algo" "Core matching algorithm (cases apply in order)."]{
+@figure["fig:core-algo" "Core matching algorithm (cases apply in order)"]{
 @(render-algorithm)
 }
 
@@ -79,19 +80,30 @@ Putting aside the problem of left recursion, the call @mt[(M G p t)]
 computes the set of @mt[b] such that @matches-schema/unframed or 
 @decomposes-schema/unframed for some @mt[C] and @mt[t_^′], and the top-level 
 wrapper function @mt[matches] restricts this set to the bindings associated with
-match derivations. More precisely, the following result holds (the complete proof
-is given in @secref{sec:proof}).
+match derivations. 
+
+To make this precise, we first give a definition of left-recursion.
+Intuitively, a grammar is left-recursive if there is a way to, in a 
+straight-forward recursive parser, get from some non-terminal back
+to that same non-terminal without consuming any input. So, our
+definition of left-recursion builds a graph from the grammar that connects
+each pattern to any other pattern that might reach without consuming any input, 
+and then checks for a cycle in the graph. The most interesting case is the last one,
+where an @mt[:in-hole] pattern is connected to its second argument when
+the first argument can generate @mt[:hole].
 
 @(element (style "leftrecurdef" '()) "")
+
 @(element (style "correctnessthm" '()) "")
+@(if extended-version?
+     @list{The complete proof is given in @secref{sec:proof}.}
+     @list{The complete proof is available at @url{eecs.northwestern.edu/~robby/plug/}.})
 
 Parsing algorithms that support left recursive context-free grammars go back 
 nearly fifty years@~cite[kuno-cacm65]. We refer the reader to
-@citet[frost-iwpt07-sec3] for a summary. Some of these algorithms appear 
-adaptable to our setting,@note{We realized the significance of this line of work to ours only recently; if
-the PC knows this area, we would be grateful for any advice.} though we 
-have implemented only one, an extension of the packrat parsing
-algorithm@~cite[warth-pepm08]. This extension dynamically detects left recursion and 
+@citet[frost-iwpt07-sec3] for a summary. We have implemented
+an extension of the packrat parsing
+algorithm@~cite[warth-pepm08] that dynamically detects left recursion and 
 treats the choice leading to it as a failure. If the other choices for the same 
 portion of the input make any progress at all, the algorithm repeats the parse
 attempt, in hopes that the entries added to the memo table during the failed
