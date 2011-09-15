@@ -26,10 +26,12 @@ systems designed to model a programming language since these systems are
 not expected to terminate.
 
 As part of their work on SL, a meta-language similar to Redex, @citet[xiao-hosc01]
-define a semantics for Felleisen-Hieb contexts by translating grammars to finite 
-tree automata. This indirect approach allows SL to prove decomposition lemmas 
+define a semantics for Felleisen-Hieb contexts by translating grammars into
+their own formalism, an extension of finite tree automata. 
+This indirect approach allows SL to prove decomposition lemmas 
 automatically using existing automata algorithms, but it is considerably more
-complicated than our approach and does not allow for multi-hole contexts.
+complicated than our approach and does not allow for multi-holed grammars like
+the ones in @figure-ref{fig:cont} and @figure-ref{fig:delim}.
 
 @citet[dubois-tphols00] develops the first formulation of a 
 Felleisen-Hieb reduction semantics in a proof assistant, as part of a mechanized
