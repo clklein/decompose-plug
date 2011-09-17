@@ -21,6 +21,8 @@
          cont-double-red :cont-double-red
          cont-plus-red :cont-plus-red
          cont-pair-red :cont-pair-red
+
+         cont-eq-red :cont-eq-red
          
          Σ 
          subst subst-1 subst-A)
@@ -268,3 +270,34 @@
    (subst-vars (x_1 any_1) 
                (subst-vars (x_2 any_2) ... any_3))]
   [(subst-vars any) any])
+
+
+;; --- an example that Casey and Robby came up with
+;;     that illustrates why same said pair's idea for
+;;     changing how plug works is broken. In short,
+;;     this test case guards against that silliness 
+;;     going forward (see also the test example)
+
+
+(define-double-extended-language Λkeq/red Λk/red :Λkeq/red :Λk/red
+  (e .... (equal? e e) (cons e e))
+  (E .... (equal? E e) (equal? v E) (cons E e) (cons v E))
+  (v .... (cons v v)))
+
+(define-values (cont-eq-red :cont-eq-red)
+  (let-values ([(cont-eq-red :cont-eq-red)
+                (double-reduction-relation 
+                 Λkeq/red :Λkeq/red ()
+                 (--> (in-hole E (equal? v_1 v_1))
+                      (in-hole E 0))
+                 ;; if they aren't equal, we get a stuck state;
+                 ;; strange, but works with what we have here,
+                 ;; since the actual rule would require a side-condition
+                 )])
+    (values (union-reduction-relations
+             cont-eq-red
+             (extend-reduction-relation cont-partial-red Λkeq/red)
+             (extend-reduction-relation cbv-red Λkeq/red))
+            (union-red-rels (reinterp-red-rel :cont-partial-red :Λkeq/red)
+                            :cont-eq-red
+                            (reinterp-red-rel :cbv-red :Λkeq/red)))))

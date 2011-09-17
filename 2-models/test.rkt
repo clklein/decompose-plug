@@ -380,4 +380,46 @@
    (term (|+1| (call/ccs (λ (k) (tuple ((snd k) 0) 1)))))
    (term 2))
 
+
+
+(test-double-reduction*
+ cont-eq-red :cont-eq-red
+ (term (equal? (cons 1 2) (cons 1 2)))
+ (term 0))
+
+(test-double-reduction*
+ cont-eq-red :cont-eq-red
+ (term (equal? (cons (|+1| 0) 2)
+               (cons 1 (|+1| 1))))
+ (term 0))
+
+(test-double-reduction*
+ cont-eq-red :cont-eq-red
+ (term (equal? (cons (|+1| 0) 2)
+               (cons (|+1| 0) 2)))
+ (term 0))
+
+(test-double-reduction*
+ cont-eq-red :cont-eq-red
+ (term (equal? (cons 1 2) (cons 2 1)))
+ (term (equal? (cons 1 2) (cons 2 1))))
+
+(test-double-reduction*
+ cont-eq-red :cont-eq-red
+ (term (equal? (cons (call/cc (λ (k) (k 1))) 2)
+               (cons (call/cc (λ (k) (k 1))) 2)))
+ (term 0))
+
+(test-double-reduction*
+ cont-eq-red :cont-eq-red
+ (term (equal? (cons (call/cc (λ (k) (k 1))) 2)
+               (cons 1 2)))
+ (term 0))
+
+(test-double-reduction*
+ cont-eq-red :cont-eq-red
+ (term (equal? (cons (call/cc (λ (k) (k 1))) 2)
+               (cons 1 (call/cc (λ (k) (k 2))))))
+ (term 0))
+
 (test-results)
