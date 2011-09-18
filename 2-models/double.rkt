@@ -18,6 +18,8 @@ Also has hide-hole removing capabilities
          "../sem-sem/patterns.rkt"
          (only-in "../sem-sem/reduction.rkt" reductions/multi reductions*/multi))
 
+(define debug? #f)
+
 (require redex/reduction-semantics
          (for-syntax racket/base))
 
@@ -283,6 +285,7 @@ Also has hide-hole removing capabilities
          (syntax-case stx ()
            [(_ #:norm norm rr :rr trm expected ...)
             #`(begin
+                (when debug? (printf "testing line ~a\n" #,(syntax-line stx)))
                 #,@(if (syntax-e #'rr)
                        (list (syntax/loc #'rr
                                (test-equal
@@ -302,6 +305,7 @@ Also has hide-hole removing capabilities
   (syntax-case stx ()
     [(_ lang :lang pat trm bindings)
      #`(begin
+         (when debug? (printf "testing line ~a\n" #,(syntax-line stx)))
          #,@(if (syntax-e #'lang)
                 (list (syntax/loc #'lang
                         (test-equal (rb/f->b (redex-match lang pat (term trm)))
