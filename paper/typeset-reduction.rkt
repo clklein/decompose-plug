@@ -31,7 +31,7 @@
          (symbol->string (lw-e (list-ref lws 1)))
          (metafunction-style)
          (metafunction-font-size))
-        (white-bracket "[") (list-ref lws 2) ", " (list-ref lws 3) (white-bracket "]")
+        (white-bracket "[") (list-ref lws 2) "," (list-ref lws 3) (white-bracket "]")
         " = " (list-ref lws 4)))
 
 (define (white-bracket str)
@@ -60,6 +60,7 @@
 (define compound-rewriters
   (list (list 'meta-app rewrite-meta-app)
         (list 'no-ctxts no-white-brackets)
+        (list 'non-ctxt no-white-brackets)
         (list 'plug rewrite-plug)
         (list 'lookup rewrite-lookup)
         (list 'eq rewrite-eq)
@@ -97,10 +98,17 @@
 (define framed-no-ctxts-schema
   (frame-rule-schema no-ctxts-schema))
 
+(define non-ctxt-schema
+  (with-rewriters
+   (rule-schema reduction (non-ctxt t))))
+(define framed-non-ctxt-schema
+  (frame-rule-schema non-ctxt-schema))
+
 (define (render-reduction)
   (with-rewriters
    (let ([plug-schema-placeholder (ghost framed-plug-schema)]
-         [no-ctxts-schema-placeholder (ghost framed-no-ctxts-schema)])
+         [no-ctxts-schema-placeholder (ghost framed-no-ctxts-schema)]
+         [non-ctxt-schema-placeholder (ghost framed-non-ctxt-schema)])
      (define without-schemas
        (vc-append
         20
@@ -129,7 +137,12 @@
         (vc-append
          no-ctxts-schema-placeholder
          (parameterize ([relation-clauses-combine horizontal-clauses])
-           (render-judgment-form no-ctxts)))))
+           (render-judgment-form no-ctxts)))
+        
+        (vc-append
+         non-ctxt-schema-placeholder
+         (parameterize ([relation-clauses-combine horizontal-clauses])
+           (render-judgment-form non-ctxt)))))
      (define (schema-offset placeholder)
        (define-values (x y)
          (ct-find without-schemas placeholder))
@@ -139,9 +152,11 @@
      (foldl pin-schema
             without-schemas
             (list plug-schema-placeholder
-                  no-ctxts-schema-placeholder)
+                  no-ctxts-schema-placeholder
+                  non-ctxt-schema-placeholder)
             (list framed-plug-schema 
-                  framed-no-ctxts-schema)))))
+                  framed-no-ctxts-schema
+                  framed-non-ctxt-schema)))))
 
 (define-syntax-rule (rt t) ; "reduction term"
   (with-rewriters (lw->pict reduction (to-lw t))))
