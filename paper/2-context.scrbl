@@ -13,6 +13,9 @@
 
 @title[#:tag "sec:examples"]{Matching and Contexts}
 
+This section introduces the notion of a context and explains, through a series of examples, how pattern matching for contexts works.
+Each example model comes with a lesson that informs the design of our context-sensitive reduction semantics semantics.
+
 @wfigure["fig:arith" "Arithmetic Expressions"]{
 @(render-language arith)
 
@@ -21,22 +24,11 @@
 @(render-reduction-relation arith-red)
 }
 
-This section introduces the notion of a context and explains, through a series of examples, how pattern matching for contexts works.
-Each example model comes with a lesson that informs the design of our context-sensitive reduction semantics semantics.
-
 In its essence, a pattern of the form @rr[(in-hole C e)] matches an expression when the expression can be split into two parts,
 an outer part (the context) that matches @rr[C] and an inner part that matches @rr[e]. The outer part marks where the inner
 part appears with a hole, written @rr[hole]. In other words, when thinking of an expression as a tree, matching against
 @rr[(in-hole C e)] finds some subtree of the expression that matches @rr[e], and then replaces that sub-term with the hole
 to build a new expression in such a way that the new expression matches @rr[C].
-
-To get warmed up, consider @figure-ref["fig:arith"]. In this language @rr[a] matches addition expressions and @rr[C] matches
-contexts for addition expressions. More precisely, @rr[C] matches an addition expression that has exactly one hole.
-For example, the expression @rr[(+ 1 2)] matches  @rr[(in-hole C a)] three ways, as shown in @figure-ref["fig:ex"].
-Accordingly, the reduction relation given in @figure-ref["fig:arith"] reduces addition expressions wherever they appear
-in an expression, e.g., reducing @rr[(+ (+ 1 2) (+ 3 4))] to two different expressions, @rr[(+ 3 (+ 3 4))] and @rr[(+ (+ 1 2) 7)].
-This example tells us that our context matching semantics must support multiple decompositions for
-any given term.
 
 @wfigure["fig:ex" "Example Decomposition"]{
 @centered{
@@ -51,6 +43,14 @@ any given term.
                    @paragraph[(style #f '()) (list @element[(style "hspace" '())]{.2in})]
                    @paragraph[(style #f '()) @list{@rr[a] = @rr[2]}]))]}
 }
+
+To get warmed up, consider @figure-ref["fig:arith"]. In this language @rr[a] matches addition expressions and @rr[C] matches
+contexts for addition expressions. More precisely, @rr[C] matches an addition expression that has exactly one hole.
+For example, the expression @rr[(+ 1 2)] matches  @rr[(in-hole C a)] three ways, as shown in @figure-ref["fig:ex"].
+Accordingly, the reduction relation given in @figure-ref["fig:arith"] reduces addition expressions wherever they appear
+in an expression, e.g., reducing @rr[(+ (+ 1 2) (+ 3 4))] to two different expressions, @rr[(+ 3 (+ 3 4))] and @rr[(+ (+ 1 2) 7)].
+This example tells us that our context matching semantics must support multiple decompositions for
+any given term.
 
 A common use of contexts is to restrict the places where reduction may occur in order to model 
 a realistic programming language's order of evaluation. 
@@ -85,7 +85,7 @@ in this case).
 Contexts can also be used in clever ways to model the call-by-need λ-calculus.
 Like call-by-name, call-by-need evaluates the argument to a function only if
 the value is actually needed by the function's body. 
-Unlike call-by-name, however, each 
+Unlike call-by-name, each 
 function argument is evaluated at most once. 
 A typical implementation of
 a language with call-by-need uses state to track if an argument has been evaluated,
@@ -124,7 +124,7 @@ the context @rr[(|+1| hole)] with @rr[x] in
 the hole, and thus the entire expression decomposes
 into the context
 @rr[((λ (x) (|+1| x)) hole)].
-This use of contexts tell us that our semantics must be
+This use of contexts tells us that our semantics must be
 able to support a sophisticated form of nesting, namely that
 sometimes a decomposition must occur in one part of a term in order
 for a decomposition to occur in another.
@@ -148,7 +148,7 @@ is the continuation. @Figure-ref["fig:cont"] extends the
 left-to-right call-by-value model in @figure-ref["fig:lc"] with support
 for continuations.
 It adds @rr[call/cc], the operator that grabs a continuation, and the new value form
-@rr[(cont E)] that represents a continuation. 
+@rr[(cont E)] that represents a continuation and thus can be applied to invoke the continuation.
 
 For example, the expression
 @rr[(|+1| (call/cc (λ (k) (k 2))))] 
@@ -187,13 +187,8 @@ Generalizing from ordinary continuations to delimited
 continuations is simply a matter of factoring the contexts
 into two parts, those that contain a prompt and those that
 do not. @Figure-ref["fig:delim"] shows one way to do this, as
-an extension of @figure-ref["fig:lc"].@note{Some find the equivalent, 
-non-left recursive grammar @(render-language non-left-recur #:nts '(E)) clearer.
-At least one author of the present paper, however, does not and
-was surprised when Redex failed to terminate on a similar example. 
-Along similar lines we have gotten similar comments from Redex users
-when they were surprised along these lines, suggesting that Redex
-should support these kinds of languages.}
+an extension of the call-by-value lambda calculus from 
+@figure-ref["fig:lc"].
 
 The non-terminal @rr[E]
 matches an arbitrary evaluation context and @rr[M] matches an evaluation context
@@ -217,7 +212,15 @@ form @rr[(in-hole C e)] by attempting to match @rr[C] against
 the entire term and, once a match has been found, attempting to 
 match what appeared at the hole against @rr[e]. With @rr[E], however,
 this leads to an infinite loop because @rr[E] expands to a
-decomposition that includes @rr[E] in the first position.
+decomposition that includes @rr[E] in the first position.@note{Some find the equivalent, 
+non-problematic grammar @(render-language non-left-recur #:nts '(E)) clearer.
+At least one author of the present paper (who has spent a considerable amount
+of time hacking on Redex's matcher, no less), however, does not and
+was surprised when Redex failed to terminate on a similar example. 
+We have also gotten comments from Redex users
+when they were surprised along these lines, suggesting that Redex
+should support these kinds of grammars.}
+
 
 A simple fix that works for the delimited continuations 
 example is to backtrack when encountering such cycles; that fix, however, does not work
@@ -227,5 +230,3 @@ that treats that cycle as a failure to match, but the
 context @rr[(f hole)] should match @rr[C], and more generally,
 the two definitions of @rr[C] in @figure-ref["fig:wacky"]
 should be equivalent.
-(A more complex version of this context came up when one of our Redex
-users was developing an extension to the call-by-need model.)
