@@ -16,7 +16,7 @@ As with patterns, we consider a core specification language that lacks
 many of the conveniences of a language like Redex but nevertheless addresses the
 principal ideas.
 
-@figure["fig:reduction" "A semantics for reduction"]{
+@figure["fig:reduction" "A semantics for reduction (cases apply in order)"]{
 @(centered (render-reduction))
 }
 

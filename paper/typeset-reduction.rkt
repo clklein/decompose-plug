@@ -12,7 +12,7 @@
         (list-ref lws 2)
         " ⊢ "
         (list-ref lws 3)
-        " / "
+        " / " 
         (list-ref lws 4)
         (hbl-append (text " ") (arrow->pict '-->) (text " "))
         (list-ref lws 5)
@@ -26,7 +26,7 @@
 (define (rewrite-meta-app lws)
   (list "δ(" (list-ref lws 2) ", " (list-ref lws 3) ")"))
 
-(define (rewrite-plug lws)
+(define (rewrite-3-as-fn lws)
   (list (text
          (symbol->string (lw-e (list-ref lws 1)))
          (metafunction-style)
@@ -59,9 +59,6 @@
 
 (define compound-rewriters
   (list (list 'meta-app rewrite-meta-app)
-        (list 'no-ctxts no-white-brackets)
-        (list 'non-ctxt no-white-brackets)
-        (list 'plug rewrite-plug)
         (list 'lookup rewrite-lookup)
         (list 'eq rewrite-eq)
         (list 'set rewrite-set)
@@ -81,82 +78,37 @@
 (define (horizontal-clauses l)
   (apply hbl-append 20 l))
 
-(define (plug-rules . rule-indices)
-  (parameterize ([relation-clauses-combine horizontal-clauses]
-                 [metafunction-cases rule-indices])
-    (render-judgment-form plug)))
-
-(define plug-schema
-  (with-rewriters
-   (rule-schema reduction (plug t_1 t_2 t_3))))
-(define framed-plug-schema
-  (frame-rule-schema plug-schema))
-
-(define no-ctxts-schema
-  (with-rewriters
-   (rule-schema reduction (no-ctxts t))))
-(define framed-no-ctxts-schema
-  (frame-rule-schema no-ctxts-schema))
-
-(define non-ctxt-schema
-  (with-rewriters
-   (rule-schema reduction (non-ctxt t))))
-(define framed-non-ctxt-schema
-  (frame-rule-schema non-ctxt-schema))
-
 (define (render-reduction)
   (with-rewriters
-   (let ([plug-schema-placeholder (ghost framed-plug-schema)]
-         [no-ctxts-schema-placeholder (ghost framed-no-ctxts-schema)]
-         [non-ctxt-schema-placeholder (ghost framed-non-ctxt-schema)])
-     (define without-schemas
-       (vc-append
-        20
-        (hc-append
-         horizontal-gap-size
-         (parameterize ([metafunction-cases '(0)])
-           (render-judgment-form reduces))
-         (parameterize ([render-language-nts '(r)])
-           (vl-append
-            (render-language reduction)
-            (non-bnf-def "f" (arbitrary-function-domain "t" "t")))))
-        
-        (vl-append
-         (metafunction-signature "inst" "r" "b" "t")
-         (render-metafunctions inst))
-        
-        (vc-append
-         plug-schema-placeholder
-         (vc-append
-          vertical-gap-size
-          (plug-rules 0)
-          (plug-rules 1 2)
-          (plug-rules 3 4)
-          (plug-rules 5 6)))
-        
-        (vc-append
-         no-ctxts-schema-placeholder
-         (parameterize ([relation-clauses-combine horizontal-clauses])
-           (render-judgment-form no-ctxts)))
-        
-        (vc-append
-         non-ctxt-schema-placeholder
-         (parameterize ([relation-clauses-combine horizontal-clauses])
-           (render-judgment-form non-ctxt)))))
-     (define (schema-offset placeholder)
-       (define-values (x y)
-         (ct-find without-schemas placeholder))
-       y)
-     (define (pin-schema placeholder schema base)
-       (pin-over base 0 (schema-offset placeholder) schema))
-     (foldl pin-schema
-            without-schemas
-            (list plug-schema-placeholder
-                  no-ctxts-schema-placeholder
-                  non-ctxt-schema-placeholder)
-            (list framed-plug-schema 
-                  framed-no-ctxts-schema
-                  framed-non-ctxt-schema)))))
+   (vc-append
+    20
+    (hc-append
+     horizontal-gap-size
+     (parameterize ([metafunction-cases '(0)])
+       (render-judgment-form reduces))
+     (parameterize ([render-language-nts '(r)])
+       (vl-append
+        (render-language reduction)
+        (non-bnf-def "f" (arbitrary-function-domain "t" "t")))))
+    
+    (vl-append
+     20 
+     (vl-append
+      (metafunction-signature "inst" "r" "b" "t")
+      (render-metafunctions inst))
+     
+     (vl-append
+      (metafunction-signature "plug" "C" "t" "t")
+      (render-metafunctions plug))
+     
+     (vl-append
+      (metafunction-signature "join" "t" "t" "t")
+      (render-metafunctions join))
+     
+     (vl-append
+      (metafunction-signature "δ" "(t → t)" "t" "t")
+      (text "An unspecified function that applies metafunctions"
+            (cons 'italic (default-style))))))))
 
 (define-syntax-rule (rt t) ; "reduction term"
   (with-rewriters (lw->pict reduction (to-lw t))))

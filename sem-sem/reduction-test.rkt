@@ -92,12 +92,12 @@
                   ((:name a (:nt a))
                    (:var a)))
                  aa
-                 (aa (:cons :hole aa)))
+                 (aa (:left :hole aa)))
 (test-reductions ((a (aa)))
                  (((:in-hole (:name x :hole) (:name a (:nt a)))
                    (:cons (:var a) (:var x))))
                  aa
-                 ((:cons aa :hole)))
+                 ((:right aa :hole)))
 
 (test-reductions ()
                  ([a (:cons a a)])
@@ -144,7 +144,7 @@
                  ([(:cons (:name n_1 (:nt n)) (:name n_2 (:nt n)))
                    (:cons (:var n_1) :hole)])
                  (:cons 1 2)
-                 ((:cons 1 :hole)))
+                 ((:right 1 :hole)))
 
 (test-reductions* ()
                   ([a b] [a e] [b c] [c c] [c d])
