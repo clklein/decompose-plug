@@ -8,6 +8,13 @@
                              (pair y (:right a :hole)))))
             (term (:cons (:cons a b) :hole)))
 
+(test-equal (term (inst (:cons (:cons (:var x) (:var y))
+                               (:var z))
+                        (set (pair x :hole)
+                             (pair y :hole)
+                             (pair z :hole))))
+            (term (:cons (:cons :hole :hole) :hole)))
+
 (define-syntax-rule (define-reduction-test-form name reduce)
   (define-syntax (name stx)
     (syntax-case stx ()

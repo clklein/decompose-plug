@@ -63,6 +63,7 @@
         (list 'eq rewrite-eq)
         (list 'set rewrite-set)
         (list 'pair rewrite-pair)
+        (list 'no-ctxts no-white-brackets)
         (list 'matches rewrite-matches)
         (list 'reduces rewrite-reduces)))
 
@@ -74,9 +75,6 @@
         (λ () expr))]
       [(cons (list name rewriter) rs)
        (with-compound-rewriter name rewriter (loop rs))])))
-
-(define (horizontal-clauses l)
-  (apply hbl-append 20 l))
 
 (define (render-reduction)
   (with-rewriters
@@ -103,12 +101,17 @@
      
      (vl-append
       (metafunction-signature "join" "t" "t" "t")
-      (render-metafunctions join))
+      (parameterize ([metafunction-pict-style 'left-right/beside-side-conditions])
+        (render-metafunctions join)))
      
      (vl-append
       (metafunction-signature "δ" "(t → t)" "t" "t")
       (text "An unspecified function that applies metafunctions"
-            (cons 'italic (default-style))))))))
+            (cons 'italic (default-style)))))
+    
+    (parameterize ([relation-clauses-combine 
+                    (λ (l) (apply hbl-append 40 l))])
+      (render-judgment-form no-ctxts)))))
 
 (define-syntax-rule (rt t) ; "reduction term"
   (with-rewriters (lw->pict reduction (to-lw t))))

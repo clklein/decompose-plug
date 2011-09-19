@@ -11,7 +11,7 @@
 
 (provide reduction
          reduces reductions/multi reductions*/multi
-         inst plug join)
+         inst plug join no-ctxts)
 
 (define-extended-language reduction patterns
   (r a
@@ -30,21 +30,25 @@
   [(inst :hole b) :hole]
   [(inst (:var x) b)
    (lookup b x)]
-  [(inst (:app f r) b)
-   (meta-app f (inst r b))]
   [(inst (:in-hole r_1 r_2) b) 
    ;; WARNING: result of 'inst' not necc. a C
    (plug (inst r_1 b) (inst r_2 b))]
   [(inst (:cons r_1 r_2) b)
-   (join (inst r_1 b) (inst r_2 b))])
+   (join (inst r_1 b) (inst r_2 b))]
+  [(inst (:app f r) b)
+   (meta-app f (inst r b))])
 
 (define-metafunction reduction
   join : t t -> t
-  [(join C a) (:left C a)]
-  [(join C (:cons t_1 t_2)) (:left C (:cons t_1 t_2))]
-  [(join a C) (:right a C)]
-  [(join (:cons t_1 t_2) C) (:right (:cons t_1 t_2) C)]
+  [(join C t) (:left C t) (judgment-holds (no-ctxts t))]
+  [(join t C) (:right t C) (judgment-holds (no-ctxts t))]
   [(join t_1 t_2) (:cons t_1 t_2)])
+
+(define-judgment-form reduction
+  #:mode (no-ctxts I)
+  #:contract (no-ctxts t)
+  [(no-ctxts a)]
+  [(no-ctxts (:cons t_1 t_2)) (no-ctxts t_1) (no-ctxts t_2)])
 
 (define-metafunction reduction
   plug : C t -> t
