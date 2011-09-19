@@ -20,7 +20,7 @@
 
 @title{Introduction}
 
-The dominant style of operational semantics technique in use today
+The dominant style of operational semantics in use today
 has at its heart the notion of a context that controls 
 where evaluation occurs. These contexts allow the designer
 of a reduction semantics to factor the definition of 
@@ -72,7 +72,8 @@ model of Redex (there is little danger of meta-circularity causing
 problems, as the embedding uses a modest subset of Redex's
 functionality---notably, no contexts or reduction relations). 
 This model allows us to test that our semantics gives
-the intended meanings to interesting calculi from the literature.
+the intended meanings to interesting calculi from the literature,
+something that would be difficult to prove.
 
 The remainder of this paper builds up an intuitive understanding of 
 what contexts are and how they are used via a series of examples, gives a semantics

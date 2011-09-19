@@ -33,7 +33,7 @@ contexts has changed several times, as we repeatedly encountered
 reduction systems that did not behave according to their authors'
 intent. This paper describes the culimation of that experience.
 To the best of our knowledge, the semantics given here accommodates even
-the most complex uses of Felleisen-Hieb-style semantics available.
+the most complex uses of contexts available.
 }
 
 @include-section["1-intro.scrbl"]
