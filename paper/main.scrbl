@@ -51,6 +51,17 @@ understanding of evaluation context semantics.
 Thanks also to Matthias Felleisen and Matthew Flatt for
 helpful discussions of the work.
 
+@section[#:tag "sec:url" #:style (style #f '(hidden unnumbered))]{}
+@(element (style "paragraph" '()) '(""))
+
+A version of this paper can be found online at:
+@centered{@url{http://www.eecs.northwestern.edu/~robby/plug/}}
+That web page contains 
+@(if extended-version?
+     @list{a version of the paper with a complete proof of the theorem}
+     @list{the final version of the paper as it appears in the proceedings})
+and the Redex models for all of the figures in this paper.
+
 @(generate-bibliography)
 
 @section[#:tag "sec:pre-appendix" #:style (style #f '(hidden unnumbered))]{}
