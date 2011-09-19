@@ -94,8 +94,6 @@ In addition to these contrived reduction rules, the semantics in
 in @secref{sec:examples}, as well as the most sophisticated uses of
 contexts we have encountered in the literature, in particular:
 @itemlist[
-  @item{@citet[icfp2007-fyff]'s semantics for delimited control in the presence of dynamic
-        binding, exception handling, and Scheme's @racket[dynamic-wind] form.}
   @item{@citet[cbn-calculus]'s core call-by-need calculus. Their @racket[letrec]
         calculus uses decomposition in fundamentally the same way, but the 
         particular formulation they choose makes use of pattern-matching constructs
@@ -104,5 +102,7 @@ contexts we have encountered in the literature, in particular:
         construct that enforces dependencies between adjacent terms. The examples
         directory distributed with Redex shows one way to define their @racket[letrec]
         evaluation contexts without these constructs.}
+  @item{@citet[icfp2007-fyff]'s semantics for delimited control in the presence of dynamic
+        binding, exception handling, and Scheme's @racket[dynamic-wind] form.}
   @item{@citet[cf-cbn-calculus]'s call-by-need calculus, which defines evaluation
         contexts using a heavily left-recursive grammar.}]
