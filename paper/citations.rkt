@@ -508,6 +508,13 @@
                                 #:number 3
                                 #:pages '(265 301))
    #:date "1997"))
+
+(define cf-cbn-calculus
+  (make-bib 
+   #:author (authors "Stephen Chang" "Matthias Felleisen")
+   #:title "The Call-by-need Lambda Calculus"
+   #:location "Unpublished Manuscript"
+   #:date 2011))
   
 (define berendregt 
   (make-bib 

@@ -1,4 +1,4 @@
-#lang scribble/base
+#lang scribble/manual
 @(require scriblib/figure
           slideshow/pict
           redex/pict
@@ -6,6 +6,7 @@
           "../2-models/models.rkt"
           "../sem-sem/reduction.rkt"
           "../sem-sem/patterns.rkt"
+          "citations.rkt"
           "typeset-reduction.rkt")
 
 @title[#:tag "sec:reduction"]{A Semantics for Reduction}
@@ -90,4 +91,18 @@ reduction rules for projecting @Λkp-term[tuple] components.
 
 In addition to these contrived reduction rules, the semantics in 
 @figure-ref{fig:reduction} supports all of the systems 
-in @secref{sec:examples}.
+in @secref{sec:examples}, as well as the most sophisticated uses of
+contexts we have encountered in the literature, in particular:
+@itemlist[
+  @item{@citet[icfp2007-fyff]'s semantics for delimited control in the presence of dynamic
+        binding, exception handling, and Scheme's @racket[dynamic-wind] form.}
+  @item{@citet[cbn-calculus]'s core call-by-need calculus. Their @racket[letrec]
+        calculus uses decomposition in fundamentally the same way, but the 
+        particular formulation they choose makes use of pattern-matching constructs
+        that are orthogonal to the ones we describe and not currently available in
+        Redex, namely associative-commutative matching and a Kleene star-like
+        construct that enforces dependencies between adjacent terms. For an example
+        of how to express their @racket[letrec] evaluation contexts without these
+        constructs, see: @url{http://git.racket-lang.org/plt/blob/HEAD:/collects/redex/examples/cbn-letrec.rkt}.}
+  @item{@citet[cf-cbn-calculus]'s call-by-need calculus, which defines evaluation
+        contexts using a heavily left-recursive grammar.}]
