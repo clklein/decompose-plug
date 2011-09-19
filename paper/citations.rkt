@@ -569,7 +569,7 @@
 (define dubois-tphols00
   (make-bib
    #:author "Catherine Dubois"
-   #:title "Proving ML Type Soundness Within Coq"
+   #:title "Proving ML Type Soundness within Coq"
    #:location (proceedings-location tphols
                                     #:series lncs
                                     #:volume 1869
