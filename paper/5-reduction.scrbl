@@ -39,23 +39,16 @@ instantiate to the result of applying the meta-function to the instantiated
 argument template. 
 
 The instantiation of @rt[:in-hole] templates makes use of a generic @rt[plug]
-function that accepts a term representing a context and a term to plug, and
+function that accepts a context and a term to plug, and
 returns the result of plugging the context with the term.
 
-When @rt[plug]'s first argument is a context @rt[C], then it
-follows the path  recorded for @rt[C] when it was constructed by decomposition
-as shown in the first three rules for @rt[plug].
-When @rt[plug]'s first argument is a term constructed with @rt[:cons], it
-allows plugging only when there is an unambiguous location in which to plug.
-Specifically, if there is a @rt[:left], @rt[:right], or @rt[:hole] in both
-sides of the @rt[:cons], then @rt[plug] is not well-defined (and thus neither is
-@rt[inst]), but if there is a context on only one side, then @rt[plug], will 
-fill that context.
+When @rt[plug]'s second argument is a context, it constructs a larger context
+by essentially concatenating the two contexts, preserving the path to the hole.
+When @rt[plug]'s second argument is some non-context term, it replaces
+the @rt[:left] and @rt[:right] constructors with @rt[:cons], producing a non-context
+term.
 
-When plugging 
-a context @rt[C_1] with a context @rt[C_2], @rt[plug] preserves the path 
-superimposed on @rt[C_1], thereby connecting it with the path on @rt[C_2]. 
-This path extension is necessary, for example, to support the following rule
+The path extension is necessary, for example, to support the following rule
 for an unusual control operator:
 @(centered
   (parameterize ([rule-pict-style 'horizontal])
@@ -74,6 +67,12 @@ Although the rule does not explicitly define a path for the extended context
 @Λk-term[(1+ E)],
 one can be safely inferred, since the term paired with @Λk-term[E] has no
 pluggable sub-terms. 
+
+The case of the @rt[inst] function for @rt[:cons] templates performs this inference
+via the function @rt[join]. When given a context and a term that is not a context, 
+@rt[join] extends the context's path through the extra layer. 
+When both arguments contain contexts, @rt[join] combines the terms with @rt[:cons],
+preventing possible ambiguity in a subsequent plugging operation.
 
 @(define-syntax-rule (Λkp-term t)
    (render-lw Λdk/red (to-lw t)))
