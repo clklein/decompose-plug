@@ -101,8 +101,8 @@ contexts we have encountered in the literature, in particular:
         particular formulation they choose makes use of pattern-matching constructs
         that are orthogonal to the ones we describe and not currently available in
         Redex, namely associative-commutative matching and a Kleene star-like
-        construct that enforces dependencies between adjacent terms. For an example
-        of how to express their @racket[letrec] evaluation contexts without these
-        constructs, see: @url{http://git.racket-lang.org/plt/blob/HEAD:/collects/redex/examples/cbn-letrec.rkt}.}
+        construct that enforces dependencies between adjacent terms. The examples
+        directory distributed with Redex shows one way to define their @racket[letrec]
+        evaluation contexts without these constructs.}
   @item{@citet[cf-cbn-calculus]'s call-by-need calculus, which defines evaluation
         contexts using a heavily left-recursive grammar.}]
