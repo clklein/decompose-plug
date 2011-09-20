@@ -24,7 +24,7 @@ nesting through non-terminals). Second, the rules provide no answer to the
 question of whether to proceed in expanding a non-terminal if none of the input 
 term has been consumed since last encountering that non-terminal. This question
 arises, for example, when decomposing by the non-terminal @pt[E] from the 
-grammar in @figure-ref{fig:delim}, since @pt[E]'s second production causes the 
+grammar in @figure-ref{fig:delim}, since @pt[E]'s second alternative causes the 
 @pt[:in-hole] rule to decompose the same term by @pt[E]. This
 second problem is the manifestation of left recursion in the form of grammars
 we consider.
@@ -72,7 +72,7 @@ a larger context if @mt[m] is a decomposition.
 The remaining three cases are straightforward. The @mt[:name] case recurs on the
 sub-pattern and extends the bindings of each of the results with either the 
 matched term or the context carved out by the decomposition. The @mt[:nt] case
-tries each production, discarding the binding component of each result. The
+tries each alternative, discarding the binding component of each result. The
 final case, a catch-all, applies when the pattern does not match or decompose
 the input term.
 
@@ -83,11 +83,11 @@ wrapper function @mt[matches] restricts this set to the bindings associated with
 match derivations. 
 
 To make this precise, we first give a definition of left-recursion.
-Intuitively, a grammar is left-recursive if there is a way to, in a 
-straight-forward recursive parser, get from some non-terminal back
+Intuitively, a grammar is left-recursive if there is a way, in a 
+straight-forward recursive parser, to get from some non-terminal back
 to that same non-terminal without consuming any input. So, our
-definition of left-recursion builds a graph from the grammar that connects
-each pattern to any other pattern that might reach without consuming any input, 
+definition of left-recursion builds a graph from the grammar by connecting
+each pattern to the other patterns that might reached without consuming any input, 
 and then checks for a cycle in the graph. The most interesting case is the last one,
 where an @mt[:in-hole] pattern is connected to its second argument when
 the first argument can generate @mt[:hole].
@@ -123,13 +123,13 @@ For readability, we use conventional notation for terms,
 contexts, and patterns and omit @mt[M]'s unchanging first argument. 
 
 The extended algorithm repeats the call @mt[(M (f (f hole)) C)] three times,
-assuming it tries @wt[C]'s productions from left to right:
+assuming it tries @wt[C]'s alternatives from left to right:
 
 @itemlist[#:style 'ordered
-@item{The @mt[:in-hole] production immediately leads to another call 
+@item{The @mt[:in-hole] alternative immediately leads to another call 
 @mt[(M (f (f hole)) C)], which the extended algorithm considers a failure, since 
 the same call is already in progress. Next, @mt[M] tries @wt[C]'s @wt[hole] 
-production, which produces one result: the trivial decomposition 
+alternative, which produces one result: the trivial decomposition 
 @pt[(decomposes (f (f hole)) hole (f (f hole)) C)].
 Since the first call made some progress---it computed one possible 
 decomposition---the extended algorithm repeats the process.}

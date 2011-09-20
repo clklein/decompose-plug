@@ -10,7 +10,7 @@
 plug's behavior differs in that it fills all of the context's holes. 
 @citet[felleisen-hieb] exploit the power of a selective notion of context 
 to give equational semantics for many aspects of programming languages, 
-notably continuations and state. The meaning of multi-holed contexts does
+notably continuations and state. The meaning of multi-holed grammars does
 not arise in their work, since the grammar for contexts restricts them
 to exactly one hole.
 
@@ -45,9 +45,9 @@ that may be formed using the plug operation.
 Berghofer's, Leroy's, and Xi's solutions to the POPLmark Challenge@~cite[POPLmark] use 
 Dubois's encoding for the challenge's reduction semantics. Vouillon's solution uses a 
 first-order encoding of contexts and therefore provides an explicit definition
-of plugging. (The other submitted solutions use structural operational 
+of plugging. The other submitted solutions use structural operational 
 semantics, do not address dynamic semantics at all, or are no longer available 
-online.)
+online.
 
 @citet[refocusing] and 
 @citet[refocusing-formalized] provide an axiomatization of the various 

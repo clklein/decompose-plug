@@ -13,8 +13,8 @@
 
 @title[#:tag "sec:examples"]{Matching and Contexts}
 
-This section introduces the notion of a context and explains, through a series of examples, how pattern matching for contexts works.
-Each example model comes with a lesson that informs the design of our context-sensitive reduction semantics semantics.
+This section introduces the notion of contexts and explains through a series of examples how matching works in their presence.
+Each example comes with a lesson that informs the design of our context-sensitive reduction semantics semantics.
 
 @wfigure["fig:arith" "Arithmetic Expressions"]{
 @(render-language arith)
@@ -27,7 +27,7 @@ Each example model comes with a lesson that informs the design of our context-se
 In its essence, a pattern of the form @rr[(in-hole C e)] matches an expression when the expression can be split into two parts,
 an outer part (the context) that matches @rr[C] and an inner part that matches @rr[e]. The outer part marks where the inner
 part appears with a hole, written @rr[hole]. In other words, when thinking of an expression as a tree, matching against
-@rr[(in-hole C e)] finds some subtree of the expression that matches @rr[e], and then replaces that sub-term with the hole
+@rr[(in-hole C e)] finds some subtree of the expression that matches @rr[e], and then replaces that sub-term with a hole
 to build a new expression in such a way that the new expression matches @rr[C].
 
 @wfigure["fig:ex" "Example Decomposition"]{
@@ -96,14 +96,14 @@ but it is also possible to give a direct explanation, exploiting contexts to con
 }
 
 @Figure-ref["fig:cbn"] shows the contexts from @citet[cbn-calculus]'s model of call-by-need.
-The first three productions of @rr[E] are standard, allowing evaluation
+The first three of @rr[E]'s alternatives are standard, allowing evaluation
 in the argument of the @rr[|+1|] primitive, 
 as well as in the function position of an application (regardless of what
-appears in the argument position). The fourth production allows evaluation in the body of
+appears in the argument position). The fourth alternative allows evaluation in the body of
 a @rr[λ]-expression that is in the function position of an application. Intuitively,
 this case says that once we have determined the function to be applied, then
 we can begin to evaluate its body. Of course, the function may eventually need its 
-argument, and at that point, the final production comes into play.
+argument, and at that point, the final alternative comes into play.
 It says that when an applied function needs its argument, then that argument may be
 evaluated.
 
@@ -114,7 +114,7 @@ reduces by simplifying the body of the
 without reducing the argument, because 
 it decomposes into this context
 @rr[((λ (x) hole) (|+1| 2))]
-using the fourth production of @rr[E].
+using the fourth alternative of @rr[E].
 In contrast,
 @rr[((λ (x) (|+1| x)) (|+1| 2))]
 reduces to
@@ -148,7 +148,7 @@ is the continuation. @Figure-ref["fig:cont"] extends the
 left-to-right call-by-value model in @figure-ref["fig:lc"] with support
 for continuations.
 It adds @rr[call/cc], the operator that grabs a continuation, and the new value form
-@rr[(cont E)] that represents a continuation and thus can be applied to invoke the continuation.
+@rr[(cont E)] that represents a continuation and can be applied to invoke the continuation.
 
 For example, the expression
 @rr[(|+1| (call/cc (λ (k) (k 2))))] 
@@ -161,10 +161,10 @@ The next step is to substitute for @rr[k],
 which yields the expression
 @(rr (|+1| ((cont (|+1| hole)) 2))).
 This expression has a continuation value in the function
-position of an application, and the next step is to
+position of an application, making the next step
 invoke the continuation. So, we can simply replace the context
 of the continuation invocation with the context inside the continuation,
-plugging the argument passed to the continuation in the hole:
+plugging the argument passed to the continuation in the hole, yielding
 @rr[(|+1| 2)].
 This reduction system tells us that our context decomposition
 semantics must be able to support contexts that appear in a
@@ -185,8 +185,8 @@ match a specified pattern, such as @rr[E]).
 
 Generalizing from ordinary continuations to delimited 
 continuations is simply a matter of factoring the contexts
-into two parts, those that contain a prompt and those that
-do not. @Figure-ref["fig:delim"] shows one way to do this, as
+into two parts, one that may contain prompts and one that may
+not. @Figure-ref["fig:delim"] shows one way to do this, as
 an extension of the call-by-value lambda calculus from 
 @figure-ref["fig:lc"].
 
@@ -195,7 +195,7 @@ matches an arbitrary evaluation context and @rr[M] matches an evaluation context
 that does not contain any prompt expressions. Accordingly,
 the rule for grabbing a continuation exploits this factoring
 to record only the portion of the context between the call to
-@rr[call/comp] and the nearest enclosing prompt in a continuation.
+@rr[call/comp] and the nearest enclosing prompt.
 
 @wfigure["fig:wacky" "Wacky Context"]{
 @(vl-append 
@@ -206,8 +206,8 @@ to record only the portion of the context between the call to
 
 The interesting aspect of this system is how @rr[E] refers to @rr[M] 
 and how that makes it difficult to support an algorithm
-that matches @rr[E]. For all of the example systems so far in
-this section, a matching algorithm can match a pattern of the
+that matches @rr[E]. For all of the example systems in this section
+so far, a matching algorithm can match a pattern of the
 form @rr[(in-hole C e)] by attempting to match @rr[C] against
 the entire term and, once a match has been found, attempting to 
 match what appeared at the hole against @rr[e]. With @rr[E], however,
@@ -215,11 +215,10 @@ this leads to an infinite loop because @rr[E] expands to a
 decomposition that includes @rr[E] in the first position.@note{Some find the equivalent, 
 non-problematic grammar @(render-language non-left-recur #:nts '(E)) clearer.
 At least one author of the present paper (who has spent a considerable amount
-of time hacking on Redex's matcher, no less), however, does not and
+of time hacking on Redex's implementation, no less), however, does not and
 was surprised when Redex failed to terminate on a similar example. 
-We have also gotten comments from Redex users
-when they were surprised along these lines, suggesting that Redex
-should support these kinds of grammars.}
+We have also received comments from Redex users who were surprised by
+similar examples, suggesting that Redex should support such definitions.}
 
 
 A simple fix that works for the delimited continuations 

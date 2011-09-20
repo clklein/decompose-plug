@@ -47,7 +47,7 @@ the most complex uses of contexts available.
 @(element (style "paragraph" '()) '("Acknowledgments"))
 Thanks to Stephen Chang for his many 
 interesting examples of contexts that challenged our
-understanding of evaluation context semantics.
+understanding of context-sensitive matching.
 Thanks also to Matthias Felleisen and Matthew Flatt for
 helpful discussions of the work.
 

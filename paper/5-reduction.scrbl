@@ -14,7 +14,7 @@
 We now put the notion of matching from @secref{sec:match-rules} to work in a
 formalization of the standard notation for context-sensitive reduction rules. 
 As with patterns, we consider a core specification language that lacks
-many of the conveniences of a language like Redex but nevertheless addresses the
+many of the conveniences of a language like Redex but nevertheless highlights the
 principal ideas.
 
 @figure["fig:reduction" "A semantics for reduction (function cases apply in order)"]{
@@ -25,8 +25,8 @@ principal ideas.
 a grammar and rules of the shape
 @(hbl-append 2 (rt p) (arrow->pict '-->) (rt r)),
 each consisting of a pattern @rt[p] and a term template @rt[r]. 
-Redex then uses the judgment in the upper-left corner of the figure to
-determine if a particular term @rt[t] rewrites to @rt[t_^′].
+Redex uses the judgment form in the upper-left corner of the figure to
+determine if a particular term @rt[t] reduces to @rt[t_^′] by the given rule.
 The grammar in the
 figure's top-right gives the syntax for term templates, which include atoms,
 the context @rt[:hole],
@@ -40,27 +40,24 @@ instantiate to the result of applying the meta-function to the instantiated
 argument template. 
 
 The instantiation of @rt[:in-hole] templates makes use of a generic @rt[plug]
-function that accepts a context and a term to plug, and
+function that accepts a context and a term and
 returns the result of plugging the context with the term.
-
 When @rt[plug]'s second argument is a context, it constructs a larger context
-by essentially concatenating the two contexts, preserving the path to the hole.
-When @rt[plug]'s second argument is some non-context term, it replaces
-the @rt[:left] and @rt[:right] constructors with @rt[:cons], producing a non-context
-term.
-
+by concatenating the two contexts, preserving the path to the hole.
 The path extension is necessary, for example, to support the following rule
 for an unusual control operator:
 @(centered
   (parameterize ([rule-pict-style 'horizontal])
     (render-reduction-relation cont-double-red)))
+When @rt[plug]'s second argument is some non-context term, it replaces
+the @rt[:left] or @rt[:right] constructor with @rt[:cons], producing a non-context
+term.
 
 @(define-syntax-rule (Λk-term t)
    (render-lw Λdk/red (to-lw t)))
 
-The rules that allow @rt[plug] to fill contexts embedded in
-@rt[:cons] expressions helps with rules
-that extend contexts, like this one for another unusual control operator:
+Insistence that @rt[plug]'s first argument be a context creates a potential 
+problem for rules which extend contexts, like this one for another unusual control operator:
 @(centered
   (parameterize ([rule-pict-style 'horizontal])
     (render-reduction-relation cont-plus-red)))
@@ -70,7 +67,7 @@ one can be safely inferred, since the term paired with @Λk-term[E] has no
 pluggable sub-terms. 
 
 The case of the @rt[inst] function for @rt[:cons] templates performs this inference
-via the function @rt[join]. When given a context and a term that is not a context, 
+via the function @rt[join]. When given a context and a term containing no contexts, 
 @rt[join] extends the context's path through the extra layer. 
 When both arguments contain contexts, @rt[join] combines the terms with @rt[:cons],
 preventing possible ambiguity in a subsequent plugging operation.
@@ -92,16 +89,16 @@ reduction rules for projecting @Λkp-term[tuple] components.
 In addition to these contrived reduction rules, the semantics in 
 @figure-ref{fig:reduction} supports all of the systems 
 in @secref{sec:examples}, as well as the most sophisticated uses of
-contexts we have encountered in the literature, in particular:
+contexts we have encountered in the literature, specifically:
 @itemlist[
-  @item{@citet[cbn-calculus]'s core call-by-need calculus. Their @racket[letrec]
-        calculus uses decomposition in fundamentally the same way, but the 
-        particular formulation they choose makes use of pattern-matching constructs
-        that are orthogonal to the ones we describe and not currently available in
-        Redex, namely associative-commutative matching and a Kleene star-like
-        construct that enforces dependencies between adjacent terms. The examples
-        directory distributed with Redex shows one way to define their @racket[letrec]
-        evaluation contexts without these constructs.}
+  @item{@citet[cbn-calculus]'s core call-by-need calculus. Their extension of this
+        calculus to @racket[letrec] uses decomposition in fundamentally the same way,
+        but the particular formulation they choose makes use of pattern-matching 
+        constructs orthogonal to the ones we describe here, namely associative-commutative 
+        matching and a Kleene star-like construct that enforces dependencies between 
+        adjacent terms. The examples directory distributed with Redex shows one way to
+        define their @racket[letrec] evaluation contexts without these constructs, which
+        Redex does not currently support.}
   @item{@citet[icfp2007-fyff]'s semantics for delimited control in the presence of dynamic
         binding, exception handling, and Scheme's @racket[dynamic-wind] form.}
   @item{@citet[cf-cbn-calculus]'s call-by-need calculus, which defines evaluation
