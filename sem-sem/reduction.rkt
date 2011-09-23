@@ -11,7 +11,7 @@
 
 (provide reduction
          reduces reductions/multi reductions*/multi
-         inst plug join no-ctxts)
+         inst plug join has-context)
 
 (define-extended-language reduction patterns
   (r a
@@ -19,46 +19,64 @@
      (:var x)
      (:app f r)
      (:in-hole r r)
-     (:cons r r))
+     (:cons r r)
+     (:hide-hole r))
   (s (r (x ...)) ; optional freshness declarations
      r)
   (f (side-condition any_1 (procedure? (term any_1)))))
 
 (define-metafunction reduction
-  inst : r b -> t
-  [(inst a b) a]
-  [(inst :hole b) :hole]
-  [(inst (:var x) b)
-   (lookup b x)]
+  inst : r b -> (tuple t bool)
+  [(inst a b) (tuple a false)]
+  [(inst :hole b) (tuple :hole true)]
+  [(inst (:var x) b) (tuple (lookup b x) (has-context (lookup b x)))]
   [(inst (:in-hole r_1 r_2) b) 
+   (plug C (inst r_2 b))
    ;; WARNING: result of 'inst' not necc. a C
-   (plug (inst r_1 b) (inst r_2 b))]
+   (where (tuple C true) (inst r_1 b))]
   [(inst (:cons r_1 r_2) b)
    (join (inst r_1 b) (inst r_2 b))]
   [(inst (:app f r) b)
-   (meta-app f (inst r b))])
+   (tuple (meta-app f (inst r b)) (has-context (meta-app f (inst r b))))]
+  [(inst (:hide-hole p) b)
+   (tuple t false)
+   (where (tuple t bool) (inst t b))])
 
 (define-metafunction reduction
-  join : t t -> t
-  [(join C t) (:left C t) (judgment-holds (no-ctxts t))]
-  [(join t C) (:right t C) (judgment-holds (no-ctxts t))]
-  [(join t_1 t_2) (:cons t_1 t_2)])
-
-(define-judgment-form reduction
-  #:mode (no-ctxts I)
-  #:contract (no-ctxts t)
-  [(no-ctxts a)]
-  [(no-ctxts (:cons t_1 t_2)) (no-ctxts t_1) (no-ctxts t_2)])
+  join : (tuple t bool) (tuple t bool) -> (tuple t bool)
+  [(join (tuple C true) (tuple t false)) (tuple (:left C t) true)]
+  [(join (tuple t false) (tuple C true)) (tuple (:right t C) true)]
+  [(join (tuple t_1 bool_1) (tuple t_2 bool_2)) (tuple (:cons t_1 t_2) (∨ bool_1 bool_2))])
 
 (define-metafunction reduction
-  plug : C t -> t
-  [(plug :hole t) t]
+  ∨ : bool bool -> bool
+  [(∨ false false) false]
+  [(∨ bool bool) true])
+
+(define-metafunction reduction
+  plug : C (tuple t bool) -> (tuple t bool)
+  [(plug :hole (tuple t bool)) (tuple t bool)]
   
-  [(plug (:left C_l t_r) C) (:left (plug C_l C) t_r)]
-  [(plug (:left C_l t_r) t) (:cons (plug C_l t) t_r)]
+  [(plug (:left C_l t_r) (tuple C_c true)) 
+   (tuple (:left t_l t_r) true)
+   (where (tuple C_c true) (plug C_c C))]
+  [(plug (:left C_l t_r) (tuple t bool_1)) 
+   (tuple (:cons t_l t_r) (has-context t_r))
+   (where (tuple t_l bool_2) (plug C_l (tuple t bool_1)))]
+  ;[(plug (:left C_l t_r) C) (:left (plug C_l C) t_r)]
+  ;[(plug (:left C_l t_r) t) (:cons (plug C_l t) t_r)]
   
-  [(plug (:right t_l C_r) C) (:right t_l (plug C_r C))]
-  [(plug (:right t_l C_r) t) (:cons t_l (plug C_r t))])
+  [(plug (:right t_l C_r) (tuple C bool)) (tuple (:right t_r (plug C_r C)) bool)]
+  [(plug (:right t_l C_r) (tuple t bool)) (tuple (:cons t_l (plug C_r t)) bool)]
+  ;[(plug (:right t_l C_r) C) (:right t_l (plug C_r C))]
+  ;[(plug (:right t_l C_r) t) (:cons t_l (plug C_r t))]
+  )
+
+(define-metafunction reduction
+  has-context : t -> bool
+  [(has-context a) false]
+  [(has-context (:cons t_1 t_2)) (∨ (has-context t_1) (has-context t_2))]
+  [(has-context t) true])
 
 (define-metafunction reduction
   lookup : b x -> t
