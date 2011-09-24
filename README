@@ -3,7 +3,7 @@ semantics.
 
 The `semantics' directory contains a Redex encoding of the semantics.
 
-The `aplas11' directory contains the Scribble source for the paper
+The `aplas2011' directory contains the Scribble source for the paper
 describing the semantics, including the paper's examples.
 
 The `pld-talk' contains the Slideshow source for Robby Findler's PLD
