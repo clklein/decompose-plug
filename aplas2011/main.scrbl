@@ -64,11 +64,10 @@ and the Redex models for all of the figures in this paper.
 
 @(generate-bibliography)
 
-@section[#:tag "sec:pre-appendix" #:style (style #f '(hidden unnumbered))]{}
-
 @(if extended-version?
      (list
-      ;@(element (style "newpage" '()) '())
+      @section[#:tag "sec:pre-appendix" #:style (style #f '(hidden unnumbered))]{}
+      @(element (style "newpage" '()) '())
       @section[#:tag "sec:proof"]{Appendix}
       @element[(style "input" '(exact-chars)) '("core-algorithm-correctness-txt.tex")])
      (void))
