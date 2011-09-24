@@ -3,7 +3,7 @@
 
 This file does the translation from
 Redex-looking notation to the notation
-for the sem-sem/ directory models
+for the semantics/ directory models
 
 Also has hide-hole removing capabilities
 
@@ -14,9 +14,9 @@ Also has hide-hole removing capabilities
          racket/set
          racket/contract
          rackunit
-         "../sem-sem/syntax-directed-match-total.rkt"
-         "../sem-sem/patterns.rkt"
-         (only-in "../sem-sem/reduction.rkt" reductions/multi reductions*/multi))
+         "../../semantics/syntax-directed-match-total.rkt"
+         "../../semantics/patterns.rkt"
+         (only-in "../../semantics/reduction.rkt" reductions/multi reductions*/multi))
 
 (define debug? #f)
 

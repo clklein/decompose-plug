@@ -1,7 +1,10 @@
 This repository provides a semantics for context-sensitive reduction
 semantics.
 
-The sem-sem directory contains a Redex encoding of the semantics.
+The `semantics' directory contains a Redex encoding of the semantics.
 
-The paper directory contains a Scribble document describing the
-semantics.
+The `aplas11' directory contains the Scribble source for the paper
+describing the semantics, including the paper's examples.
+
+The `pld-talk' contains the Slideshow source for Robby Findler's PLD
+2011 talk about the project.

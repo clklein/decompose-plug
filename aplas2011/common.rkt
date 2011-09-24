@@ -101,7 +101,6 @@
     (:right "right")
     (:hole "hole")
     (:number "number")
-    (:hide-hole "hide-hole")
     (no-bindings "∅")))
 
 (define (with-keyword-rewriters thunk)

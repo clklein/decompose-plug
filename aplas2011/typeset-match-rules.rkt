@@ -1,9 +1,9 @@
 #lang racket
 (require redex/pict
          slideshow/pict
-         "../sem-sem/patterns.rkt"
-         "../sem-sem/common.rkt"
-         "../sem-sem/non-syntax-directed-match.rkt"
+         "../semantics/patterns.rkt"
+         "../semantics/common.rkt"
+         "../semantics/non-syntax-directed-match.rkt"
          "common.rkt")
 (provide pt
          with-rewriters

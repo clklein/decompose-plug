@@ -3,9 +3,9 @@
           slideshow/pict
           redex/pict
           (except-in redex/reduction-semantics plug)
-          "../2-models/models.rkt"
-          "../sem-sem/reduction.rkt"
-          "../sem-sem/patterns.rkt"
+          "2-models/models.rkt"
+          "../semantics/reduction.rkt"
+          "../semantics/patterns.rkt"
           "citations.rkt"
           "typeset-reduction.rkt")
 

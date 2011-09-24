@@ -3,6 +3,8 @@
 @(require scriblib/figure
           scribble/manual
           "typeset-match-rules.rkt"
+          "2-models/double.rkt"
+          "2-models/models.rkt"
           "wfigure.rkt")
 
 @title[#:tag "sec:match-rules"]{A Semantics for Matching}
@@ -42,18 +44,15 @@ for clarity: @pt[(:in-hole p_1 p_2)]. Finally, interior nodes are matched
 by the pattern @pt[(:cons p_1 p_2)], where @pt[p_1] and @pt[p_2] match the corresponding
 sub-terms.
 
-@(begin
-   (require "../2-models/double.rkt"
-            "../2-models/models.rkt")
-   (define-syntax-rule (check-ok/pt e1 e2)
-     (let ([converted (rp->p (lang-nts :arith) 'e1)]
-           [qe2 'e2])
-       (unless (equal? converted qe2)
-         (error '3-semantics.scrbl 
-                "example doesn't match:\n  ~s\n  ~s"
-                converted
-                qe2))
-       @pt[e2])))
+@(define-syntax-rule (check-ok/pt e1 e2)
+   (let ([converted (rp->p (lang-nts :arith) 'e1)]
+         [qe2 'e2])
+     (unless (equal? converted qe2)
+       (error '3-semantics.scrbl 
+              "example doesn't match:\n  ~s\n  ~s"
+              converted
+              qe2))
+     @pt[e2]))
 
 For example, the left-hand side of the reduction rule in 
 @figure-ref{fig:arith} corresponds to the following pattern, 

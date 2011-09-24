@@ -4,8 +4,8 @@
           scriblib/figure
           redex/pict
           scriblib/footnote
-          "../2-models/models.rkt"
-          "../sem-sem/syntax-directed-match.rkt"
+          "2-models/models.rkt"
+          "../semantics/syntax-directed-match.rkt"
           "citations.rkt"
           "typeset-match-rules.rkt"
           "typeset-match-algo.rkt"

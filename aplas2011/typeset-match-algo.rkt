@@ -3,7 +3,7 @@
 (require redex/pict
          slideshow/pict
          "common.rkt"
-         "../sem-sem/syntax-directed-match.rkt")
+         "../semantics/syntax-directed-match.rkt")
 (provide mt
          render-algorithm)
 

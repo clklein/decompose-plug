@@ -1,0 +1,30 @@
+This directory contains a Redex encoding of the APLAS 2011 paper 
+
+   _A Semantics for Context-Sensitive Reduction Semantics_
+
+by Klein, McCarthy, Jaconette, and Findler.
+
+It requires at least Racket version 5.1.3.7, available at
+
+   http://www.racket-lang.org/
+
+Notable files:
+- run-tests.rkt: a script that runs all the tests
+- sem-sem/patterns.rkt: the definitions in figure 8
+- sem-sem/non-syntax-directed-match.rkt: the definitions in figure 9
+- sem-sem/non-syntax-directed-match-test.rkt: tests of the previous
+- sem-sem/syntax-directed-match.rkt: the definitions in figure 10
+- sem-sem/syntax-directed-match-test.rkt: tests of the previous
+- sem-sem/reduction.rkt: the definitions in figure 11
+- sem-sem/reduction-test.rkt: tests of the previous
+- sem-sem/syntax-directed-match-total.rkt: a prototype matching algorithm
+  supporting left-recursive grammars
+- sem-sem/syntax-directed-match-total-test.rkt: tests of the previous
+- 2-models/models.rkt: the examples from sections 2 and 5
+- 2-models/test.rkt: tests of the previous
+- 2-models/double.rkt: utilities for translating Redex syntax to the
+  representation used by the Redex encoding of the semantics
+
+The following Git repository contains the latest version of this semantics:
+
+   http://github.com/clklein/decompose-plug/

@@ -6,18 +6,18 @@
 (provide (all-defined-out))
 
 (define-language patterns
-  (t (:cons t t)
-     a
-     C)
   (C :hole
      (:left C t)
      (:right t C))
-  (p a
+  (t a :hole
+     (:cons t t)
+     (:left t t)
+     (:right t t))
+  (p a :hole
+     (:cons p p)
      (:name x p)
      (:nt n)
-     (:in-hole p p)
-     (:cons p p)
-     :hole)
+     (:in-hole p p))
   (a variable-not-otherwise-mentioned
      number)
   (x variable-not-otherwise-mentioned)
@@ -29,9 +29,8 @@
   (D [x (p ...)])
   
   (k :cons :left :right) ; for convenience in matching rules
-
-  (otherwise-mentioned ⊤)
-  (bool true false))
+  
+  (otherwise-mentioned ⊤))
 
 (define pattern? (redex-match patterns p))
 (define atom? (redex-match patterns a))
