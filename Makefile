@@ -2,9 +2,8 @@ dist: DOES_NOT_EXIST
 	rm -rf dist
 	mkdir dist
 	mkdir dist/aplas-semantics
-	cd aplas2011; make main.pdf; make aplas2011-kmjf.pdf
-	cp aplas2011/main.pdf dist/aplas2011-kmjf-revised-short.pdf
-	cp aplas2011/aplas2011-kmjf.pdf dist/aplas2011-kmjf-revised-long.pdf
+	cd aplas2011; make main.pdf
+	cp aplas2011/main.pdf dist/aplas2011-kmjf-revised.pdf
 	git clone . submitted
 	cd submitted; git reset --hard f54f5187f7b45e33e6d6305ebaff6ca9e81e92be
 	mv submitted/sem-sem dist/aplas-semantics
