@@ -1,5 +1,5 @@
 This repository provides a semantics for context-sensitive reduction
-semantics.
+semantics. See http://www.eecs.northwestern.edu/~robby/plug/.
 
 The `semantics' directory contains a Redex encoding of the semantics.
 
