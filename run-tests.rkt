@@ -5,4 +5,4 @@
          "semantics/syntax-directed-match-total-test.rkt"
          "semantics/set-comp-test.rkt"
          "semantics/reduction-test.rkt"
-         "aplas11/2-models/test.rkt")
+         "aplas2011/2-models/test.rkt")
