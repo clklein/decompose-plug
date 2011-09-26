@@ -102,22 +102,25 @@
 
 (define (render-reduction)
   (with-rewriters
-   (vc-append
-    20
-    (hc-append
-     horizontal-gap-size
+   (lt-superimpose
+    (ht-append
+     140
      (parameterize ([metafunction-cases '(0)])
        (render-judgment-form reduces))
      (parameterize ([render-language-nts '(r)])
-       (vl-append
-        (render-language reduction)
-        (non-bnf-def "f" (arbitrary-function-domain "t" "t")))))
+       (frame
+        (inset 
+         (vl-append
+          (render-language reduction)
+          (non-bnf-def "f" (arbitrary-function-domain "t" "t")))
+         4))))
     
     (vl-append
      20 
+     (blank 0 40)
      (vl-append
       (metafunction-signature "inst" "r" "b" (list "t" "bool"))
-      (parameterize ([metafunction-pict-style 'left-right/beside-side-conditions])
+      (parameterize (#;[metafunction-pict-style 'left-right/beside-side-conditions])
         (render-metafunctions inst)))
      
      (vl-append
@@ -134,7 +137,7 @@
       (render-metafunctions has-context))
      
      (vl-append
-      (metafunction-signature "δ" "(t → t)" (list "t" "bool") (list "t" "bool"))
+      (metafunction-signature "δ" "(t → t)" "t" "t")
       (text "An unspecified function that applies metafunctions"
             (cons 'italic (default-style)))))
     

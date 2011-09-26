@@ -6,7 +6,7 @@
 (test-equal (term (inst (:in-hole (:in-hole (:var x) (:var y)) b)
                         (set (pair x (:left :hole :hole))
                              (pair y (:right a :hole)))))
-            (term (tuple (:cons (:cons a b) :hole) true)))
+            (term (tuple (:cons (:cons a b) :hole) :true)))
 
 (test-equal (term (inst (:cons (:cons (:var x) (:var y))
                                (:var z))
@@ -14,7 +14,7 @@
                              (pair y :hole)
                              (pair z :hole))))
             (term (tuple (:cons (:cons :hole :hole) :hole)
-                         true)))
+                         :true)))
 
 (define-syntax-rule (define-reduction-test-form name reduce)
   (define-syntax (name stx)

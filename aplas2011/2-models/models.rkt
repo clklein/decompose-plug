@@ -301,3 +301,5 @@
             (union-red-rels (reinterp-red-rel :cont-partial-red :Λkeq/red)
                             :cont-eq-red
                             (reinterp-red-rel :cbv-red :Λkeq/red)))))
+
+(define-double-language a-lang :a-lang)

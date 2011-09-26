@@ -27,55 +27,56 @@
 
 (define-metafunction reduction
   inst : r b -> (tuple t bool)
-  [(inst a b) (tuple a false)]
-  [(inst :hole b) (tuple :hole true)]
+  [(inst a b) (tuple a :false)]
+  [(inst :hole b) (tuple :hole :true)]
   [(inst (:var x) b) (tuple (lookup b x) (has-context (lookup b x)))]
   [(inst (:in-hole r_1 r_2) b) 
    (plug C (inst r_2 b))
    ;; WARNING: result of 'inst' not necc. a C
-   (where (tuple C true) (inst r_1 b))]
+   (where (tuple C :true) (inst r_1 b))]
   [(inst (:cons r_1 r_2) b)
    (join (inst r_1 b) (inst r_2 b))]
   [(inst (:app f r) b)
-   (tuple (meta-app f (inst r b)) (has-context (meta-app f (inst r b))))]
+   (tuple (meta-app f t) (has-context (meta-app f t)))
+   (where (tuple t bool) (inst r b))]
   [(inst (:hide-hole p) b)
-   (tuple t false)
+   (tuple t :false)
    (where (tuple t bool) (inst t b))])
 
 (define-metafunction reduction
   plug : C (tuple t bool) -> (tuple t bool)
   [(plug :hole (tuple t bool)) (tuple t bool)]
   
-  [(plug (:left C_1 t_r) (tuple C_2 true)) 
-   (tuple (:left C_3 t_r) true)
-   (where (tuple C_3 true) (plug C_1 (tuple C_2 true)))]
+  [(plug (:left C_1 t_r) (tuple C_2 :true)) 
+   (tuple (:left C_3 t_r) :true)
+   (where (tuple C_3 :true) (plug C_1 (tuple C_2 :true)))]
   [(plug (:left C_l t_r) (tuple t bool_1)) 
    (tuple (:cons t_l t_r) (∨ bool_2 (has-context t_r)))
    (where (tuple t_l bool_2) (plug C_l (tuple t bool_1)))]
   
-  [(plug (:right t_l C_1) (tuple C_2 true)) 
-   (tuple (:right t_l C_3) true)
-   (where (tuple C_3 true) (plug C_1 (tuple C_2 true)))]
+  [(plug (:right t_l C_1) (tuple C_2 :true)) 
+   (tuple (:right t_l C_3) :true)
+   (where (tuple C_3 :true) (plug C_1 (tuple C_2 :true)))]
   [(plug (:right t_l C_r) (tuple t bool_1)) 
    (tuple (:cons t_l t_r) (∨ bool_2 (has-context t_1)))
    (where (tuple t_r bool_2) (plug C_r (tuple t bool_1)))])
 
 (define-metafunction reduction
   join : (tuple t bool) (tuple t bool) -> (tuple t bool)
-  [(join (tuple C true) (tuple t false)) (tuple (:left C t) true)]
-  [(join (tuple t false) (tuple C true)) (tuple (:right t C) true)]
+  [(join (tuple C :true) (tuple t :false)) (tuple (:left C t) :true)]
+  [(join (tuple t :false) (tuple C :true)) (tuple (:right t C) :true)]
   [(join (tuple t_1 bool_1) (tuple t_2 bool_2)) (tuple (:cons t_1 t_2) (∨ bool_1 bool_2))])
 
 (define-metafunction reduction
   ∨ : bool bool -> bool
-  [(∨ false false) false]
-  [(∨ bool_1 bool_2) true])
+  [(∨ :false :false) :false]
+  [(∨ bool_1 bool_2) :true])
 
 (define-metafunction reduction
   has-context : t -> bool
-  [(has-context a) false]
+  [(has-context a) :false]
   [(has-context (:cons t_1 t_2)) (∨ (has-context t_1) (has-context t_2))]
-  [(has-context t) true])
+  [(has-context t) :true])
 
 (define-metafunction reduction
   lookup : b x -> t
@@ -102,11 +103,13 @@
   #:contract (reduces G t p t s)
   [(reduces G t p t_^′ r)
    (matches G t p b)
-   (where (t_^′ bool) (inst r b))]
+   (where (tuple t_^′ bool)
+          (inst r b))]
   ; Rules with freshness declarations (not shown in paper)
   [(reduces G t p t_^′ (r (x ...)))
    (matches G t p b)
-   (where (t_^′ bool) (inst r (add-fresh b t (x ...))))])
+   (where (tuple t_^′ bool) 
+          (inst r (add-fresh b t (x ...))))])
 (define-metafunction reduction
   [(add-fresh b t (x ...))
    ,(add-fresh/proc (term b) (term t) (term (x ...)))])

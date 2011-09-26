@@ -111,6 +111,8 @@
     (:hole "hole")
     (:number "number")
     (:hide-hole "hide-hole")
+    (:true "true")
+    (:false "false")
     (no-bindings "∅")))
 
 (define (with-keyword-rewriters thunk)
