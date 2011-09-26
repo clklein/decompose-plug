@@ -43,6 +43,24 @@
    (where (tuple t bool) (inst t b))])
 
 (define-metafunction reduction
+  plug : C (tuple t bool) -> (tuple t bool)
+  [(plug :hole (tuple t bool)) (tuple t bool)]
+  
+  [(plug (:left C_1 t_r) (tuple C_2 true)) 
+   (tuple (:left C_3 t_r) true)
+   (where (tuple C_3 true) (plug C_1 (tuple C_2 true)))]
+  [(plug (:left C_l t_r) (tuple t bool_1)) 
+   (tuple (:cons t_l t_r) (∨ bool_2 (has-context t_r)))
+   (where (tuple t_l bool_2) (plug C_l (tuple t bool_1)))]
+  
+  [(plug (:right t_l C_1) (tuple C_2 true)) 
+   (tuple (:right t_l C_3) true)
+   (where (tuple C_3 true) (plug C_1 (tuple C_2 true)))]
+  [(plug (:right t_l C_r) (tuple t bool_1)) 
+   (tuple (:cons t_l t_r) (∨ bool_2 (has-context t_1)))
+   (where (tuple t_r bool_2) (plug C_r (tuple t bool_1)))])
+
+(define-metafunction reduction
   join : (tuple t bool) (tuple t bool) -> (tuple t bool)
   [(join (tuple C true) (tuple t false)) (tuple (:left C t) true)]
   [(join (tuple t false) (tuple C true)) (tuple (:right t C) true)]
@@ -51,26 +69,7 @@
 (define-metafunction reduction
   ∨ : bool bool -> bool
   [(∨ false false) false]
-  [(∨ bool bool) true])
-
-(define-metafunction reduction
-  plug : C (tuple t bool) -> (tuple t bool)
-  [(plug :hole (tuple t bool)) (tuple t bool)]
-  
-  [(plug (:left C_l t_r) (tuple C_c true)) 
-   (tuple (:left t_l t_r) true)
-   (where (tuple C_c true) (plug C_c C))]
-  [(plug (:left C_l t_r) (tuple t bool_1)) 
-   (tuple (:cons t_l t_r) (has-context t_r))
-   (where (tuple t_l bool_2) (plug C_l (tuple t bool_1)))]
-  ;[(plug (:left C_l t_r) C) (:left (plug C_l C) t_r)]
-  ;[(plug (:left C_l t_r) t) (:cons (plug C_l t) t_r)]
-  
-  [(plug (:right t_l C_r) (tuple C bool)) (tuple (:right t_r (plug C_r C)) bool)]
-  [(plug (:right t_l C_r) (tuple t bool)) (tuple (:cons t_l (plug C_r t)) bool)]
-  ;[(plug (:right t_l C_r) C) (:right t_l (plug C_r C))]
-  ;[(plug (:right t_l C_r) t) (:cons t_l (plug C_r t))]
-  )
+  [(∨ bool_1 bool_2) true])
 
 (define-metafunction reduction
   has-context : t -> bool
@@ -103,11 +102,11 @@
   #:contract (reduces G t p t s)
   [(reduces G t p t_^′ r)
    (matches G t p b)
-   (where t_^′ (inst r b))]
+   (where (t_^′ bool) (inst r b))]
   ; Rules with freshness declarations (not shown in paper)
   [(reduces G t p t_^′ (r (x ...)))
    (matches G t p b)
-   (where t_^′ (inst r (add-fresh b t (x ...))))])
+   (where (t_^′ bool) (inst r (add-fresh b t (x ...))))])
 (define-metafunction reduction
   [(add-fresh b t (x ...))
    ,(add-fresh/proc (term b) (term t) (term (x ...)))])
