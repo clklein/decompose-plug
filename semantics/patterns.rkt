@@ -29,8 +29,9 @@
   (D [x (p ...)])
   
   (k :cons :left :right) ; for convenience in matching rules
-  
-  (otherwise-mentioned ⊤))
+
+  (otherwise-mentioned ⊤)
+  (bool true false))
 
 (define pattern? (redex-match patterns p))
 (define atom? (redex-match patterns a))

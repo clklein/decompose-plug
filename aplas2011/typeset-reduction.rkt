@@ -57,6 +57,27 @@
         " "
         (list-ref lws 2)))
 
+(define (rewrite-tuple lws)
+  (list "〈"
+        (list-ref lws 2)
+        ", "
+        (list-ref lws 3)
+        "〉"))
+
+(define (rewrite-wedge lws)
+  (list ""
+        (list-ref lws 2)
+        " ∧ "
+        (list-ref lws 3)
+        ""))
+
+(define (rewrite-vee lws)
+  (list ""
+        (list-ref lws 2)
+        " ∨ "
+        (list-ref lws 3)
+        ""))
+
 (define compound-rewriters
   (list (list 'meta-app rewrite-meta-app)
         (list 'lookup rewrite-lookup)
@@ -65,7 +86,10 @@
         (list 'pair rewrite-pair)
         (list 'no-ctxts no-white-brackets)
         (list 'matches rewrite-matches)
-        (list 'reduces rewrite-reduces)))
+        (list 'reduces rewrite-reduces)
+        (list 'tuple rewrite-tuple)
+        (list '∧ rewrite-wedge)
+        (list '∨ rewrite-vee)))
 
 (define-syntax-rule (with-rewriters expr)
   (let loop ([rws compound-rewriters])
@@ -93,7 +117,8 @@
      20 
      (vl-append
       (metafunction-signature "inst" "r" "b" "t")
-      (render-metafunctions inst))
+      (parameterize ([metafunction-pict-style 'left-right/beside-side-conditions])
+        (render-metafunctions inst)))
      
      (vl-append
       (metafunction-signature "plug" "C" "t" "t")
@@ -105,10 +130,15 @@
         (render-metafunctions join)))
      
      (vl-append
+      (metafunction-signature "has-context" "t" "bool")
+      (render-metafunctions has-context))
+     
+     (vl-append
       (metafunction-signature "δ" "(t → t)" "t" "t")
       (text "An unspecified function that applies metafunctions"
             (cons 'italic (default-style)))))
     
+    #;
     (parameterize ([relation-clauses-combine 
                     (λ (l) (apply hbl-append 40 l))])
       (render-judgment-form no-ctxts)))))
