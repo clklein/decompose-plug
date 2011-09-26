@@ -58,11 +58,11 @@
         (list-ref lws 2)))
 
 (define (rewrite-tuple lws)
-  (list "〈"
+  (list left-tuple 
         (list-ref lws 2)
         ", "
         (list-ref lws 3)
-        "〉"))
+        right-tuple))
 
 (define (rewrite-wedge lws)
   (list ""
@@ -116,16 +116,16 @@
     (vl-append
      20 
      (vl-append
-      (metafunction-signature "inst" "r" "b" "t")
+      (metafunction-signature "inst" "r" "b" (list "t" "bool"))
       (parameterize ([metafunction-pict-style 'left-right/beside-side-conditions])
         (render-metafunctions inst)))
      
      (vl-append
-      (metafunction-signature "plug" "C" "t" "t")
+      (metafunction-signature "plug" "C" (list "t" "bool") (list "t" "bool"))
       (render-metafunctions plug))
      
      (vl-append
-      (metafunction-signature "join" "t" "t" "t")
+      (metafunction-signature "join" (list "t" "bool") (list "t" "bool") (list "t" "bool"))
       (parameterize ([metafunction-pict-style 'left-right/beside-side-conditions])
         (render-metafunctions join)))
      
@@ -134,7 +134,7 @@
       (render-metafunctions has-context))
      
      (vl-append
-      (metafunction-signature "δ" "(t → t)" "t" "t")
+      (metafunction-signature "δ" "(t → t)" (list "t" "bool") (list "t" "bool"))
       (text "An unspecified function that applies metafunctions"
             (cons 'italic (default-style)))))
     

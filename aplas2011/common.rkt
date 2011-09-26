@@ -72,7 +72,16 @@
   (cond [(string? t)
          (non-terminal-text t)]
         [(pict? t) t]
+        [(list? t) 
+         (hbl-append 
+          (text left-tuple (default-style) (default-font-size))
+          (apply hbl-append (add-between (map pict/nt t)
+                                         (text ", " (default-style) (default-font-size))))
+          (text right-tuple (default-style) (default-font-size)))]
         [else (error 'pict/nt "expected pict or string but got ~s" t)]))
+
+(define left-tuple "〈")
+(define right-tuple "〉")
 
 (define (powerset s)
   (hbl-append (text "℘" '() 20) (text "(") (pict/nt s) (text ")")))
