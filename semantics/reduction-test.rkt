@@ -3,6 +3,22 @@
 (require "reduction.rkt"
          (except-in redex/reduction-semantics plug))
 
+(test-equal (term (inst a (set))) (term (tuple a :false)))
+(test-equal (term (inst :hole (set))) (term (tuple :hole :true)))
+(test-equal (term (inst (:var x) (set (pair x z)))) (term (tuple z :false)))
+(test-equal (term (inst (:var x) (set (pair x :hole)))) (term (tuple :hole :true)))
+(test-equal (term (inst (:cons x y) (set))) (term (tuple (:cons x y) :false)))
+(test-equal (term (inst (:cons :hole y) (set))) (term (tuple (:left :hole y) :true)))
+(test-equal (term (inst (:in-hole (:cons :hole z) (:cons y :hole)) (set))) 
+            (term (tuple (:left (:right y :hole) z) :true)))
+(test-equal (term (inst (:hide-hole (:cons :hole x)) (set)))
+            (term (tuple (:left :hole x) :false)))
+(test-equal (term (inst (:in-hole (:cons (:cons :hole x) (:hide-hole (:cons y :hole)))
+                                  z)
+                        (set)))
+            (term (tuple (:cons (:cons z x) (:right y :hole))
+                         :true)))
+
 (test-equal (term (inst (:in-hole (:in-hole (:var x) (:var y)) b)
                         (set (pair x (:left :hole :hole))
                              (pair y (:right a :hole)))))
@@ -15,6 +31,7 @@
                              (pair z :hole))))
             (term (tuple (:cons (:cons :hole :hole) :hole)
                          :true)))
+
 
 (define-syntax-rule (define-reduction-test-form name reduce)
   (define-syntax (name stx)

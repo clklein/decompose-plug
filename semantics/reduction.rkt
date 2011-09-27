@@ -41,7 +41,7 @@
    (where (tuple t bool) (inst r b))]
   [(inst (:hide-hole p) b)
    (tuple t :false)
-   (where (tuple t bool) (inst t b))])
+   (where (tuple t bool) (inst p b))])
 
 (define-metafunction reduction
   plug : C (tuple t bool) -> (tuple t bool)
