@@ -26,7 +26,7 @@
             (term (tuple (:left (:right x :hole) y) :true)))
 (test-equal (term (inst (:in-hole (:hide-hole (:cons (:cons x :hole) y)) (:hide-hole :hole)) (set)))
             (term (tuple (:left (:right x :hole) y) :false)))
-(test-equal (term (inst (in-hole
+(test-equal (term (inst (:in-hole
                          (:cons (:in-hole (:hide-hole (:cons (:cons x :hole) y)) (:hide-hole :hole))
                                 :hole)
                          z)
