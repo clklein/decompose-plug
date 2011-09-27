@@ -33,7 +33,7 @@
   [(inst (:in-hole r_1 r_2) b) 
    (plug C (inst r_2 b))
    ;; WARNING: result of 'inst' not necc. a C
-   (where (tuple C :true) (inst r_1 b))]
+   (where (tuple C bool) (inst r_1 b))]
   [(inst (:cons r_1 r_2) b)
    (join (inst r_1 b) (inst r_2 b))]
   [(inst (:app f r) b)
@@ -47,16 +47,16 @@
   plug : C (tuple t bool) -> (tuple t bool)
   [(plug :hole (tuple t bool)) (tuple t bool)]
   
-  [(plug (:left C_1 t_r) (tuple C_2 :true)) 
-   (tuple (:left C_3 t_r) :true)
-   (where (tuple C_3 :true) (plug C_1 (tuple C_2 :true)))]
+  [(plug (:left C_1 t_r) (tuple C_2 bool_1)) 
+   (tuple (:left C_3 t_r) (∨ bool_1 (has-context t_r)))
+   (where (tuple C_3 bool_2) (plug C_1 (tuple C_2 bool_1)))]
   [(plug (:left C_l t_r) (tuple t bool_1)) 
    (tuple (:cons t_l t_r) (∨ bool_2 (has-context t_r)))
    (where (tuple t_l bool_2) (plug C_l (tuple t bool_1)))]
   
-  [(plug (:right t_l C_1) (tuple C_2 :true)) 
-   (tuple (:right t_l C_3) :true)
-   (where (tuple C_3 :true) (plug C_1 (tuple C_2 :true)))]
+  [(plug (:right t_l C_1) (tuple C_2 bool_1)) 
+   (tuple (:right t_l C_3) (∨ bool_2 (has-context t_1)))
+   (where (tuple C_3 bool_2) (plug C_1 (tuple C_2 bool_1)))]
   [(plug (:right t_l C_r) (tuple t bool_1)) 
    (tuple (:cons t_l t_r) (∨ bool_2 (has-context t_1)))
    (where (tuple t_r bool_2) (plug C_r (tuple t bool_1)))])
