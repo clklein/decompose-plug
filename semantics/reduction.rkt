@@ -32,7 +32,6 @@
   [(inst (:var x) b) (tuple (lookup b x) (has-context (lookup b x)))]
   [(inst (:in-hole r_1 r_2) b) 
    (plug C (inst r_2 b))
-   ;; WARNING: result of 'inst' not necc. a C
    (where (tuple C bool) (inst r_1 b))]
   [(inst (:cons r_1 r_2) b)
    (join (inst r_1 b) (inst r_2 b))]
@@ -43,6 +42,25 @@
    (tuple t :false)
    (where (tuple t bool) (inst p b))])
 
+
+(define-metafunction reduction
+  plug : C (tuple t bool) -> (tuple t bool)
+  [(plug :hole (tuple t bool)) (tuple t bool)]
+  [(plug (:left C t_r) (tuple t bool)) 
+   (join (plug C (tuple t bool)) (tuple t_r :false))]
+  [(plug (:right t_l C) (tuple t bool)) 
+   (join (tuple t_l :false) (plug C (tuple t bool)))])
+
+#;
+(define-metafunction reduction
+  plug : C (tuple t bool) -> (tuple t bool)
+  [(plug :hole (tuple t bool)) (tuple t bool)]
+  [(plug (:left C t_r) (tuple t bool)) 
+   (join (plug C (tuple t bool)) (tuple t_r (has-context t_r)))]
+  [(plug (:right t_l C) (tuple t bool)) 
+   (join (tuple t_l (has-context t_l)) (plug C (tuple t bool)))])
+
+#;
 (define-metafunction reduction
   plug : C (tuple t bool) -> (tuple t bool)
   [(plug :hole (tuple t bool)) (tuple t bool)]
