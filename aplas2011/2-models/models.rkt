@@ -24,6 +24,8 @@
 
          cont-eq-red :cont-eq-red
          
+         left-rec-eval-ctxt :left-rec-eval-ctxt
+         
          Σ 
          subst subst-1 subst-A)
 
@@ -271,6 +273,14 @@
                (subst-vars (x_2 any_2) ... any_3))]
   [(subst-vars any) any])
 
+;; a left recursive definition of evaluation contexts
+(define-double-language left-rec-eval-ctxt :left-rec-eval-ctxt
+  (E (in-hole E (hole e))
+     (in-hole E (v hole))
+     hole)
+  (e (e e) (λ (x) e) x)
+  (v (λ (x) e))
+  (x variable-not-otherwise-mentioned))
 
 ;; --- an example that Casey and Robby came up with
 ;;     that illustrates why same said pair's idea for

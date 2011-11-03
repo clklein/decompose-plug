@@ -331,6 +331,24 @@
    (term (|+1| (|#| (|+1| (call/comp (λ (k) (k (k 0))))))))
    (term 4))
 
+;; tests of left recursive contexts
+(test-double-match #f :left-rec-eval-ctxt
+                   E
+                   hole
+                   (((E hole))))
+(test-double-match #f :left-rec-eval-ctxt
+                   E
+                   (hole ((λ (x) x) (λ (x) x)))
+                   (((E (hole ((λ (x) x) (λ (x) x)))))))
+(test-double-match #f :left-rec-eval-ctxt
+                   E
+                   ((λ (x) x) hole)
+                   (((E ((λ (x) x) hole)))))
+(test-double-match #f :left-rec-eval-ctxt
+                   E
+                   (((λ (x) x) (λ (x) x)) hole)
+                   #f)
+
 ;; tests of exotic relations discussed in section 5
 
 (test-double-reduction*

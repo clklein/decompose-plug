@@ -76,17 +76,9 @@
 (lesson "Contexts may be involved in no decompositions during a match")
 
 (example
- Λdk/red :Λdk/red ()
- (in-hole M (|#| (in-hole E (call/comp v))))
- (|+1| (|#| (|+1| (call/comp (λ (k) (k 2))))))
- #:out-of-memory? #t)
-
-(flush-examples)
-
-(example
- wacky :wacky ()
- C
- (f (f hole))
+ left-rec-eval-ctxt :left-rec-eval-ctxt (e v x)
+ E
+ ((λ (x) x) hole)
  #:out-of-memory? #t)
 
 (flush-examples)
