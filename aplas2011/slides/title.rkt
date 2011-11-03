@@ -258,7 +258,9 @@
      (t "Jay McCarthy")
      (t "Steven Jaconette")
      (t "Robby Findler")))
-  (define title (bt "Matching Contexts"))
+  (define title 
+    (vc-append (bt "A Semantics for Context-Sensitive")
+               (bt "Reduction Semantics")))
   (define title-info
     (colorize (inset 
                (vc-append 20 

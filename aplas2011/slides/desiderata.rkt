@@ -14,7 +14,7 @@
      "lifecycle")
     ("Focus on"
      "lightweight"
-     "verification"
+     "validation"
      "techniques")))
 
 (define (raw-bubble-pict strs)

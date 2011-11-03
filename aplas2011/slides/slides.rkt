@@ -4,7 +4,6 @@
          "title.rkt"
          "examples.rkt"
          "util.rkt"
-         "timeline.rkt"
          "simple-pattern.rkt"
          "desiderata.rkt"
          "redex-code-example.rkt"
@@ -17,8 +16,6 @@
 (desiderata)
 
 (a-redex-example)
-
-(timeline)
 
 (simple-pattern-overview)
 

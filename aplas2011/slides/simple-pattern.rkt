@@ -52,4 +52,4 @@
           (pat λ) "," (pat 17) "," (pat +))
     (list (pat (pat ...)) "match an interior node in a tree; one child per"
           (pat pat) "in the sequence")
-    (list (pat nt) "try all of the productions of" (pat nt)))))
+    (list (pat nt) "try all of the alternatives for" (pat nt)))))
