@@ -1,6 +1,8 @@
 #lang racket/base
 (require slideshow
          redex
+         racket/runtime-path
+         racket/draw
          "../2-models/util.rkt")
 (provide pat lesson render-sexp scale-up define-from over-there)
 
@@ -23,6 +25,8 @@
   (channel-put to-orig-param (list c thunk))
   (channel-get c))
 
+
+
 (literal-style "Inconsolata")
 (non-terminal-style (literal-style))
 (default-style (literal-style))
@@ -32,7 +36,37 @@
 (label-font-size (default-font-size))
 (metafunction-font-size (default-font-size))
 
+(define (clip-to w h p)
+  (inset/clip p 
+              0 0
+              (- w (pict-width p))
+              (- h (pict-height p))))
 
+(define-runtime-path pattern.png "pattern.png")
+(define tile (bitmap (read-bitmap pattern.png)))
+(define bkg
+  (cc-superimpose
+   (clip-to
+    1024 768
+    (apply hc-append
+           (make-list 6
+                      (apply vc-append
+                             (make-list 5 tile)))))
+   (cellophane (colorize (filled-rounded-rectangle
+                          (- 1024 margin)
+                          (- 768 margin)
+                          40
+                          ;#:draw-border? #f
+                          )
+                         "white")
+               .9)))
+
+(current-slide-assembler
+ (let ([c-a-s (current-slide-assembler)])
+   (λ (a b c)
+     (ct-superimpose (inset bkg (- margin))
+                     (c-a-s a b c)))))
+ 
 (define-syntax-rule (pat arg)
   (rr arg))
 
