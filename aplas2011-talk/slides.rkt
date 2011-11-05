@@ -7,7 +7,7 @@
          "simple-pattern.rkt"
          "desiderata.rkt"
          "redex-code-example.rkt"
-         "../2-models/models.rkt"
+         "../aplas2011/2-models/models.rkt"
          racket/runtime-path
          redex)
 
@@ -82,9 +82,9 @@
 
 (lesson "An algorithm must deal with cycles well")
 
-(define-runtime-path semantics/patterns.rkt "../../semantics/patterns.rkt")
-(define-runtime-path typeset-match-rules.rkt "../typeset-match-rules.rkt")
-(define-runtime-path common.rkt "../common.rkt")
+(define-runtime-path semantics/patterns.rkt "../semantics/patterns.rkt")
+(define-runtime-path typeset-match-rules.rkt "../aplas2011/typeset-match-rules.rkt")
+(define-runtime-path common.rkt "../aplas2011/common.rkt")
 
 (define-from patterns semantics/patterns.rkt)
 (define-from matches-schema typeset-match-rules.rkt)

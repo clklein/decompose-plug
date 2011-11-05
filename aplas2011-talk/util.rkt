@@ -3,7 +3,7 @@
          redex
          racket/runtime-path
          racket/draw
-         "../2-models/util.rkt")
+         "../aplas2011/2-models/util.rkt")
 (provide pat lesson render-sexp scale-up define-from over-there)
 
 (define to-orig-param (make-channel))
@@ -42,7 +42,7 @@
               (- w (pict-width p))
               (- h (pict-height p))))
 
-(define-runtime-path pattern.png "pattern.png")
+(define-runtime-path pattern.png "1927533.png")
 (define tile (bitmap (read-bitmap pattern.png)))
 (define bkg
   (cc-superimpose
@@ -59,7 +59,7 @@
                           ;#:draw-border? #f
                           )
                          "white")
-               .9)))
+               .8)))
 
 (current-slide-assembler
  (let ([c-a-s (current-slide-assembler)])

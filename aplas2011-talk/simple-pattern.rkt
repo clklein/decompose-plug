@@ -2,7 +2,7 @@
 (require slideshow
          redex
          "util.rkt"
-         "../2-models/models.rkt")
+         "../aplas2011/2-models/models.rkt")
 
 (provide simple-pattern-overview)
 

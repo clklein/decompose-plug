@@ -7,8 +7,8 @@
          racket/gui/base
          slideshow/code
          "util.rkt"
-         "../2-models/double.rkt"
-         "../2-models/models.rkt")
+         "../aplas2011/2-models/double.rkt"
+         "../aplas2011/2-models/models.rkt")
 (provide example flush-examples)
 
 (define-syntax-rule
