@@ -42,24 +42,27 @@
               (- w (pict-width p))
               (- h (pict-height p))))
 
-(define-runtime-path pattern.png "1927533.png")
+(define extra-margin 16)
+
+(define-runtime-path pattern.png "1944457.png")
 (define tile (bitmap (read-bitmap pattern.png)))
+
 (define bkg
   (cc-superimpose
    (clip-to
     1024 768
     (apply hc-append
-           (make-list 6
+           (make-list (ceiling (/ 1024 (pict-width tile)))
                       (apply vc-append
-                             (make-list 5 tile)))))
+                             (make-list (ceiling (/ 768 (pict-height tile))) 
+                                        tile)))))
    (cellophane (colorize (filled-rounded-rectangle
-                          (- 1024 margin)
-                          (- 768 margin)
+                          (- 1024 margin extra-margin)
+                          (- 768 margin extra-margin)
                           40
-                          ;#:draw-border? #f
-                          )
+                          #:draw-border? #f)
                          "white")
-               .8)))
+               .95)))
 
 (current-slide-assembler
  (let ([c-a-s (current-slide-assembler)])

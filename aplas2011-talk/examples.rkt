@@ -107,7 +107,11 @@
   (define input-pict (list-ref thunk-pair 1))
   (define button-label (inset (t "Run in Redex") 20 10))
   (clickback
-   (cc-superimpose (linewidth 10
+   (cc-superimpose (colorize (filled-rounded-rectangle (pict-width button-label) 
+                                                       (pict-height button-label)
+                                                       #:draw-border? #f)
+                             "white")
+                   (linewidth 10
                               (rounded-rectangle (pict-width button-label) 
                                                  (pict-height button-label)))
                    button-label)

@@ -226,7 +226,7 @@
 (define bw-title-background 
   (make-plt-title-background light-gray
                              light-gray
-                             white
+                             #f
                              white ; gray ; red
                              black 
                              'transparent))
@@ -274,8 +274,9 @@
   (define p
     (cc-superimpose
      wb-title-background
-     
      title-info))
+  
+  
     (slide (cc-superimpose 
             bw-title-background
             (clip (refocus p title-info)))))
