@@ -5,7 +5,10 @@
          "common.rkt"
          "../semantics/common.rkt"
          "../semantics/reduction.rkt")
-(provide rt render-reduction)
+(provide rt render-reduction
+         render-r-grammar
+         render-reduces
+         with-reduction-rewriters)
 
 (define (rewrite-reduces lws)
   (list ""
@@ -91,60 +94,67 @@
         (list '∧ rewrite-wedge)
         (list '∨ rewrite-vee)))
 
-(define-syntax-rule (with-rewriters expr)
+(define (with-reduction-rewriters thunk)
   (let loop ([rws compound-rewriters])
     (match rws
       ['() 
        (with-keyword-rewriters
-        (λ () expr))]
+        thunk)]
       [(cons (list name rewriter) rs)
        (with-compound-rewriter name rewriter (loop rs))])))
 
 (define (render-reduction)
-  (with-rewriters
-   (lt-superimpose
-    (ht-append
-     140
-     (parameterize ([metafunction-cases '(0)])
-       (render-judgment-form reduces))
-     (parameterize ([render-language-nts '(r)])
+  (with-reduction-rewriters
+   (λ ()
+     (lt-superimpose
+      (ht-append
+       140
+       (render-reduces)
        (frame
         (inset 
-         (vl-append
-          (render-language reduction)
-          (non-bnf-def "f" (arbitrary-function-domain "t" "t")))
-         4))))
-    
+         (render-r-grammar)
+         4)))
+      
+      (vl-append
+       20 
+       (blank 0 40)
+       (vl-append
+        (metafunction-signature "inst" "r" "b" (list "t" "bool"))
+        (parameterize (#;[metafunction-pict-style 'left-right/beside-side-conditions])
+          (render-metafunctions inst)))
+       
+       (vl-append
+        (metafunction-signature "plug" "C" (list "t" "bool") (list "t" "bool"))
+        (render-metafunctions plug))
+       
+       (vl-append
+        (metafunction-signature "join" (list "t" "bool") (list "t" "bool") (list "t" "bool"))
+        (parameterize ([metafunction-pict-style 'left-right/beside-side-conditions])
+          (render-metafunctions join)))
+       
+       (vl-append
+        (metafunction-signature "has-context" "t" "bool")
+        (render-metafunctions has-context))
+       
+       (vl-append
+        (metafunction-signature "δ" "(t → t)" "t" "t")
+        (text "An unspecified function that applies metafunctions"
+              (cons 'italic (default-style)))))
+      
+      #;
+      (parameterize ([relation-clauses-combine 
+                      (λ (l) (apply hbl-append 40 l))])
+        (render-judgment-form no-ctxts))))))
+
+(define (render-reduces)
+  (parameterize ([metafunction-cases '(0)])
+    (render-judgment-form reduces)))
+
+(define (render-r-grammar)
+  (parameterize ([render-language-nts '(r)])
     (vl-append
-     20 
-     (blank 0 40)
-     (vl-append
-      (metafunction-signature "inst" "r" "b" (list "t" "bool"))
-      (parameterize (#;[metafunction-pict-style 'left-right/beside-side-conditions])
-        (render-metafunctions inst)))
-     
-     (vl-append
-      (metafunction-signature "plug" "C" (list "t" "bool") (list "t" "bool"))
-      (render-metafunctions plug))
-     
-     (vl-append
-      (metafunction-signature "join" (list "t" "bool") (list "t" "bool") (list "t" "bool"))
-      (parameterize ([metafunction-pict-style 'left-right/beside-side-conditions])
-        (render-metafunctions join)))
-     
-     (vl-append
-      (metafunction-signature "has-context" "t" "bool")
-      (render-metafunctions has-context))
-     
-     (vl-append
-      (metafunction-signature "δ" "(t → t)" "t" "t")
-      (text "An unspecified function that applies metafunctions"
-            (cons 'italic (default-style)))))
-    
-    #;
-    (parameterize ([relation-clauses-combine 
-                    (λ (l) (apply hbl-append 40 l))])
-      (render-judgment-form no-ctxts)))))
+     (render-language reduction)
+     (non-bnf-def "f" (arbitrary-function-domain "t" "t")))))
 
 (define-syntax-rule (rt t) ; "reduction term"
   (with-rewriters (lw->pict reduction (to-lw t))))

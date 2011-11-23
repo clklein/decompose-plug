@@ -3,7 +3,8 @@
 (require (except-in slideshow #;printable<%>)
          racket/gui/base
          racket/class
-         racket/math)
+         racket/math
+         "util.rkt")
 
 (provide title)
 
@@ -19,6 +20,46 @@
 (define dark-red (make-object color% 100 0 0))
 (define gray (make-object color% 50 50 50))
 (define light-gray (make-object color% 150 150 150))
+
+(define (make-brush-bitmap bmp)
+  (define tile (bitmap bmp))
+  (define pict 
+    (clip-to
+     1024 768
+     (apply hc-append
+            (make-list (ceiling (/ 1024 (pict-width tile)))
+                       (apply vc-append
+                              (make-list (ceiling (/ 768 (pict-height tile))) 
+                                         tile))))))
+  (define bm (make-bitmap 1024 768))
+  (define bdc (make-object bitmap-dc% bm))
+  (draw-pict pict bdc 0 0)
+  (send bdc set-bitmap #f)
+  bm)
+
+(define (adjust-bitmap bmp f)
+  (define w (send bmp get-width))
+  (define h (send bmp get-height))
+  (define new-bmp (make-bitmap w h))
+  (define pixels (make-bytes (* w h 4)))
+  (send bmp get-argb-pixels 0 0 w h pixels)
+  (for ([i (in-range 0 (* 4 w h) 4)])
+    (define a (bytes-ref pixels i))
+    (define r (bytes-ref pixels (+ i 1)))
+    (define g (bytes-ref pixels (+ i 2)))
+    (define b (bytes-ref pixels (+ i 3)))
+    (define-values (a2 r2 g2 b2) (f a r g b))
+    (bytes-set! pixels i a2)
+    (bytes-set! pixels (+ i 1) r2)
+    (bytes-set! pixels (+ i 2) g2)
+    (bytes-set! pixels (+ i 3) b2))
+  (send new-bmp set-argb-pixels 0 0 w h pixels)
+  new-bmp)
+
+(define b-1925953 (read-bitmap "1925953.png"))
+(define violety (make-brush-bitmap b-1925953))
+(define redy (make-brush-bitmap (adjust-bitmap b-1925953 (λ (a r g b) (values a r g g)))))
+(define bluey (make-brush-bitmap (adjust-bitmap b-1925953 (λ (a r g b) (values a g g b)))))
 
 (define (with-dc-settings dc thunk)
   (let ([alpha (send dc get-alpha)]
@@ -158,6 +199,10 @@
               (plt-red-color dc)
               (send dc draw-path left-logo-path dx dy)
               (send dc draw-path bottom-logo-path dx dy)))]
+          [(is-a? plt-red-color brush%)
+           (send dc set-brush plt-red-color)
+           (send dc draw-path left-logo-path dx dy)
+           (send dc draw-path bottom-logo-path dx dy)]
           [else
            (send dc set-brush plt-red-color 'solid)
            (send dc draw-path left-logo-path dx dy)
@@ -184,6 +229,9 @@
             (λ ()
               (plt-blue-color dc) 
               (send dc draw-path right-logo-path dx dy)))]
+          [(is-a? plt-blue-color brush%)
+           (send dc set-brush plt-blue-color)
+           (send dc draw-path right-logo-path dx dy)]
           [else
            (send dc set-brush plt-blue-color 'solid)
            (send dc draw-path right-logo-path dx dy)])
@@ -224,8 +272,8 @@
                              plt-pen-style))
 
 (define bw-title-background 
-  (make-plt-title-background light-gray
-                             light-gray
+  (make-plt-title-background (make-object brush% "black" 'solid redy) ; light-gray
+                             (make-object brush% "black" 'solid bluey) ; light-gray
                              #f
                              white ; gray ; red
                              black 
@@ -277,6 +325,9 @@
      title-info))
   
   
-    (slide (cc-superimpose 
-            bw-title-background
-            (clip (refocus p title-info)))))
+  (slide 
+   (cc-superimpose 
+    bw-title-background
+    (clip (refocus p title-info)))))
+
+;(title)

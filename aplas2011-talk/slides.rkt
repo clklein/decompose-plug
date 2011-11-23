@@ -13,6 +13,11 @@
 
 (title)
 
+(slide
+ (scale/improve-new-text 
+  (pat (in-hole E | |))
+  4))
+
 (desiderata)
 
 (a-redex-example)
@@ -21,8 +26,8 @@
 
 (slide 
  (table 2
-        (list (t "the hole:") (scale (pat hole) 1.5)
-              (t "decomposition:") (scale (pat (in-hole pat pat)) 1.5))
+        (list (scale (pat hole) 1.5) (t "the hole") 
+              (scale (pat (in-hole pat pat)) 1.5) (t "decomposition") )
         (cons rc-superimpose lc-superimpose)
         cbl-superimpose
         40 40))
@@ -74,8 +79,8 @@
 
 (example
  left-rec-eval-ctxt :left-rec-eval-ctxt (e v x)
- E
- ((λ (x) x) hole)
+ (in-hole E (|+1| number))
+ ((λ (x) x) (|+1| 2))
  #:out-of-memory? #t)
 
 (flush-examples)
@@ -84,6 +89,7 @@
 
 (define-runtime-path semantics/patterns.rkt "../semantics/patterns.rkt")
 (define-runtime-path typeset-match-rules.rkt "../aplas2011/typeset-match-rules.rkt")
+(define-runtime-path typeset-reduction.rkt "../aplas2011/typeset-reduction.rkt")
 (define-runtime-path common.rkt "../aplas2011/common.rkt")
 
 (define-from patterns semantics/patterns.rkt)
@@ -92,20 +98,30 @@
 (define-from decomposes-schema typeset-match-rules.rkt)
 (define-from decomposes-rules typeset-match-rules.rkt)
 (define-from with-keyword-rewriters common.rkt)
+(define-from render-r-grammar typeset-reduction.rkt)
+(define-from render-reduces typeset-reduction.rkt)
+(define-from with-reduction-rewriters typeset-reduction.rkt)
 
-(slide
- (scale-up
-  (inset 
-   (vc-append 20
-              (hc-append 40
-                         matches-schema
-                         decomposes-schema)
-              (over-there
-               (λ () (parameterize ([render-language-nts '(p a t C)])
-                       (with-keyword-rewriters 
-                        (λ () 
-                          (render-language patterns)))))))
-   20)))
+(let ([t-nt
+       (λ (nt)
+         (over-there
+          (λ () (parameterize ([render-language-nts (list nt)])
+                  (with-keyword-rewriters 
+                   (λ () 
+                     (render-language patterns)))))))])
+  (slide
+   (scale-up
+    (inset 
+     (vc-append 40
+                (hc-append 40
+                           matches-schema
+                           decomposes-schema)
+                (ht-append
+                 20
+                 (t-nt 't)
+                 (t-nt 'p)
+                 (t-nt 'C)))
+     20))))
 
 (define rules1
   (vr-append matches-schema
@@ -118,3 +134,20 @@
 (slide (scale-up (cc-superimpose (ghost rules2) rules1)))
 
 (slide (scale-up (cc-superimpose (ghost rules1) rules2)))
+
+(slide (scale-up (over-there
+                  (λ ()
+                    (with-reduction-rewriters
+                     (λ ()
+                       (vc-append 
+                        40 
+                        (blank)
+                        (with-compound-rewriter
+                         'tuple  ;; hack to avoid showing 'inst' returning 2 values
+                         (λ (lws) (list (list-ref lws 2)))
+                         (render-reduces))
+                        (render-r-grammar)
+                        (blank)
+                        (blank))))))))
+
+(slide (scale/improve-new-text (t "Thank you.") 2))

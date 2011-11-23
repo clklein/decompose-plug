@@ -67,11 +67,17 @@
        (combine 1)
        (combine 2)
        (combine 3)))
+    
+    
+    ;; comment out the button
+    #;
     (slide
      (vl-append (rc-superimpose (blank (pict-width main) 0)
                                 (inset (mk-button thunk-pair)
                                        0 0 0 (- (pict-height (t "something")))))
-                main)))
+                main))
+    
+    (slide main))
   (set! examples-cache '())
   (set! example-thunks '()))
 
@@ -140,7 +146,8 @@
 ;                                                                                                                      
 
 
-(define e (parameterize ([sandbox-security-guard (current-security-guard)])
+(define e (parameterize ([sandbox-security-guard (current-security-guard)]
+                         [sandbox-memory-limit (* 2 (sandbox-memory-limit))])
             (make-evaluator 'racket
                             '(require redex))))
 

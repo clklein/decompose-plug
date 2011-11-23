@@ -4,7 +4,8 @@
          racket/runtime-path
          racket/draw
          "../aplas2011/2-models/util.rkt")
-(provide pat lesson render-sexp scale-up define-from over-there)
+(provide pat lesson render-sexp scale-up define-from over-there
+         clip-to)
 
 (define to-orig-param (make-channel))
 
@@ -25,8 +26,6 @@
   (channel-put to-orig-param (list c thunk))
   (channel-get c))
 
-
-
 (literal-style "Inconsolata")
 (non-terminal-style (literal-style))
 (default-style (literal-style))
@@ -44,7 +43,7 @@
 
 (define extra-margin 16)
 
-(define-runtime-path pattern.png "1944457.png")
+(define-runtime-path pattern.png "1925953.png")
 (define tile (bitmap (read-bitmap pattern.png)))
 
 (define bkg
@@ -97,5 +96,5 @@
   (lw->pict typesetting-lang (to-lw/stx (read-syntax #f p))))
 
 (define (scale-up p)
-  (scale p (min (/ client-w (pict-width p))
-                (/ client-h (pict-height p)))))
+  (scale p (min (/ (- client-w 12) (pict-width p))
+                (/ (- client-h 12) (pict-height p)))))
