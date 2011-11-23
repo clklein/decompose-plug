@@ -8,3 +8,13 @@ describing the semantics, including the paper's examples.
 
 The `pld-talk' contains the Slideshow source for Robby Findler's PLD
 2011 talk about the project.
+
+TODO: the semantics in figure 11 has been updated to deal with
+'hide-hole', but the running text hasn't. The current Casey/Robby
+consensus is that if we get cons chaperones, then the model in the
+paper is what we should do in Redex proper. If not, then Casey
+believes that we want something closer to the version of Redex in 5.2,
+which doesn't have explicit paths in the contexts, but instead
+requires searching for the hole to determine if something is a
+context. The advantage being that 'match' still works for processing
+terms (using quasiquote patterns).
