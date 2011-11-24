@@ -47,12 +47,28 @@
 (define b-1925953 (read-bitmap pattern.png))
 (define tile (bitmap b-1925953))
 
+(define bkg-pict
+  (dc
+   (λ (dc dx dy)
+     (define brush (send dc get-brush))
+     (define pen (send dc get-pen))
+     (send dc set-brush (new brush%
+                             [stipple b-1925953]
+                             [transformation (assembler-transformation)]))
+     (send dc set-pen "black" 1 'transparent)
+     (send dc draw-rectangle dx dy 1024 768)
+     (send dc set-brush brush)
+     (send dc set-pen pen))
+   1024 768))
+
 (define bkg
   (cc-superimpose
+   bkg-pict
+   #;
    (clip-to
     1024 768
     (apply hc-append
-           (make-list (ceiling (/ 1024 (pict-width tile)))
+           (make-list 
                       (apply vc-append
                              (make-list (ceiling (/ 768 (pict-height tile))) 
                                         tile)))))
