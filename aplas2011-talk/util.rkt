@@ -5,7 +5,7 @@
          racket/draw
          "../aplas2011/2-models/util.rkt")
 (provide pat lesson render-sexp scale-up define-from over-there
-         clip-to)
+         clip-to assembler-transformation b-1925953)
 
 (define to-orig-param (make-channel))
 
@@ -44,7 +44,8 @@
 (define extra-margin 16)
 
 (define-runtime-path pattern.png "1925953.png")
-(define tile (bitmap (read-bitmap pattern.png)))
+(define b-1925953 (read-bitmap pattern.png))
+(define tile (bitmap b-1925953))
 
 (define bkg
   (cc-superimpose
@@ -66,9 +67,18 @@
 (current-slide-assembler
  (let ([c-a-s (current-slide-assembler)])
    (λ (a b c)
-     (ct-superimpose (inset bkg (- margin))
-                     (c-a-s a b c)))))
- 
+     (define pict
+       (ct-superimpose (inset bkg (- margin))
+                       (c-a-s a b c)))
+     (define drawer (make-pict-drawer pict))
+     (dc
+      (λ (dc dx dy)
+        (parameterize ([assembler-transformation (send dc get-transformation)])
+          (drawer dc dx dy)))
+      (pict-width pict)
+      (pict-height pict)))))
+(define assembler-transformation (make-parameter #f))
+
 (define-syntax-rule (pat arg)
   (rr arg))
 

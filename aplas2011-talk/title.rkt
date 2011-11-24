@@ -56,7 +56,6 @@
   (send new-bmp set-argb-pixels 0 0 w h pixels)
   new-bmp)
 
-(define b-1925953 (read-bitmap "1925953.png"))
 (define violety (make-brush-bitmap b-1925953))
 (define redy (make-brush-bitmap (adjust-bitmap b-1925953 (λ (a r g b) (values a r g g)))))
 (define bluey (make-brush-bitmap (adjust-bitmap b-1925953 (λ (a r g b) (values a g g b)))))
@@ -176,22 +175,11 @@
         ;; Draw red regions
         (cond
           [(is-a? plt-red-color bitmap%)
-           (let ([rgn1 (new region% [dc dc])]
-                 [rgn2 (new region% [dc dc])])
-             (send rgn1 set-path left-logo-path dx dy #;#;(- dx 150) (- dy 20))
-             (send rgn2 set-path bottom-logo-path dx dy #;#; (- dx 150) (- dy 20))
-             (send rgn2 union rgn1)
-             (send dc set-clipping-region rgn2)
-             
-             ;; the left and top values of the bounding box seem to change over time,
-             ;; so I've just put reasonable numbers below.
-             (let-values ([(sw sh) (send dc get-scale)])
-               (send dc set-scale 1 1)
-               (send dc draw-bitmap plt-red-color 220 100)
-               (send dc set-scale sw sh)))
-           (send dc set-clipping-region old-clip)
-           (cleanup-edges left-logo-path dc dx dy)
-           (cleanup-edges bottom-logo-path dc dx dy)]
+           (send dc set-brush (new brush% 
+                                   [stipple plt-red-color]
+                                   [transformation (assembler-transformation)]))
+           (send dc draw-path left-logo-path dx dy)
+           (send dc draw-path bottom-logo-path dx dy)]
           [(procedure? plt-red-color)
            (with-dc-settings 
             dc
@@ -199,10 +187,6 @@
               (plt-red-color dc)
               (send dc draw-path left-logo-path dx dy)
               (send dc draw-path bottom-logo-path dx dy)))]
-          [(is-a? plt-red-color brush%)
-           (send dc set-brush plt-red-color)
-           (send dc draw-path left-logo-path dx dy)
-           (send dc draw-path bottom-logo-path dx dy)]
           [else
            (send dc set-brush plt-red-color 'solid)
            (send dc draw-path left-logo-path dx dy)
@@ -211,27 +195,16 @@
         ;; Draw blue region
         (cond
           [(is-a? plt-blue-color bitmap%)
-           (let ([rgn (new region% [dc dc])])
-             (send rgn set-path right-logo-path dx dy #;#; (- dx 150) (- dy 20))
-             (send dc set-clipping-region rgn)
-             
-             ;; the left and top values of the bounding box seem to change over time,
-             ;; so I've just put reasonable numbers below.
-             (let-values ([(sw sh) (send dc get-scale)])
-               (send dc set-scale 1 1)
-               (send dc draw-bitmap plt-blue-color 430 50)
-               (send dc set-scale sw sh))
-             (send dc set-clipping-region old-clip)
-             (cleanup-edges right-logo-path dc dx dy))]
+           (send dc set-brush (new brush% 
+                                   [stipple plt-blue-color]
+                                   [transformation (assembler-transformation)]))
+           (send dc draw-path right-logo-path dx dy)]
           [(procedure? plt-blue-color)
            (with-dc-settings 
             dc
             (λ ()
               (plt-blue-color dc) 
               (send dc draw-path right-logo-path dx dy)))]
-          [(is-a? plt-blue-color brush%)
-           (send dc set-brush plt-blue-color)
-           (send dc draw-path right-logo-path dx dy)]
           [else
            (send dc set-brush plt-blue-color 'solid)
            (send dc draw-path right-logo-path dx dy)])
@@ -272,8 +245,8 @@
                              plt-pen-style))
 
 (define bw-title-background 
-  (make-plt-title-background (make-object brush% "black" 'solid redy) ; light-gray
-                             (make-object brush% "black" 'solid bluey) ; light-gray
+  (make-plt-title-background redy ; light-gray
+                             bluey ; light-gray
                              #f
                              white ; gray ; red
                              black 
@@ -329,5 +302,3 @@
    (cc-superimpose 
     bw-title-background
     (clip (refocus p title-info)))))
-
-;(title)
