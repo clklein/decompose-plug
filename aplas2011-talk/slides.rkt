@@ -50,6 +50,17 @@
 
 (lesson "Contexts must support multiple ways to decompose each expression form (app in this case)")
 
+
+(example
+ left-rec-eval-ctxt :left-rec-eval-ctxt (e v x)
+ (in-hole E (|+1| number))
+ ((λ (x) x) (|+1| 2))
+ #:out-of-memory? #t)
+
+(flush-examples)
+
+(lesson "An algorithm must deal with cycles well")
+
 (example
  Λneed/red :Λneed/red (A v)
  (in-hole E (|+1| number))
@@ -76,16 +87,6 @@
 (flush-examples)
 
 (lesson "Contexts may be involved in no decompositions during a match")
-
-(example
- left-rec-eval-ctxt :left-rec-eval-ctxt (e v x)
- (in-hole E (|+1| number))
- ((λ (x) x) (|+1| 2))
- #:out-of-memory? #t)
-
-(flush-examples)
-
-(lesson "An algorithm must deal with cycles well")
 
 (define-runtime-path semantics/patterns.rkt "../semantics/patterns.rkt")
 (define-runtime-path typeset-match-rules.rkt "../aplas2011/typeset-match-rules.rkt")
