@@ -27,6 +27,17 @@
       x)
    (x variable-not-otherwise-mentioned)))
 
+(define language-inside
+  (code (e (e e)
+           (λ (x) e)
+           (+ e e)
+           x)))
+(define language-outside
+  (code (define-language Λ
+          #,language-inside
+          (x variable-not-otherwise-mentioned))))
+  
+  
 (with-pict
  extended-lang-pict
  (define-extended-language Λ/red Λ
@@ -62,18 +73,43 @@
                           (thunk)))
 
 (define (a-redex-example)
-  (slide
-   (hc-append
-    40 
-    (scale (vl-append (render-language Λ #:nts (remove 'x (language-nts Λ)))
-                      (render-language Λ/red))
-           2/3)
+  (define lang-code-total
     (scale (vl-append 40
                       (vl-append (tt "#lang racket")
                                  (tt "(require redex)"))
                       lang-pict
                       extended-lang-pict)
-           .8)))
+           .8))
+  
+  (define math-lang (vl-append (scale (ghost (code abc)) .8)
+                               (scale (render-language Λ #:nts (remove 'x (language-nts Λ)))
+                                      .6)))
+  (define math-extended-lang (scale (render-language Λ/red)
+                                    .6))
+  
+  (define beside-offset (+ (max (pict-width math-lang)
+                                (pict-width math-extended-lang))
+                           20))
+  (define (add-beside in-pict
+                      new-pict
+                      main)
+    (define-values (dx dy) (lt-find main in-pict))
+    (pin-over main
+              (- beside-offset)
+              dy
+              new-pict))
+                      
+  
+  (slide
+   (panorama
+    (add-beside 
+     extended-lang-pict
+     math-extended-lang
+     (add-beside 
+      lang-pict
+      math-lang
+      lang-code-total))))
+               
   
   (slide
    (scale (with-subst-rewrite
