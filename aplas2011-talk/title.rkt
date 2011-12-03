@@ -11,6 +11,8 @@
 (define white (make-object color% 255 255 255))
 (define black (make-object color% 0 0 0))
 (define gray (make-object color% 50 50 50))
+(define deep-purple (make-object color% 51 0 102))
+(define shallow-purple (make-object color% 204 153 255))
 
 (define (make-brush-bitmap bmp)
   (define tile (bitmap bmp))
@@ -50,6 +52,13 @@
 (define violety (make-brush-bitmap b-1925953))
 (define redy (make-brush-bitmap (adjust-bitmap b-1925953 (λ (a r g b) (values a r g g)))))
 (define bluey (make-brush-bitmap (adjust-bitmap b-1925953 (λ (a r g b) (values a g g b)))))
+(define deep-violety 
+  (make-brush-bitmap (adjust-bitmap b-1925953 (λ (a r g b) 
+                                                (define (adj n) (round (* n 1/2)))
+                                                (values a 
+                                                        (adj r)
+                                                        (adj g)
+                                                        (adj b))))))
 
 (define (with-dc-settings dc thunk)
   (let ([alpha (send dc get-alpha)]
@@ -217,12 +226,28 @@
           (send dc set-brush brush)
           (send dc set-alpha alpha))))
     
+    (define bkg
+      (cond
+        [(is-a? plt-background-color bitmap%)
+         (dc
+          (λ (dc dx dy)
+            (with-dc-settings
+             dc
+             (λ ()
+               (send dc set-brush (new brush% 
+                                       [stipple plt-red-color]
+                                       [transformation (assembler-transformation)]))
+               (send dc set-pen "black" 1 'transparent)
+               (send dc draw-rectangle dx dy client-w client-h))))
+          client-w client-h)]
+        [plt-background-color
+         (colorize (filled-rectangle client-w client-h)
+                    plt-background-color)]
+        [else (blank client-w client-h)]))
+    
     ((if clip? clip values)
      (pin-over
-      (if plt-background-color
-          (colorize (filled-rectangle client-w client-h)
-                    plt-background-color)
-          (blank client-w client-h))
+      bkg
       320
       50
       (scale (dc paint-plt 630 630 0 0) 12/10)))))
@@ -236,12 +261,12 @@
                              'transparent))
 
 (define wb-title-background 
-  (make-plt-title-background black
+  (make-plt-title-background deep-violety ; deep-purple
+                             deep-violety
+                             deep-violety
                              black
                              black
-                             gray
-                             gray 
-                             'solid))
+                             'transparent))
 
 (define (title)
   (define names 
