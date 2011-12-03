@@ -8,18 +8,9 @@
 
 (provide title)
 
-(define plt-red-color (make-object color% 242 183 183))
-(define plt-blue-color (make-object color% 183 202 242))
-(define plt-background-color (make-object color% 209 220 248))
-(define plt-lambda-color (send the-color-database find-color "white"))
-(define plt-pen-color "black")
-(define plt-pen-style 'transparent)
 (define white (make-object color% 255 255 255))
 (define black (make-object color% 0 0 0))
-(define red (make-object color% 255 0 0))
-(define dark-red (make-object color% 100 0 0))
 (define gray (make-object color% 50 50 50))
-(define light-gray (make-object color% 150 150 150))
 
 (define (make-brush-bitmap bmp)
   (define tile (bitmap bmp))
@@ -236,14 +227,6 @@
       50
       (scale (dc paint-plt 630 630 0 0) 12/10)))))
 
-(define plt-title-background 
-  (make-plt-title-background plt-red-color
-                             plt-blue-color 
-                             plt-background-color
-                             plt-lambda-color
-                             plt-pen-color 
-                             plt-pen-style))
-
 (define bw-title-background 
   (make-plt-title-background redy ; light-gray
                              bluey ; light-gray
@@ -259,17 +242,6 @@
                              gray
                              gray 
                              'solid))
-
-(define (paleize p)
-  (refocus (cc-superimpose 
-            p
-            (cellophane 
-             (colorize (filled-rectangle (pict-width p)
-                                         (pict-height p)
-                                         #:draw-border? #f)
-                       "white")
-             .6))
-           p))
 
 (define (title)
   (define names 
@@ -296,7 +268,6 @@
     (cc-superimpose
      wb-title-background
      title-info))
-  
   
   (slide 
    (cc-superimpose 
