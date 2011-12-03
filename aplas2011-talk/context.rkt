@@ -2,6 +2,7 @@
 (require (prefix-in 2: 2htdp/image)
          slideshow
          (only-in mrlib/image-core render-image)
+         redex/pict
          "util.rkt")
 (provide context-picture)
 
@@ -23,11 +24,15 @@
    (label (i->p (2:triangle 300 'outline (2:pen "black" 20 "solid" "round" "round")))
           C)
    ((if e? values ghost)
-    (label (i->p (2:triangle 100 'outline (2:pen "black" 20 "solid" "round" "round")))
-           e))))
+    (colorize
+     (label (i->p (2:triangle 100 'outline (2:pen "red" 20 "solid" "round" "round")))
+            e)
+     "red"))))
 
 (define decomp
-  (scale (pat (in-hole pat_1 pat_2)) 1.5))
+  (with-atomic-rewriter
+   'specialpat (λ () (colorize (pat pat_2) "red"))
+   (scale (pat (in-hole pat_1 specialpat)) 1.5)))
 
 (define (stage-context-picture tri2)
   (slide 
@@ -48,7 +53,7 @@
                                 (triangle-context #t) 
                                 (vc-append
                                  (hbl-append (t "then match ")
-                                             e
+                                             (colorize e "red")
                                              (t " against"))
                                  (t "the spot where the hole went"))))))))
 (define (context-picture)
