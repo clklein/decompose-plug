@@ -29,33 +29,44 @@
             e)
      "red"))))
 
-(define decomp
+(define (decomp red1? red2?)
   (with-atomic-rewriter
-   'specialpat (λ () (colorize (pat pat_2) "red"))
-   (scale (pat (in-hole pat_1 specialpat)) 1.5)))
+   'specialpat1 
+   (λ () (if red1?
+             (colorize (pat pat_1) "red")
+             (pat pat_1)))
+   (with-atomic-rewriter
+    'specialpat2 
+    (λ () (if red2?
+              (colorize (pat pat_2) "red")
+              (pat pat_2)))
+    (scale (pat (in-hole specialpat1 specialpat2)) 1.5))))
 
-(define (stage-context-picture tri2)
+(define (stage-context-picture tri2 body red1? red2?)
   (slide 
    (vl-append 120 
-              (hbl-append (t "to match ") 
-                          decomp
-                          (t ","))
-              (ht-append
-               60
-               (vc-append 10
-                          (triangle-context #f) 
-                          (vc-append
-                           (hbl-append (t "first match ")
-                                       C
-                                       (t ", treating"))
-                           (t "the hole as a wildcard,")))
-               (tri2 (vc-append 10
-                                (triangle-context #t) 
-                                (vc-append
-                                 (hbl-append (t "then match ")
-                                             (colorize e "red")
-                                             (t " against"))
-                                 (t "the spot where the hole went"))))))))
+              (hbl-append (t "to match ")
+                          (decomp red1? red2?)
+                          (body (t ",")))
+              (body
+               (ht-append
+                60
+                (vc-append 10
+                           (triangle-context #f) 
+                           (vc-append
+                            (hbl-append (t "first match ")
+                                        C
+                                        (t ", treating"))
+                            (t "the hole as a wildcard,")))
+                (tri2 (vc-append 10
+                                 (triangle-context #t) 
+                                 (vc-append
+                                  (hbl-append (t "then match ")
+                                              (colorize e "red")
+                                              (t " against"))
+                                  (t "the spot where the hole went")))))))))
+
 (define (context-picture)
-  (stage-context-picture ghost)
-  (stage-context-picture values))
+  (stage-context-picture ghost ghost #f #f)
+  (stage-context-picture ghost values #t #f)
+  (stage-context-picture values values #f #t))

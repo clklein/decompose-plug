@@ -50,7 +50,6 @@
 
 (lesson "Contexts must support multiple ways to decompose each expression form (app in this case)")
 
-
 (example
  left-rec-eval-ctxt :left-rec-eval-ctxt (e v x)
  (in-hole E (|+1| number))
