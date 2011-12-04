@@ -4,7 +4,8 @@
          (only-in mrlib/image-core render-image)
          redex/pict
          "util.rkt")
-(provide context-picture)
+(provide context-picture
+         contexts-above)
 
 (define (i->p i)
   (dc (λ (dc dx dy)
@@ -19,10 +20,10 @@
   (refocus (vc-append 10  p2 p1)
            p1))
 
-(define (triangle-context e?)
+(define (triangle-context e? upper-label?)
   (cb-superimpose
    (label (i->p (2:triangle 300 'outline (2:pen "black" 20 "solid" "round" "round")))
-          C)
+          (if upper-label? C (ghost C)))
    ((if e? values ghost)
     (colorize
      (label (i->p (2:triangle 100 'outline (2:pen "red" 20 "solid" "round" "round")))
@@ -52,14 +53,14 @@
                (ht-append
                 60
                 (vc-append 10
-                           (triangle-context #f) 
+                           (triangle-context #f #t) 
                            (vc-append
                             (hbl-append (t "first match ")
                                         C
                                         (t ", treating"))
                             (t "the hole as a wildcard,")))
                 (tri2 (vc-append 10
-                                 (triangle-context #t) 
+                                 (triangle-context #t #t) 
                                  (vc-append
                                   (hbl-append (t "then match ")
                                               (colorize e "red")
@@ -70,3 +71,9 @@
   (stage-context-picture ghost ghost #f #f)
   (stage-context-picture ghost values #t #f)
   (stage-context-picture values values #f #t))
+
+(define (contexts-above)
+  (vc-append
+   40
+   (triangle-context #f #t)
+   (triangle-context #t #f)))

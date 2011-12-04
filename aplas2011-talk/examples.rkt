@@ -53,12 +53,13 @@
                thunk)])
     (set! example-thunks (append example-thunks (list (list t input-pict) (list t input-pict))))))
 
-(define (flush-examples)
+(define (flush-examples [adjust (λ (i p) (list p))])
   (when (null? examples-cache)
     (error 'flush-examples "not examples saved"))
   (define backgrounds (map (λ (l) (launder (ghost (apply cc-superimpose l)))) (transpose examples-cache)))
   (for ([example (in-list examples-cache)]
-        [thunk-pair (in-list example-thunks)])
+        [thunk-pair (in-list example-thunks)]
+        [i (in-naturals)])
     (define (combine i) (lt-superimpose (list-ref example i) (list-ref backgrounds i)))
     (define main
       (vl-append
@@ -76,8 +77,8 @@
                                 (inset (mk-button thunk-pair)
                                        0 0 0 (- (pict-height (t "something")))))
                 main))
-    
-    (slide main))
+    (for ([slide-pict (in-list (adjust i main))])
+      (slide slide-pict)))
   (set! examples-cache '())
   (set! example-thunks '()))
 

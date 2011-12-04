@@ -56,7 +56,13 @@
  ((λ (x) x) (|+1| 2))
  #:out-of-memory? #t)
 
-(flush-examples)
+(flush-examples
+ (λ (i p)
+   (if (= i 1)
+       (list p
+             (rt-superimpose p (scale (contexts-above) 2/3)))
+       (list p))))
+   
 
 (lesson "An algorithm must deal with cycles well")
 
@@ -71,9 +77,9 @@
  ((λ (x) (|+1| x)) (|+1| 3)))
 
 (flush-examples)
-;; This is another example of the previous lesson.
 (lesson "Finding a decomposition may require other, unrelated decompositions")
 
+#|
 (example
  Λk/red :Λk/red ()
  (in-hole E (call/cc v))
@@ -86,6 +92,7 @@
 (flush-examples)
 
 (lesson "Contexts may be involved in no decompositions during a match")
+|#
 
 (define-runtime-path semantics/patterns.rkt "../semantics/patterns.rkt")
 (define-runtime-path typeset-match-rules.rkt "../aplas2011/typeset-match-rules.rkt")
