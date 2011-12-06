@@ -112,10 +112,25 @@
                
   
   (slide
-   (scale (with-subst-rewrite
-           (λ ()
-             (render-reduction-relation red #:style 'horizontal)))
-          2/3)
+   (parameterize ([white-bracket-sizing 
+                   (λ (str size)
+                     (let ([inset-amt 18])
+                       (cond
+                         [(equal? str "[")
+                          (values inset-amt
+                                  0
+                                  0
+                                  (/ inset-amt 2))]
+                         [else
+                          (values 0
+                                  inset-amt
+                                  (/ inset-amt 2)
+                                  0)])))])
+     (scale/improve-new-text
+      (with-subst-rewrite
+       (λ ()
+         (render-reduction-relation red #:style 'horizontal)))
+      2/3))
    
    (blank)
    
