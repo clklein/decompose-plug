@@ -119,15 +119,9 @@
   (slide
    (scale-up
     (inset 
-     (vc-append 40
-                (hc-append 40
-                           matches-schema
-                           decomposes-schema)
-                (ht-append
-                 20
-                 (t-nt 't)
-                 (t-nt 'p)
-                 (t-nt 'C)))
+     (hc-append 40
+                matches-schema
+                decomposes-schema)
      20))))
 
 (define rules1
